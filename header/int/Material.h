@@ -18,6 +18,8 @@ struct Material{
 	
 	GLuint textureUniform;
 	
+	Material(void);
+
 	Material(string _shaderName);
 	
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);

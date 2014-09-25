@@ -5,7 +5,7 @@
 
 using std::vector; using std::string;
 
-struct Triangle{
+struct Face{
 	int v0;
 	int v1;
 	int v2;
@@ -14,8 +14,8 @@ struct Triangle{
 	Vector2 uv1;
 	Vector2 uv2;
 	
-	Triangle();
-	Triangle(int _v0, int _v1, int _v2);
+	Face();
+	Face(int _v0, int _v1, int _v2);
 };
 
 struct Vertex{
@@ -29,7 +29,7 @@ struct Vertex{
 
 struct Model{
 	vector<Vertex> vertices;
-	vector<Triangle> faces;
+	vector<Face> faces;
 	
 	Model(void);
 	Model(const Model& model);
@@ -42,6 +42,6 @@ struct Model{
 
 Vertex ParseVertexLine(string line);
 
-Triangle ParseFaceLine(string line);
+Face ParseFaceLine(string line);
 
 vector<string> SplitStringByDelimiter(string searchIn, string delimiter);

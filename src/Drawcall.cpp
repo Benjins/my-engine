@@ -1,4 +1,9 @@
-#include "../include/int/Drawcall.h"
+#include "../header/int/Drawcall.h"
+#include "../header/int/Material.h"
+#include "../header/int/Texture.h"
+
+#include "GL/glew.h"
+#include "GL/glut.h"
 
 DrawCall::DrawCall(const Model& model, Material* mat){
 	int size = model.faces.size() * 3;
@@ -6,7 +11,7 @@ DrawCall::DrawCall(const Model& model, Material* mat){
 	vector<Vector2> uvCoords;
 
     for(int i = 0; i < model.faces.size(); i++){
-		Triangle face = model.faces[i];
+		Face face = model.faces[i];
 		
 		Vertices.push_back(model.vertices[face.v2-1].position);
 		Vertices.push_back(model.vertices[face.v1-1].position);
@@ -44,11 +49,11 @@ void DrawCall::Draw() const{
 	glBindBuffer(GL_ARRAY_BUFFER, uvs);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	
-	mat->mainTexture->Bind(GL_TEXTURE0);
+	material->mainTexture->Bind(GL_TEXTURE0);
 	
 	glDrawArrays(GL_TRIANGLES, 0, vertCount);
 	
-	glDisbleVertexAttribArray(0);
-	glDisbleVertexAttribArray(1);
-	glDisbleVertexAttribArray(2);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
 }

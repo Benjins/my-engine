@@ -4,19 +4,19 @@
 
 using std::ifstream; using std::cout; using std::cerr;
 
-Material::Material(){
+Material::Material(void){
 }
 
 Material::Material(string _shaderName){
 	shaderProgram = glCreateProgram();
 	shaderName = _shaderName;
 	
-	vShaderText = fShaderText = ""; 
+	vshaderText = fshaderText = ""; 
 	
-	if(ReadFile(_shaderName + ".vs", vShaderText) 
-	&& ReadFile(_shaderName + ".fs", fShaderText)){
-		AddShader(shaderProgram, vShaderText.c_str(), GL_VERTEX_SHADER);
-		AddShader(shaderProgram, fShaderText.c_str(), GL_FRAGMENT_SHADER);
+	if(ReadFile(_shaderName + ".vs", vshaderText) 
+	&& ReadFile(_shaderName + ".fs", fshaderText)){
+		AddShader(shaderProgram, vshaderText.c_str(), GL_VERTEX_SHADER);
+		AddShader(shaderProgram, fshaderText.c_str(), GL_FRAGMENT_SHADER);
 		
 		glLinkProgram(shaderProgram);
 		glValidateProgram(shaderProgram);
@@ -48,7 +48,7 @@ bool ReadFile(string fileName, string& readInto){
 	if (fileIn.is_open()) {
         string line;
         while(!fileIn.eof()) {
-			getline(fileIn, line)
+			getline(fileIn, line);
             readInto.append(line);
             readInto.append("\n");
         }

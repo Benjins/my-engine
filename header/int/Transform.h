@@ -14,7 +14,7 @@ struct SC_Transform{
 	SC_Transform* parent;
 	
 	SC_Transform();
-    SC_Transform(const Vector3& _position, const Quaternion& _rotation, const Vector3& _scale, const SC_Transform& _parent = NULL);
+    SC_Transform(const Vector3& _position, const Quaternion& _rotation, const Vector3& _scale, SC_Transform* _parent = NULL);
 	
 	Vector3 Forward() const;
 	Vector3 Up() const;

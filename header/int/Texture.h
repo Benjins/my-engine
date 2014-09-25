@@ -6,6 +6,8 @@
 
 using std::string;
 
+struct RGBApixel;
+
 struct Texture{
 	//mip maps
 	//bilinear
@@ -14,17 +16,18 @@ struct Texture{
 	string fileName;
 	GLenum textureTarget;
     GLuint textureObj;
+
+	RGBApixel** pixelData;
+	int width;
+	int height;
 	
 	Texture(GLenum TextureTarget, const string& FileName);
 
-    void Load();
+    void Load(void);
 
     void Bind(GLenum TextureUnit);
 
-private:
-    std::string m_fileName;
-    GLenum m_textureTarget;
-    GLuint m_textureObj;
+	~Texture();
 };
 
 

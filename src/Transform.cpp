@@ -8,11 +8,11 @@ SC_Transform::SC_Transform(){
 	parent = NULL;
 }
 
-SC_Transform::SC_Transform(const Vector3& _position, const Quaternion& _rotation, const Vector3& _scale, const SC_Transform& _parent){
+SC_Transform::SC_Transform(const Vector3& _position, const Quaternion& _rotation, const Vector3& _scale, SC_Transform* _parent){
 	position  = _position;
 	rotation  = _rotation;
 	scale     = _scale;
-	parent    = &_parent;
+	parent    = _parent;
 }
 
 Vector3 SC_Transform::Forward() const{

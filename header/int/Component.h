@@ -4,9 +4,7 @@
 struct GameObject;
 
 struct Component{
-  protected: 
 	const static bool isComponent = true;
-  public:
 	GameObject* gameObject;
 	
 	Component();

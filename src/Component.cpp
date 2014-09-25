@@ -10,6 +10,6 @@ void Component::OnAwake(){
 void Component::OnUpdate(){
 }
 
-void Component::~Component(){
+Component::~Component(){
 	
 }

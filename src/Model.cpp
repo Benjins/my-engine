@@ -6,11 +6,11 @@
 
 using std::ifstream; using std::cerr; using std::cout; using std::endl;
 
-Triangle::Triangle(void){
+Face::Face(void){
 	v0 = v1 = v2 = -1;
 }
 
-Triangle::Triangle(int _v0, int _v1, int _v2){
+Face::Face(int _v0, int _v1, int _v2){
 	v0 = _v0;
 	v1 = _v1;
 	v2 = _v2;
@@ -29,7 +29,7 @@ Model::Model(){
 }
 
 int Model::GLVertexCount() const{
-	return face.size() * 3;
+	return faces.size() * 3;
 }
 
 Model::Model(const Model& model){
@@ -89,14 +89,14 @@ Vertex ParseVertexLine(string line){
 	}
 }
 
-Triangle ParseFaceLine(string line){
+Face ParseFaceLine(string line){
 	vector<string> tokens = SplitStringByDelimiter(line, " ");
 	
 	if(tokens.size() != 4){
-		return Triangle();
+		return Face();
 	}
 	else{
-		return Triangle(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), atoi(tokens[3].c_str()));
+		return Face(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), atoi(tokens[3].c_str()));
 	}
 }
 
