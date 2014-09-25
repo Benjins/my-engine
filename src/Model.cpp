@@ -23,17 +23,6 @@ Vertex::Vertex(void){
 
 Vertex::Vertex(Vector3 _position){
 	position = _position;
-	
-	float cols[3];
-	
-	for(int i = 0; i < 3; i++){
-		int x = rand();
-		x = x % 1000;
-		double y = ((double)x)/1000;
-		cols[i] = y;
-	}
-	
-	color = Vector3(cols[0], cols[1], cols[2]);
 }
 
 Model::Model(){

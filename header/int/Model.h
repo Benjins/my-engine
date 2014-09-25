@@ -18,6 +18,15 @@ struct Triangle{
 	Triangle(int _v0, int _v1, int _v2);
 };
 
+struct Vertex{
+	Vector3 position;
+	Vector3 color;
+	//Vector3 uv;
+	
+	Vertex(void);
+	Vertex(Vector3 _position);
+};
+
 struct Model{
 	vector<Vertex> vertices;
 	vector<Triangle> faces;

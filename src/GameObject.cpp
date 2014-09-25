@@ -17,7 +17,7 @@ int GameObject::GLVertexCount() const{
 		return 0;
 	}
 	else{
-		return mesh.GLVerteCount();
+		return mesh->GLVertexCount();
 	}
 }
 

@@ -30,3 +30,5 @@ out/*
 
 #misc
 EngineNP++Work.txt
+*.vcxproj
+*.vcxproj.filters
