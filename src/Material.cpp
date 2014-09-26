@@ -25,8 +25,11 @@ Material::Material(string _shaderName, string textureName){
 		glValidateProgram(shaderProgram);
 		
 		if(textureName != ""){
+			cout << "mainTexture made.\n";
 			mainTexture = new Texture(GL_TEXTURE_2D, textureName);
+			mainTexture->Load();
 			textureUniform = glGetUniformLocation(shaderProgram, "_mainTex");
+			cout << (textureUniform == 0xffffffff ? "TexUniform is null\n" : "Texuniform is not null, all clear.\n");
 		}
 		else{
 			mainTexture = NULL;

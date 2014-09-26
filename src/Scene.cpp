@@ -26,7 +26,7 @@ Scene::Scene(int argc, char** argv){
     }
     
 	GameObject* y = new GameObject();
-	y->AddMaterial("shader", "texture.bmp");
+	y->AddMaterial("shader", "Texture.bmp");
 	y->AddMesh("test.obj");
 	AddObject(y);
 
