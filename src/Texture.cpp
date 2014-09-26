@@ -14,14 +14,10 @@ void Texture::Load(void){
 	width = image.TellWidth();
 	height = image.TellHeight();
 
-	pixelData = new RGBApixel*[width];
-	for(int i = 0; i < width; i++){
-		pixelData[i] = new RGBApixel[height];
-	}
-	
-	for(int i = 0; i < width; i++){
-		for(int j = 0; j < height; j++){
-			pixelData[i][j] = image.GetPixel(i,j);
+	pixelData = new RGBApixel[width*height];
+	for(int j = 0; j < height; j++){
+		for(int i = 0; i < width; i++){
+			pixelData[j*width+i] = image.GetPixel(i,j); 
 		}
 	}
 
@@ -40,10 +36,6 @@ void Texture::Bind(GLenum TextureUnit){
 
 Texture::~Texture(){
 	if(pixelData != NULL){
-		for(int i = 0; i < width; i++){
-			delete[] pixelData[i];
-		}
-
 		delete[] pixelData;
 	}
 }

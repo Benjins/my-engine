@@ -17,7 +17,7 @@ struct Texture{
 	GLenum textureTarget;
     GLuint textureObj;
 
-	RGBApixel** pixelData;
+	RGBApixel* pixelData;
 	int width;
 	int height;
 	

@@ -15,9 +15,9 @@ DrawCall::DrawCall(const Model& model, Material* mat){
     for(int i = 0; i < model.faces.size(); i++){
 		Face face = model.faces[i];
 		
-		Vertices.push_back(model.vertices[face.v2 -1].position);
-		Vertices.push_back(model.vertices[face.v1 -1].position);
-		Vertices.push_back(model.vertices[face.v0 -1].position);
+		Vertices.push_back(model.vertices[face.v2].position);
+		Vertices.push_back(model.vertices[face.v1].position);
+		Vertices.push_back(model.vertices[face.v0].position);
 
 		//cout << Vertices[i].Magnitude() << endl;
 		

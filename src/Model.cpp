@@ -120,9 +120,9 @@ Face ParseFaceLine(string line, const vector<Vector2>& uvs){
 			vector<string> faceDataSplit1 = SplitStringByDelimiter(tokens[2],"/");
 			vector<string> faceDataSplit2 = SplitStringByDelimiter(tokens[3],"/");
 
-			Face face = Face(atoi(faceDataSplit0[0].c_str()), 
-							 atoi(faceDataSplit1[0].c_str()), 
-							 atoi(faceDataSplit2[0].c_str()));
+			Face face = Face(atoi(faceDataSplit0[0].c_str())-1, 
+							 atoi(faceDataSplit1[0].c_str())-1, 
+							 atoi(faceDataSplit2[0].c_str())-1);
 
 			face.uv0 = uvs[atoi(faceDataSplit0[1].c_str())-1];
 			face.uv1 = uvs[atoi(faceDataSplit1[1].c_str())-1];
@@ -130,7 +130,9 @@ Face ParseFaceLine(string line, const vector<Vector2>& uvs){
 
 			return face;
 		}
-		Face face = Face(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), atoi(tokens[3].c_str()));
+		Face face = Face(atoi(tokens[1].c_str())-1, 
+						 atoi(tokens[2].c_str())-1, 
+						 atoi(tokens[3].c_str())-1);
 		return face;
 	}
 }
