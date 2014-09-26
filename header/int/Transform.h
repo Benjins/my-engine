@@ -4,6 +4,7 @@
 #include "../ext/3dbasics.h"
 
 struct GameObject;
+struct Mat4x4;
 
 struct SC_Transform{
 	Vector3 position;
@@ -20,6 +21,10 @@ struct SC_Transform{
 	Vector3 Up() const;
 	Vector3 Right() const;
 	
+	Mat4x4 LocalToGlobalMatrix() const;
+
+	SC_Transform GetInverse() const;
+
 	Vector3 GlobalPosition() const;
 	
     //Transform a vector into this transform's space

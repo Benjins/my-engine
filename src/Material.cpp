@@ -29,7 +29,8 @@ Material::Material(string _shaderName, string textureName){
 			mainTexture = new Texture(GL_TEXTURE_2D, textureName);
 			mainTexture->Load();
 			textureUniform = glGetUniformLocation(shaderProgram, "_mainTex");
-			cout << (textureUniform == 0xffffffff ? "TexUniform is null\n" : "Texuniform is not null, all clear.\n");
+			cameraUniform = glGetUniformLocation(shaderProgram, "_cameraMatrix");
+			//cout << (textureUniform == 0xffffffff ? "TexUniform is null\n" : "Texuniform is not null, all clear.\n");
 		}
 		else{
 			mainTexture = NULL;

@@ -17,6 +17,7 @@ struct Material{
 	Texture* mainTexture;
 	
 	GLuint textureUniform;
+	GLuint cameraUniform;
 	
 	Material(void);
 

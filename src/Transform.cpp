@@ -1,4 +1,6 @@
 #include "../header/int/Transform.h"
+#include "../header/int/Mat4.h"
+#include "../header/int/Vector4.h"
 
 SC_Transform::SC_Transform(){
 	position = Vector3(0,0,0);
@@ -22,6 +24,24 @@ Vector3 SC_Transform::Forward() const{
 Vector3 SC_Transform::Up() const{
 	return LocalToGlobal(Y_AXIS);
 }
+
+Mat4x4 SC_Transform::LocalToGlobalMatrix() const{
+	Mat4x4 transMat;
+
+	transMat.SetRow(0, Vector4(Rotate(X_AXIS * scale.x, rotation), position.x));
+	transMat.SetRow(1, Vector4(Rotate(Y_AXIS * scale.y, rotation), position.y));
+	transMat.SetRow(2, Vector4(Rotate(Z_AXIS * scale.z, rotation), position.z));
+
+	transMat.SetRow(3, Vector4(0,0,0,1));
+
+	return transMat;
+}
+
+SC_Transform SC_Transform::GetInverse() const{
+	return SC_Transform(position*-1, 
+						rotation.Conjugate(), 
+						Vector3(1/scale.x, 1/scale.y, 1/scale.z));
+} 
 
 Vector3 SC_Transform::Right() const{
 	return LocalToGlobal(X_AXIS);
@@ -61,3 +81,4 @@ Vector3 SC_Transform::LocalToGlobal(const Vector3& local) const{
 
     return globalVec;
 }
+
