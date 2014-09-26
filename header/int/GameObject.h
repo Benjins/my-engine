@@ -28,7 +28,7 @@ struct GameObject{
 	~GameObject();
 	
 	void AddMesh(string fileName);
-	void AddMaterial(string matName);
+	void AddMaterial(string matName, string textureName = "");
 
 	void OnUpdate();
 	

@@ -42,6 +42,8 @@ struct Model{
 
 Vertex ParseVertexLine(string line);
 
-Face ParseFaceLine(string line);
+Vector2 ParseUVLine(string line);
+
+Face ParseFaceLine(string line, const vector<Vector2>& uvs);
 
 vector<string> SplitStringByDelimiter(string searchIn, string delimiter);

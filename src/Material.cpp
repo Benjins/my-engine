@@ -1,13 +1,15 @@
 #include "../header/int/Material.h"
+#include "../header/int/Texture.h"
 #include <fstream>
 #include <iostream>
 
 using std::ifstream; using std::cout; using std::cerr;
 
 Material::Material(void){
+	mainTexture = NULL;
 }
 
-Material::Material(string _shaderName){
+Material::Material(string _shaderName, string textureName){
 	shaderProgram = glCreateProgram();
 	shaderName = _shaderName;
 	
@@ -15,13 +17,20 @@ Material::Material(string _shaderName){
 	
 	if(ReadFile(_shaderName + ".vs", vshaderText) 
 	&& ReadFile(_shaderName + ".fs", fshaderText)){
+		cout << "Added shader programs.\n";
 		AddShader(shaderProgram, vshaderText.c_str(), GL_VERTEX_SHADER);
 		AddShader(shaderProgram, fshaderText.c_str(), GL_FRAGMENT_SHADER);
 		
 		glLinkProgram(shaderProgram);
 		glValidateProgram(shaderProgram);
 		
-		textureUniform = glGetUniformLocation(shaderProgram, "_mainTex");
+		if(textureName != ""){
+			mainTexture = new Texture(GL_TEXTURE_2D, textureName);
+			textureUniform = glGetUniformLocation(shaderProgram, "_mainTex");
+		}
+		else{
+			mainTexture = NULL;
+		}
 	}
 	else{
 		//Probably should do something here...
@@ -61,4 +70,10 @@ bool ReadFile(string fileName, string& readInto){
         cerr << fileName << ": unable to open file.\n";
 		return false;
     }
+}
+
+Material::~Material(){
+	if(mainTexture != NULL){
+		delete mainTexture;
+	}
 }

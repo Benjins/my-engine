@@ -15,9 +15,9 @@ void GameObject::AddMesh(string fileName){
 	mesh = new Model(fileName);
 }
 
-void GameObject::AddMaterial(string matName){
+void GameObject::AddMaterial(string matName, string textureName){
 	cout << "AddMat: " << matName << endl;
-	material = new Material(matName);
+	material = new Material(matName, textureName);
 }
 
 void GameObject::OnUpdate(){

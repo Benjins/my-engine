@@ -8,12 +8,14 @@ using std::ifstream; using std::cerr; using std::cout; using std::endl;
 
 Face::Face(void){
 	v0 = v1 = v2 = -1;
+	uv0 = uv1 = uv2 = Vector2(0,0);
 }
 
 Face::Face(int _v0, int _v1, int _v2){
 	v0 = _v0;
 	v1 = _v1;
 	v2 = _v2;
+	uv0 = uv1 = uv2 = Vector2(0,0);
 }
 
 Vertex::Vertex(void){
@@ -60,19 +62,25 @@ void Model::ImportFromOBJ(string fileName){
 	}
 	
 	string line = "";
+
+	vector<Vector2> uvs;
+
 	while(!importer.eof()){
 		getline(importer, line, '\n');
 		//cout << line << endl;
 		if(line.size() < 2){
 			continue;
 		}
-		else if(line[0] == 'v' && line[1] != 't'){
+		else if(line[0] == 'v' && line[1] == 't'){
 			//cout << "vertex line\n";
+			uvs.push_back(ParseUVLine(line));
+		}
+		else if(line[0] == 'v'){
 			vertices.push_back(ParseVertexLine(line));
 		}
 		else if(line[0] == 'f'){
 			//cout << "face line\n";
-			faces.push_back(ParseFaceLine(line));
+			faces.push_back(ParseFaceLine(line, uvs));
 		}
 	}
 }
@@ -89,14 +97,41 @@ Vertex ParseVertexLine(string line){
 	}
 }
 
-Face ParseFaceLine(string line){
+Vector2 ParseUVLine(string line){
+	vector<string> tokens = SplitStringByDelimiter(line, " ");
+
+	if(tokens.size() != 3){
+		return Vector2();
+	}
+	else{
+		return Vector2(atof(tokens[1].c_str()), atof(tokens[2].c_str()));
+	}
+}
+
+Face ParseFaceLine(string line, const vector<Vector2>& uvs){
 	vector<string> tokens = SplitStringByDelimiter(line, " ");
 	
 	if(tokens.size() != 4){
 		return Face();
 	}
 	else{
-		return Face(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), atoi(tokens[3].c_str()));
+		vector<string> faceDataSplit0 = SplitStringByDelimiter(tokens[1],"/");
+		if(faceDataSplit0.size() > 1){
+			vector<string> faceDataSplit1 = SplitStringByDelimiter(tokens[2],"/");
+			vector<string> faceDataSplit2 = SplitStringByDelimiter(tokens[3],"/");
+
+			Face face = Face(atoi(faceDataSplit0[0].c_str()), 
+							 atoi(faceDataSplit1[0].c_str()), 
+							 atoi(faceDataSplit2[0].c_str()));
+
+			face.uv0 = uvs[atoi(faceDataSplit0[1].c_str())-1];
+			face.uv1 = uvs[atoi(faceDataSplit1[1].c_str())-1];
+			face.uv2 = uvs[atoi(faceDataSplit2[1].c_str())-1];
+
+			return face;
+		}
+		Face face = Face(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), atoi(tokens[3].c_str()));
+		return face;
 	}
 }
 

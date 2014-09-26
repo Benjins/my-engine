@@ -9,7 +9,7 @@
 using std::list;
 
 struct Scene{
-	list<GameObject> objects;
+	list<GameObject*> objects;
 	list<DrawCall> drawCalls;
 	//GameObject Camera;
 	
@@ -25,7 +25,7 @@ struct Scene{
 	Scene();
 	Scene(int argc, char** argv);
 
-	GameObject& AddObject(GameObject& obj);
+	GameObject* AddObject(GameObject* obj);
 	
 	void UpdateVertexBuffer();
 	//OnRender

@@ -20,9 +20,11 @@ struct Material{
 	
 	Material(void);
 
-	Material(string _shaderName);
+	Material(string _shaderName, string textureName = "");
 	
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
+
+	~Material();
 };
 
 bool ReadFile(string fileName, string& readInto);
