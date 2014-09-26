@@ -6,6 +6,20 @@
 GameObject::GameObject(){
 }
 
+GameObject::GameObject(Scene& sceneRef){
+	scene = &sceneRef;
+}
+
+void GameObject::AddMesh(string fileName){
+	cout << "AddMesh: " << fileName << endl;
+	mesh = new Model(fileName);
+}
+
+void GameObject::AddMaterial(string matName){
+	cout << "AddMat: " << matName << endl;
+	material = new Material(matName);
+}
+
 void GameObject::OnUpdate(){
 	for(auto iter = components.begin(); iter != components.end(); iter++){
 		(*iter)->OnUpdate();
@@ -25,5 +39,12 @@ GameObject::~GameObject(){
 	for(auto iter = components.begin(); iter != components.end(); iter++){
 		Component* comp = *iter;
 		delete comp;
+	}
+
+	if(mesh != NULL){
+		delete mesh;
+	}
+	if(material != NULL){
+		delete material;
 	}
 }

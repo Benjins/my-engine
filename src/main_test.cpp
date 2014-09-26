@@ -5,16 +5,21 @@
 #include <iostream>
 using std::cout; using std::endl;
 
-int main(){
-	Scene x;
+int main(int argc, char** argv){
+	Scene x = Scene::getInstance(argc, argv);
+
+	cout << "Here we go\n";
 	
 	GameObject y;
 	
-	x.AddObject(y);
+	y.AddMaterial("shader");
+	y.AddMesh("test.obj");
 
-	y.AddComponent<Component>();
-	
-	Component* z = y.GetComponent<Component>();
+	if(y.mesh != NULL && y.material != NULL){
+		cout << "Proper mesh and material.\n";
+	}
+
+	x.AddObject(y);
 	
 	return 0;
 }

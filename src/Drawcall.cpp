@@ -35,6 +35,8 @@ DrawCall::DrawCall(const Model& model, Material* mat){
 }
 
 void DrawCall::Draw() const{
+	cout << "\nDrawing";
+
 	glUseProgram(material->shaderProgram);
 	
 	glEnableVertexAttribArray(0);

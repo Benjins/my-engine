@@ -10,6 +10,7 @@ using std::list;
 struct Component;
 struct Material;
 struct Model;
+struct Scene;
 
 struct GameObject{
 	private : list<Component*> components;
@@ -20,10 +21,15 @@ struct GameObject{
 	
 	Material* material;
 	Model* mesh;
+	Scene* scene;
 	
 	GameObject();
+	explicit GameObject(Scene& sceneRef);
 	~GameObject();
 	
+	void AddMesh(string fileName);
+	void AddMaterial(string matName);
+
 	void OnUpdate();
 	
 	int GLVertexCount() const;
