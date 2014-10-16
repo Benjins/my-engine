@@ -27,6 +27,11 @@
 *.app
 out/*
 
+#autosaves
+*.h~
+*.cpp~
+.gitignore~
+
 #misc
 EngineNP++Work.txt
 *.vcxproj
@@ -35,3 +40,5 @@ EngineNP++Work.txt
 Debug/*
 x64/*
 *.mtl
+
+

@@ -2,8 +2,9 @@
 #include "../header/int/Texture.h"
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
-using std::ifstream; using std::cout; using std::cerr;
+using std::ifstream; using std::cout; using std::cerr; using std::strlen;
 
 Material::Material(void){
 	mainTexture = NULL;
