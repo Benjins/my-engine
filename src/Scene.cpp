@@ -76,13 +76,13 @@ void Scene::Render(){
 	float farZ = 1000;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	Mat4x4 objectMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
+	Mat4x4 perspMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
 	camera.rotation = QUAT_IDENTITY;
 
 	Mat4x4 camMatrix = camera.GetInverse().LocalToGlobalMatrix();
 
-	Mat4x4 finalMatrix = camMatrix * objectMatrix;
+	Mat4x4 finalMatrix = perspMatrix * camMatrix;
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		//Mat4x4 cameraMatrix = camera.GetInverse().LocalToGlobalMatrix();
@@ -190,7 +190,7 @@ Mat4x4 GetPerspectiveMatrix(float aspectRatio, float fieldOfView, float nearZ, f
 	persp.SetRow(0, Vector4(x1,0,0,0));
 	persp.SetRow(1, Vector4(0,y2,0,0));
 	persp.SetRow(2, Vector4(0,0,z3,z4));
-	persp.SetRow(3, Vector4(0,0,0,1));
+	persp.SetRow(3, Vector4(0,0,1,0));
 	
 	return persp;
 }
