@@ -8,8 +8,10 @@ out vec2 uv_coord;
 
 uniform mat4 _cameraMatrix;
 
+uniform mat4 objectMatrix;
+
 void main()
 {
-    gl_Position = vec4(Position, 1.0);
+    gl_Position =  objectMatrix * vec4(Position, 1.0);
 	uv_coord = UV;
 }

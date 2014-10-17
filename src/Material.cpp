@@ -31,6 +31,7 @@ Material::Material(string _shaderName, string textureName){
 			mainTexture->Load();
 			textureUniform = glGetUniformLocation(shaderProgram, "_mainTex");
 			cameraUniform = glGetUniformLocation(shaderProgram, "_cameraMatrix");
+			objectMatrixUniform = glGetUniformLocation(shaderProgram, "objectMatrix");
 			//cout << (textureUniform == 0xffffffff ? "TexUniform is null\n" : "Texuniform is not null, all clear.\n");
 		}
 		else{

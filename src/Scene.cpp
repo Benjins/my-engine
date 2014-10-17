@@ -77,11 +77,17 @@ void Scene::Render(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Mat4x4 objectMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
+	Mat4x4 camMatrix;
+	camMatrix.m[0][3] = camera.position.x;
+	camMatrix.m[1][3] = camera.position.y;
+	camMatrix.m[2][3] = camera.position.z;
+
+	Mat4x4 finalMatrix = objectMatrix * camMatrix;
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		//Mat4x4 cameraMatrix = camera.GetInverse().LocalToGlobalMatrix();
 
-		//glUniformMatrix4fv(iter->material->cameraUniform, 1, GL_TRUE, &objectMatrix.m[0][0]);
+		glUniformMatrix4fv(iter->material->objectMatrixUniform, 1, GL_TRUE, &finalMatrix.m[0][0]);
 		
 		iter->material;
 		iter->Draw();	
@@ -121,15 +127,27 @@ void Scene::OnPassiveMouse(int x, int y){
 }
 
 void Scene::OnKey(unsigned char key, int x, int y){
-	if(key == 'q'){
+	if(key == 'x'){
 		glutLeaveMainLoop();
 	}
 	else if(key == 'w'){
-		camera.position = camera.position + camera.Forward() * deltaTime;
-		cout << "Delta-time: " << deltaTime << endl;
+		camera.position = camera.position + (Z_AXIS * deltaTime * 10);
+		//cout << "Delta-time: " << deltaTime << endl;
 	}
 	else if(key == 's'){
-		camera.position = camera.position - camera.Forward() * deltaTime;
+		camera.position = camera.position - (Z_AXIS * deltaTime * 10);
+	}
+	else if(key == 'a'){
+		camera.position = camera.position - (X_AXIS * deltaTime * 10);
+	}
+	else if(key == 'd'){
+		camera.position = camera.position + (X_AXIS * deltaTime * 10);
+	}
+	else if(key == 'q'){
+		camera.position = camera.position + (Y_AXIS * deltaTime * 10);
+	}
+	else if(key == 'z'){
+		camera.position = camera.position - (Y_AXIS * deltaTime * 10);
 	}
 }
 
@@ -172,7 +190,7 @@ Mat4x4 GetPerspectiveMatrix(float aspectRatio, float fieldOfView, float nearZ, f
 	persp.SetRow(0, Vector4(x1,0,0,0));
 	persp.SetRow(1, Vector4(0,y2,0,0));
 	persp.SetRow(2, Vector4(0,0,z3,z4));
-	persp.SetRow(3, Vector4(0,0,1,0));
+	persp.SetRow(3, Vector4(0,0,0,1));
 	
 	return persp;
 }
