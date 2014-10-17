@@ -19,6 +19,9 @@ struct Scene{
 	int prevY;
 	int buttonDown;
 
+	float xRot;
+	float yRot;
+
 private:
 	clock_t prevTime;
 public:

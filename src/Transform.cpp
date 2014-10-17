@@ -28,11 +28,20 @@ Vector3 SC_Transform::Up() const{
 Mat4x4 SC_Transform::LocalToGlobalMatrix() const{
 	Mat4x4 transMat;
 
-	transMat.SetRow(0, Vector4(Rotate(X_AXIS * scale.x, rotation), position.x));
-	transMat.SetRow(1, Vector4(Rotate(Y_AXIS * scale.y, rotation), position.y));
-	transMat.SetRow(2, Vector4(Rotate(Z_AXIS * scale.z, rotation), position.z));
+	Mat4x4 linMat;
+	Mat4x4 affMat;
 
-	transMat.SetRow(3, Vector4(0,0,0,1));
+	linMat.SetRow(0, Vector4(Rotate(X_AXIS * scale.x, rotation), 0));
+	linMat.SetRow(1, Vector4(Rotate(Y_AXIS * scale.y, rotation), 0));
+	linMat.SetRow(2, Vector4(Rotate(Z_AXIS * scale.z, rotation), 0));
+	linMat.SetRow(3, Vector4(0,0,0,1));
+
+	affMat.SetRow(0, Vector4(X_AXIS, position.x));
+	affMat.SetRow(1, Vector4(Y_AXIS, position.y));
+	affMat.SetRow(2, Vector4(Z_AXIS, position.z));
+	affMat.SetRow(3, Vector4(0,0,0,1));
+
+	transMat = linMat * affMat;
 
 	return transMat;
 }

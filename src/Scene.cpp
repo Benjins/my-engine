@@ -12,6 +12,9 @@ Scene::Scene(int argc, char** argv){
 	drawCalls = list<DrawCall>();
 	camera = SC_Transform();
 
+	xRot = 0;
+	yRot = 0;
+
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
     glutInitWindowSize(1280, 720);
@@ -78,7 +81,7 @@ void Scene::Render(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Mat4x4 perspMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
-	camera.rotation = QUAT_IDENTITY;
+	//camera.rotation = QUAT_IDENTITY;
 
 	Mat4x4 camMatrix = camera.GetInverse().LocalToGlobalMatrix();
 
@@ -111,19 +114,16 @@ void Scene::OnMouse(int button, int state, int x, int y){
 }
 
 void Scene::OnPassiveMouse(int x, int y){
-	//if(buttonDown >= 0){
-		//cout << "Button down in callback.\n";
-		float deltaX = x - prevX;
-		float deltaY = y - prevY;
-		//camera.rotation = camera.rotation * Quaternion(X_AXIS,deltaX/100) * Quaternion(Y_AXIS, deltaY/100);
-	//}
+	float deltaX = x - prevX;
+	float deltaY = y - prevY;
+	
+	xRot += deltaX;
+	yRot += deltaY;
+
+	camera.rotation = Quaternion(X_AXIS,yRot/200) * Quaternion(Y_AXIS, xRot/200);
 
 	prevX = x;
 	prevY = y;
-	//int deltaX = x - glutGet(GLUT_WINDOW_WIDTH)/2;
-	//int deltaY = y - glutGet(GLUT_WINDOW_HEIGHT)/2;
-
-	//camera.rotation = camera.rotation * Quaternion(X_AXIS,deltaX) * Quaternion(Y_AXIS, deltaY);
 }
 
 void Scene::OnKey(unsigned char key, int x, int y){
