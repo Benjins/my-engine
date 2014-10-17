@@ -22,6 +22,7 @@ Scene::Scene(int argc, char** argv){
 	glutIdleFunc(RenderScene);
 	glutMouseFunc(OnMouseFunc);
 	glutMotionFunc(OnPassiveMouseFunc);
+	glutPassiveMotionFunc(OnPassiveMouseFunc);
 	glutKeyboardFunc(OnKeyFunc);
 
     // Must be done after glut is initialized!
@@ -77,12 +78,11 @@ void Scene::Render(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Mat4x4 objectMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
-	Mat4x4 camMatrix;
-	camMatrix.m[0][3] = camera.position.x;
-	camMatrix.m[1][3] = camera.position.y;
-	camMatrix.m[2][3] = camera.position.z;
+	camera.rotation = QUAT_IDENTITY;
 
-	Mat4x4 finalMatrix = objectMatrix * camMatrix;
+	Mat4x4 camMatrix = camera.GetInverse().LocalToGlobalMatrix();
+
+	Mat4x4 finalMatrix = camMatrix * objectMatrix;
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		//Mat4x4 cameraMatrix = camera.GetInverse().LocalToGlobalMatrix();
@@ -113,13 +113,13 @@ void Scene::OnMouse(int button, int state, int x, int y){
 void Scene::OnPassiveMouse(int x, int y){
 	//if(buttonDown >= 0){
 		//cout << "Button down in callback.\n";
-		float deltaX = x - prevX/2;
-		float deltaY = y - prevY/2;
-		camera.rotation = camera.rotation * Quaternion(X_AXIS,deltaX/100) * Quaternion(Y_AXIS, deltaY/100);
+		float deltaX = x - prevX;
+		float deltaY = y - prevY;
+		//camera.rotation = camera.rotation * Quaternion(X_AXIS,deltaX/100) * Quaternion(Y_AXIS, deltaY/100);
 	//}
 
-	//prevX = x;
-	//prevY = y;
+	prevX = x;
+	prevY = y;
 	//int deltaX = x - glutGet(GLUT_WINDOW_WIDTH)/2;
 	//int deltaY = y - glutGet(GLUT_WINDOW_HEIGHT)/2;
 

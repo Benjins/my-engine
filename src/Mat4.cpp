@@ -61,10 +61,10 @@ Vector4 Mat4x4::GetRow(int index) const{
 }
 
 void Mat4x4::SetRow(int index, const Vector4& value){
-	m[index][0] = value.x;
-	m[index][1] = value.y;
-	m[index][2] = value.z;
-	m[index][3] = value.w;
+	m[index][0] = value.w;
+	m[index][1] = value.x;
+	m[index][2] = value.y;
+	m[index][3] = value.z;
 }
 
 float DotProduct(const Vector4& param1, const Vector4& param2){
