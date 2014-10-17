@@ -58,4 +58,6 @@ static void OnPassiveMouseFunc(int x, int y);
 
 static void OnKeyFunc(unsigned char key, int x, int y);
 
+Mat4x4 GetPerspectiveMatrix(float aspectRatio, float fieldOfView, float nearZ, float farZ);
+
 #endif

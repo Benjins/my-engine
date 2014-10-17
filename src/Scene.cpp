@@ -1,6 +1,7 @@
 #include "../header/int/Scene.h"
 #include "../header/int/Mat4.h"
 #include "../header/int/Material.h"
+#include "../header/int/Vector4.h"
 #include <GL/freeglut.h>
 #include <GL/glew.h>
 
@@ -68,11 +69,20 @@ void Scene::Render(){
 	deltaTime = ((float)currTime - prevTime)/CLOCKS_PER_SEC;
 	prevTime = currTime;
 
+	float aspectRatio = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
+	float fieldOfView = 80;
+	float nearZ = 0.1;
+	float farZ = 1000;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	Mat4x4 objectMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
+
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
-		Mat4x4 cameraMatrix = camera.GetInverse().LocalToGlobalMatrix();
-		glUniformMatrix4fv(iter->material->cameraUniform, 1, GL_TRUE, &cameraMatrix.m[0][0]);
+		//Mat4x4 cameraMatrix = camera.GetInverse().LocalToGlobalMatrix();
+
+		//glUniformMatrix4fv(iter->material->cameraUniform, 1, GL_TRUE, &objectMatrix.m[0][0]);
+		
 		iter->material;
 		iter->Draw();	
 	}
@@ -145,4 +155,24 @@ static void OnPassiveMouseFunc(int x, int y){
 
 static void OnKeyFunc(unsigned char key, int x, int y){
 	Scene::getInstance().OnKey(key, x, y);
+}
+
+Mat4x4 GetPerspectiveMatrix(float aspectRatio, float fieldOfView, float nearZ, float farZ){
+	Mat4x4 persp;
+
+	float fieldOfView_Rad = fieldOfView/180*3.14159265f;
+	float tanHalfFOV = tanf(fieldOfView_Rad/2);
+	float zRange = nearZ - farZ;
+
+	float x1 = 1/aspectRatio/tanHalfFOV;
+	float y2 = 1/tanHalfFOV;
+	float z3 = (-nearZ - farZ)/zRange;
+	float z4 = 2*farZ*nearZ/zRange;
+	
+	persp.SetRow(0, Vector4(x1,0,0,0));
+	persp.SetRow(1, Vector4(0,y2,0,0));
+	persp.SetRow(2, Vector4(0,0,z3,z4));
+	persp.SetRow(3, Vector4(0,0,1,0));
+	
+	return persp;
 }

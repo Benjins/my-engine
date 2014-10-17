@@ -15,10 +15,10 @@ Vector4::Vector4(float _w, float _x, float _y, float _z){
 }
 
 Vector4::Vector4(const Vector3& vec, float _w){
-	w = _w;
-	x = vec.x;
-	y = vec.y;
-	z = vec.z;
+	w = vec.x;
+	x = vec.y;
+	y = vec.z;
+	z = _w;
 }
 
 Vector4::Vector4(float* arrayInit){

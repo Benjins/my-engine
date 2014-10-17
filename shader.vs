@@ -10,6 +10,6 @@ uniform mat4 _cameraMatrix;
 
 void main()
 {
-    gl_Position = _cameraMatrix * vec4(Position, 1.0);
+    gl_Position = vec4(Position, 1.0);
 	uv_coord = UV;
 }
