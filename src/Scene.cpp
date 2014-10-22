@@ -12,27 +12,31 @@ Scene::Scene(int argc, char** argv){
 	drawCalls = list<DrawCall>();
 	camera = SC_Transform();
 
-	xRot = 0;
-	yRot = 0;
-
 	glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
     glutInitWindowSize(1280, 720);
     glutInitWindowPosition(100, 100);
     glutCreateWindow("my-engine");
 
-	glutDisplayFunc(RenderScene);
-	glutIdleFunc(RenderScene);
-	glutMouseFunc(OnMouseFunc);
-	glutMotionFunc(OnPassiveMouseFunc);
-	glutPassiveMotionFunc(OnPassiveMouseFunc);
-	glutKeyboardFunc(OnKeyFunc);
-
-    // Must be done after glut is initialized!
-    GLenum res = glewInit();
+	GLenum res = glewInit();
     if (res != GLEW_OK) {
       fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
     }
+
+	glutDisplayFunc(RenderScene);
+	glutIdleFunc(RenderScene);
+	glutMouseFunc(OnMouseFunc);
+	//glutMotionFunc(OnPassiveMouseFunc);
+	glutPassiveMotionFunc(OnPassiveMouseFunc);
+	glutKeyboardFunc(OnKeyFunc);
+	
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glEnable (GL_DEPTH_TEST);
+
+	xRot = 0;
+	yRot = 0;
+    
     
 	GameObject* y = new GameObject();
 	y->AddMaterial("shader", "Texture.bmp");
@@ -40,11 +44,6 @@ Scene::Scene(int argc, char** argv){
 	AddObject(y);
 
     printf("GL version: %s\n", glGetString(GL_VERSION));
-
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glEnable (GL_DEPTH_TEST);
-
-    glutMainLoop();
 }
 
 GameObject* Scene::AddObject(GameObject* obj){
@@ -56,6 +55,10 @@ GameObject* Scene::AddObject(GameObject* obj){
 	}
 
 	return obj;
+}
+
+void Scene::Start(){
+    glutMainLoop();
 }
 
 void Scene::UpdateVertexBuffer(){
@@ -81,15 +84,11 @@ void Scene::Render(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Mat4x4 perspMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
-	//camera.rotation = QUAT_IDENTITY;
-
 	Mat4x4 camMatrix = camera.GetInverse().LocalToGlobalMatrix();
 
 	Mat4x4 finalMatrix = perspMatrix * camMatrix;
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
-		//Mat4x4 cameraMatrix = camera.GetInverse().LocalToGlobalMatrix();
-
 		glUniformMatrix4fv(iter->material->objectMatrixUniform, 1, GL_TRUE, &finalMatrix.m[0][0]);
 		
 		iter->material;
@@ -101,26 +100,24 @@ void Scene::Render(){
 
 void Scene::OnMouse(int button, int state, int x, int y){
 	if(state == GLUT_DOWN){
-		cout << "Button down in callback.\n";
-		//int deltaX = x - prevX/2;
-		//int deltaY = y - prevY/2;
-		//camera.rotation = camera.rotation * Quaternion(X_AXIS,deltaX) * Quaternion(Y_AXIS, deltaY);
+		//cout << "Button down in callback.\n";
 	}
 	
-	prevX = x;
-	prevY = y;
-
-	//glutWarpPointer	(glutGet(GLUT_WINDOW_WIDTH)/2, glutGet(GLUT_WINDOW_HEIGHT)/2);
+	//prevX = x;
+	//prevY = y;
 }
 
 void Scene::OnPassiveMouse(int x, int y){
 	float deltaX = x - prevX;
 	float deltaY = y - prevY;
 	
-	xRot += deltaX;
-	yRot += deltaY;
+	xRot = xRot + deltaX;
+	yRot = yRot + deltaY;
 
-	camera.rotation = Quaternion(X_AXIS,yRot/200) * Quaternion(Y_AXIS, xRot/200);
+	cout << "xRot: " << xRot << endl; 
+	cout << "yRot: " << yRot << endl << endl; 
+
+	camera.rotation = Quaternion(X_AXIS, yRot/200) * Quaternion(Y_AXIS, xRot/200);
 
 	prevX = x;
 	prevY = y;
@@ -128,14 +125,14 @@ void Scene::OnPassiveMouse(int x, int y){
 
 void Scene::OnKey(unsigned char key, int x, int y){
 	if(key == 'x'){
-		glutLeaveMainLoop();
+		Stop();
 	}
 	else if(key == 'w'){
-		camera.position = camera.position + (Z_AXIS * deltaTime * 10);
+		camera.position = camera.position - (Z_AXIS * deltaTime * 10);
 		//cout << "Delta-time: " << deltaTime << endl;
 	}
 	else if(key == 's'){
-		camera.position = camera.position - (Z_AXIS * deltaTime * 10);
+		camera.position = camera.position + (Z_AXIS * deltaTime * 10);
 	}
 	else if(key == 'a'){
 		camera.position = camera.position - (X_AXIS * deltaTime * 10);
@@ -151,8 +148,12 @@ void Scene::OnKey(unsigned char key, int x, int y){
 	}
 }
 
-Scene::~Scene(){
+void Scene::Stop(){
 	glutLeaveMainLoop();
+}
+
+Scene::~Scene(){
+	Stop();
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		delete (*iter);

@@ -18,11 +18,11 @@ SC_Transform::SC_Transform(const Vector3& _position, const Quaternion& _rotation
 }
 
 Vector3 SC_Transform::Forward() const{
-	return LocalToGlobal(Z_AXIS);
+	return Rotate(Z_AXIS, rotation);
 }
 
 Vector3 SC_Transform::Up() const{
-	return LocalToGlobal(Y_AXIS);
+	return Rotate(Y_AXIS, rotation);
 }
 
 Mat4x4 SC_Transform::LocalToGlobalMatrix() const{
@@ -53,7 +53,7 @@ SC_Transform SC_Transform::GetInverse() const{
 } 
 
 Vector3 SC_Transform::Right() const{
-	return LocalToGlobal(X_AXIS);
+	return Rotate(X_AXIS, rotation);
 }
 
 Vector3 SC_Transform::GlobalPosition() const{
