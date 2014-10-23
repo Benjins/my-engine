@@ -11,7 +11,7 @@ using std::string;
 static int testCount = 0;
 static int passedTests = 0;
 
-void RunAllTests();
+int RunAllTests();
 
 template<typename T>
 void AssertEqual(T actual, T expected, string error){

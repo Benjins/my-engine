@@ -11,7 +11,7 @@ using std::cout; using std::endl;
 int main(int argc, char** argv){
 
 #ifdef TESTING
-	RunAllTests();
+	return RunAllTests();
 #else
 
 

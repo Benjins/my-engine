@@ -1,3 +1,6 @@
+#ifndef MODEL_H
+#define MODEL_H
+
 #include <vector>
 #include <string>
 #include "../ext/Vector2.h"
@@ -47,3 +50,6 @@ Vector2 ParseUVLine(string line);
 Face ParseFaceLine(string line, const vector<Vector2>& uvs);
 
 vector<string> SplitStringByDelimiter(string searchIn, string delimiter);
+
+
+#endif

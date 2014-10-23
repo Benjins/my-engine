@@ -78,6 +78,41 @@ bool ReadFile(string fileName, string& readInto){
     }
 }
 
+string TrimWhitespace(string param){
+	string newStr = param;
+
+	int leadingCount = 0;
+
+	for(auto iter = newStr.begin(); iter != newStr.end(); iter++){
+		char single = *iter;
+		if(single == ' ' || single == '\n' || single == '\t'){
+			leadingCount++;
+		}
+		else{
+			break;
+		}
+	}
+
+	int trailingCount = 0;
+
+	for(auto iter = newStr.rbegin(); iter != newStr.rend(); iter++){
+		char single = *iter;
+		if(single == ' ' || single == '\n' || single == '\t'){
+			trailingCount++;
+		}
+		else{
+			break;
+		}
+	}
+
+	return newStr.substr(leadingCount, newStr.size() - leadingCount - trailingCount);
+}
+
+vector<string> GetUniformNames(string shaderCode){
+	//TO-DO write this code.
+	return SplitStringByDelimiter(shaderCode, "\n");
+}
+
 Material::~Material(){
 	if(mainTexture != NULL){
 		delete mainTexture;

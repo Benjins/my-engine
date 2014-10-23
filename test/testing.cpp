@@ -3,6 +3,7 @@
 #include "../header/int/Scene.h"
 #include "../header/int/GameObject.h"
 #include "../header/int/Component.h"
+#include "../header/int/Material.h"
 #include "../header/int/Mat4.h"
 #include "testing.h"
 
@@ -10,7 +11,7 @@
 #include <iostream>
 using std::cerr; using std::endl; using std::string; using std::cout;
 
-void RunAllTests(){
+int RunAllTests(){
 	testCount = 0;
 	passedTests = 0;
 
@@ -44,14 +45,26 @@ void RunAllTests(){
 		AssertEqual<string>(splitTest2[i], "", "splitTest2 blanks check");
 	}
 
+	AssertEqual<string>(TrimWhitespace(""), "", "TrimWhitespace empty check.");
+	AssertEqual<string>(TrimWhitespace("AAFAAGDG"), "AAFAAGDG", "TrimWhitespace no whitespace check.");
+	AssertEqual<string>(TrimWhitespace("   AAFAAGDG"), "AAFAAGDG", "TrimWhitespace leading whitespace check.");
+	AssertEqual<string>(TrimWhitespace("   AAFAAGDG    "), "AAFAAGDG", "TrimWhitespace leading and trailing whitespace check.");
+	AssertEqual<string>(TrimWhitespace(" \n\t  \t\t\t  \t\n\n   AAFAAGDG    "), "AAFAAGDG", "TrimWhitespace mixed whitespace check.");
+	AssertEqual<string>(TrimWhitespace(" \n  A  AF   AAGD  \tG \t  "), "A  AF   AAGD  \tG", "TrimWhitespace interior whitespace check.");
+
 	//--------------------------
 
 
 	cout << endl << passedTests << " of " << testCount << " tests passed.\n";
 
-	cout << "\nPress Ctrl-C to exit.\n";
-	string x;
-	cin >> x;
+	//cout << "\nPress Ctrl-C to exit.\n";
+	
+	if(passedTests == testCount){
+		return 0;
+	}
+	else{
+		return -1;
+	}
 }
 
 void AssertTrue(bool check, string error){

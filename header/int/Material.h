@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include <string>
+#include "Model.h"
 #include <GL/glew.h>
 
 using std::string;
@@ -30,5 +31,9 @@ struct Material{
 };
 
 bool ReadFile(string fileName, string& readInto);
+
+string TrimWhitespace(string param);
+
+vector<string> GetUniformNames(string shaderCode);
 
 #endif
