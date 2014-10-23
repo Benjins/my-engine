@@ -156,8 +156,6 @@ void Scene::Stop(){
 }
 
 Scene::~Scene(){
-	Stop();
-
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		delete (*iter);
 	}
