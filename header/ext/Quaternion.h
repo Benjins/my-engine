@@ -42,6 +42,8 @@ struct Quaternion {
 	Quaternion operator/(float scale) const;
 	
 	Quaternion operator*(const Quaternion& multQuat) const;
+
+	bool operator==(const Quaternion& multQuat) const;
 	
 	Quaternion Conjugate() const;
 	
