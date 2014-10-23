@@ -3,7 +3,16 @@
 #include "../header/int/Model.h"
 #include "../header/int/Material.h"
 
+#ifdef TESTING
+#  define _CRTDBG_MAP_ALLOC
+#  define _CRTDBG_MAP_ALLOC_NEW
+#  include <crtdbg.h>
+#  include <assert.h>
+#endif
+
 GameObject::GameObject(){
+	mesh = NULL;
+	material = NULL;
 }
 
 GameObject::GameObject(Scene& sceneRef){
@@ -11,12 +20,10 @@ GameObject::GameObject(Scene& sceneRef){
 }
 
 void GameObject::AddMesh(string fileName){
-	cout << "AddMesh: " << fileName << endl;
 	mesh = new Model(fileName);
 }
 
 void GameObject::AddMaterial(string matName, string textureName){
-	cout << "AddMat: " << matName << endl;
 	material = new Material(matName, textureName);
 }
 
@@ -44,6 +51,7 @@ GameObject::~GameObject(){
 	if(mesh != NULL){
 		delete mesh;
 	}
+
 	if(material != NULL){
 		delete material;
 	}

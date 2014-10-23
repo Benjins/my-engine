@@ -11,6 +11,25 @@
 #include <iostream>
 using std::cerr; using std::endl; using std::string; using std::cout;
 
+CrtCheckMemory::CrtCheckMemory(){
+#if defined(_WIN32) || defined(_WIN64)
+    _CrtMemCheckpoint(&state1);
+#endif
+  }
+
+ CrtCheckMemory::~CrtCheckMemory(){
+#if defined(_WIN32) || defined(_WIN64)
+    _CrtMemCheckpoint(&state2);
+    // using google test you can just do this.
+	int diff = _CrtMemDifference( &state3, &state1, &state2);
+	AssertEqual<int>(0, diff, "Memory leak!");
+    // else just do this to dump the leaked blocks to stdout.
+    if( _CrtMemDifference( &state3, &state1, &state2) ){
+      _CrtMemDumpStatistics( &state3 );
+	}
+#endif
+  }
+
 int RunAllTests(){
 	testCount = 0;
 	passedTests = 0;
@@ -51,6 +70,18 @@ int RunAllTests(){
 	AssertEqual<string>(TrimWhitespace("   AAFAAGDG    "), "AAFAAGDG", "TrimWhitespace leading and trailing whitespace check.");
 	AssertEqual<string>(TrimWhitespace(" \n\t  \t\t\t  \t\n\n   AAFAAGDG    "), "AAFAAGDG", "TrimWhitespace mixed whitespace check.");
 	AssertEqual<string>(TrimWhitespace(" \n  A  AF   AAGD  \tG \t  "), "A  AF   AAGD  \tG", "TrimWhitespace interior whitespace check.");
+
+	
+	if(true){
+		CrtCheckMemory memCheck;
+
+		GameObject* obj = new GameObject();
+		obj->AddComponent<Component>();
+		obj->AddComponent<Component>();
+		obj->AddComponent<Component>();
+		obj->AddMesh("test.obj");
+		delete obj;
+	}
 
 	//--------------------------
 

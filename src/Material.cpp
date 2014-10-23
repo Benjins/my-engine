@@ -4,6 +4,13 @@
 #include <iostream>
 #include <cstring>
 
+#ifdef TESTING
+#  define _CRTDBG_MAP_ALLOC
+#  define _CRTDBG_MAP_ALLOC_NEW
+#  include <crtdbg.h>
+#  include <assert.h>
+#endif
+
 using std::ifstream; using std::cout; using std::cerr; using std::strlen;
 
 Material::Material(void){

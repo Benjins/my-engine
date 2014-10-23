@@ -5,8 +5,21 @@
 
 #include <string>
 #include <iostream>
+#include <crtdbg.h>
 
 using std::string; 
+
+struct CrtCheckMemory
+{
+#if defined(_WIN32) || defined(_WIN64)
+  _CrtMemState state1;
+  _CrtMemState state2;
+  _CrtMemState state3;
+#endif
+
+  CrtCheckMemory();
+  ~CrtCheckMemory();
+};
 
 static int testCount = 0;
 static int passedTests = 0;
