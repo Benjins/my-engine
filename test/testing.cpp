@@ -85,6 +85,11 @@ int RunAllTests(){
 	AssertEqual<string>(uniformNames3[0], "_mainTex", "uniformName3 first uniform's name check");
 	AssertEqual<string>(uniformNames3[1], "position", "uniformName3 second uniform's name check");
 	
+	vector<string> uniformNames4 = GetUniformNames("#version 330\n\n\n\t  uniform   sampler2D   _mainTex;\n  in vec4 pos; \n out vec4 col;\n\t uniform vec4 position;\nvoid main(){}");
+	AssertEqual<int>(uniformNames4.size(), 2, "Number of uniforms found in uniformName4");
+	AssertEqual<string>(uniformNames4[0], "_mainTex", "uniformName4 first uniform's name check");
+	AssertEqual<string>(uniformNames4[1], "position", "uniformName4 second uniform's name check");
+
 	//Scoping
 	{
 		CrtCheckMemory memCheck;
