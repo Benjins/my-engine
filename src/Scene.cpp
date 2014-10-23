@@ -34,16 +34,19 @@ Scene::Scene(int argc, char** argv){
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable (GL_DEPTH_TEST);
 
+	Init();
+
 	xRot = 0;
 	yRot = 0;
-    
-    
+
+    printf("GL version: %s\n", glGetString(GL_VERSION));
+}
+
+void Scene::Init(){
 	GameObject* y = new GameObject();
 	y->AddMaterial("shader", "Texture.bmp");
 	y->AddMesh("test.obj");
 	AddObject(y);
-
-    printf("GL version: %s\n", glGetString(GL_VERSION));
 }
 
 GameObject* Scene::AddObject(GameObject* obj){
@@ -51,6 +54,7 @@ GameObject* Scene::AddObject(GameObject* obj){
 	obj->scene = this;
 
 	if(obj->material != NULL && obj->mesh != NULL){
+		cout << "Added draw call\n";
 		drawCalls.push_back(DrawCall(*(obj->mesh), obj->material));
 	}
 
@@ -114,10 +118,9 @@ void Scene::OnPassiveMouse(int x, int y){
 	xRot = xRot + deltaX;
 	yRot = yRot + deltaY;
 
-	cout << "xRot: " << xRot << endl; 
-	cout << "yRot: " << yRot << endl << endl; 
-
 	camera.rotation = Quaternion(X_AXIS, yRot/200) * Quaternion(Y_AXIS, xRot/200);
+
+	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
 
 	prevX = x;
 	prevY = y;

@@ -10,19 +10,18 @@
 using std::list;
 
 struct Scene{
-	list<GameObject*> objects;
-	list<DrawCall> drawCalls;
 	SC_Transform camera;
 	float deltaTime;
 
+protected:
+	list<GameObject*> objects;
+	list<DrawCall> drawCalls;
 	int prevX;
 	int prevY;
 	int buttonDown;
-
 	float xRot;
 	float yRot;
 
-private:
 	clock_t prevTime;
 public:
 	
@@ -37,6 +36,8 @@ public:
 
 	Scene();
 	Scene(int argc, char** argv);
+
+	virtual void Init();
 
 	GameObject* AddObject(GameObject* obj);
 	
@@ -54,7 +55,7 @@ public:
 
 	void Stop();
 
-	~Scene();
+	virtual ~Scene();
 };
 
 static void RenderScene();

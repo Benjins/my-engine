@@ -12,6 +12,8 @@ int main(int argc, char** argv){
 
 	Scene x = Scene::getInstance(argc, argv);
 
+	//x.Init();
+
 	x.Start();
 	
 	return 0;
