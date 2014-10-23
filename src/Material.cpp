@@ -17,6 +17,8 @@ Material::Material(void){
 	mainTexture = NULL;
 }
 
+
+//Requires an OpenGL context
 Material::Material(string _shaderName, string textureName){
 	shaderProgram = glCreateProgram();
 	shaderName = _shaderName;
@@ -117,7 +119,20 @@ string TrimWhitespace(string param){
 
 vector<string> GetUniformNames(string shaderCode){
 	//TO-DO write this code.
-	return SplitStringByDelimiter(shaderCode, "\n");
+	vector<string> lines = SplitStringByDelimiter(shaderCode, "\n");
+
+	vector<string> uniformNames = vector<string>();
+
+	for(auto iter = lines.begin(); iter != lines.end(); iter++){
+		string trimmedLine = TrimWhitespace(*iter);
+		if(trimmedLine.substr(0,7) == "uniform"){
+			int lastSpace = trimmedLine.find_last_of(' ') + 1;
+			int uniformLength = trimmedLine.size() - lastSpace - 1;
+			uniformNames.push_back(trimmedLine.substr(lastSpace, uniformLength));
+		}
+	}
+
+	return uniformNames;
 }
 
 Material::~Material(){

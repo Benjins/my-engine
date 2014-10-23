@@ -71,8 +71,22 @@ int RunAllTests(){
 	AssertEqual<string>(TrimWhitespace(" \n\t  \t\t\t  \t\n\n   AAFAAGDG    "), "AAFAAGDG", "TrimWhitespace mixed whitespace check.");
 	AssertEqual<string>(TrimWhitespace(" \n  A  AF   AAGD  \tG \t  "), "A  AF   AAGD  \tG", "TrimWhitespace interior whitespace check.");
 
+	vector<string> uniformNames1 = GetUniformNames("uniform sampler2D _mainTex;");
+	AssertEqual<int>(uniformNames1.size(), 1, "Number of uniforms found in uniformName1");
+	AssertEqual<string>(uniformNames1[0], "_mainTex", "uniformName1 first uniform's name check");
+	//cout << "uniformNames1[0]:" << uniformNames1[0] << ":_mainTex:" << endl;
+
+	vector<string> uniformNames2 = GetUniformNames("\t  uniform   sampler2D   _mainTex;  ");
+	AssertEqual<int>(uniformNames2.size(), 1, "Number of uniforms found in uniformName2");
+	AssertEqual<string>(uniformNames2[0], "_mainTex", "uniformName2 first uniform's name check");
+
+	vector<string> uniformNames3 = GetUniformNames("\t  uniform   sampler2D   _mainTex;  \n\t uniform vec4 position;");
+	AssertEqual<int>(uniformNames3.size(), 2, "Number of uniforms found in uniformName3");
+	AssertEqual<string>(uniformNames3[0], "_mainTex", "uniformName3 first uniform's name check");
+	AssertEqual<string>(uniformNames3[1], "position", "uniformName3 second uniform's name check");
 	
-	if(true){
+	//Scoping
+	{
 		CrtCheckMemory memCheck;
 
 		GameObject* obj = new GameObject();
