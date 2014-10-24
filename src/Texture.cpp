@@ -7,6 +7,7 @@ Texture::Texture(GLenum TextureTarget, const std::string& _fileName){
 	pixelData = NULL;
 }
 
+//Requires OpenGL context
 void Texture::Load(void){
     BMP image;
 	
