@@ -3,7 +3,11 @@
 
 #include <string>
 #include "Model.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/glew.h>
+#endif
 
 using std::string;
 

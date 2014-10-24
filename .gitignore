@@ -43,5 +43,7 @@ EngineNP++Work.txt
 Debug/*
 x64/*
 *.mtl
-
-
+build/*
+temp/*
+my-engine/*
+my-engine/my-engine.xcodeproj/*

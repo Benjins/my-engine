@@ -2,7 +2,11 @@
 #define DRAWCALL_H
 
 #include "Model.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/glew.h>
+#endif
 
 struct Material;
 

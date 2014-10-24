@@ -2,8 +2,12 @@
 #include "../header/int/Material.h"
 #include "../header/int/Texture.h"
 
-#include "GL/glew.h"
-#include "GL/glut.h"
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/glew.h>
+#include <GL/glut.h>
+#endif
 
 DrawCall::DrawCall(const Model& model, Material* mat){
 	material = mat;

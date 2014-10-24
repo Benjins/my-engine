@@ -5,10 +5,12 @@
 #include <cstring>
 
 #ifdef TESTING
+#if defined(_WIN32) || defined(_WIN64)
 #  define _CRTDBG_MAP_ALLOC
 #  define _CRTDBG_MAP_ALLOC_NEW
 #  include <crtdbg.h>
 #  include <assert.h>
+#endif
 #endif
 
 using std::ifstream; using std::cout; using std::cerr; using std::strlen;

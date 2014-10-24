@@ -5,7 +5,9 @@
 
 #include <string>
 #include <iostream>
+#if defined(_WIN32) || defined(_WIN64)
 #include <crtdbg.h>
+#endif
 
 using std::string; 
 

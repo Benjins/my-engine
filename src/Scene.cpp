@@ -2,8 +2,14 @@
 #include "../header/int/Mat4.h"
 #include "../header/int/Material.h"
 #include "../header/int/Vector4.h"
-#include <GL/freeglut.h>
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <GLUT/glut.h>
+#else
 #include <GL/glew.h>
+#include <GL/freeglut.h>
+#endif
 
 Scene::Scene(){
 }
@@ -19,10 +25,12 @@ Scene::Scene(int argc, char** argv){
     glutInitWindowPosition(100, 100);
     glutCreateWindow("my-engine");
 
+#ifndef __APPLE__
 	GLenum res = glewInit();
     if (res != GLEW_OK) {
       fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
     }
+#endif
 
 	glutDisplayFunc(RenderScene);
 	glutIdleFunc(RenderScene);
@@ -152,7 +160,9 @@ void Scene::OnKey(unsigned char key, int x, int y){
 }
 
 void Scene::Stop(){
+#ifndef __APPLE__
 	glutLeaveMainLoop();
+#endif
 }
 
 Scene::~Scene(){
