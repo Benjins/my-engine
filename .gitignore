@@ -32,6 +32,9 @@ out/*
 *.cpp~
 .gitignore~
 
+#mac specific
+.DS_Store
+
 #misc
 EngineNP++Work.txt
 *.vcxproj
