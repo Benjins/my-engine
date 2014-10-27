@@ -90,6 +90,7 @@ void Scene::Render(){
 
 	GameObject* y = *objects.begin();
 	y->transform.rotation = Quaternion(Y_AXIS, ((float)currTime)/1000);
+	y->transform.position.y = sinf(((float)currTime)/1000);
 
 	float aspectRatio = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
 	float fieldOfView = 80;

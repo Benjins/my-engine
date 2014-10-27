@@ -91,6 +91,25 @@ int RunAllTests(){
 	AssertEqual<string>(uniformNames4[0], "_mainTex", "uniformName4 first uniform's name check");
 	AssertEqual<string>(uniformNames4[1], "position", "uniformName4 second uniform's name check");
 
+	SC_Transform transTest1;
+	SC_Transform transTest1_p;
+	transTest1.parent = &transTest1_p;
+	transTest1.position = X_AXIS;
+	transTest1_p.rotation = Quaternion(Y_AXIS, 3.14159265358979f/2);
+	Vector3 globalTest1 = transTest1.GlobalPosition();
+	
+	AssertApprox(globalTest1.x,0,"global position test 1 x-value");
+	AssertApprox(globalTest1.y,0,"global position test 1 y-value");
+	AssertApprox(globalTest1.z,1,"global position test 1 z-value");
+
+	transTest1_p.rotation = Quaternion(Y_AXIS, 3.14159265358979f);
+	transTest1_p.position = Z_AXIS * 3;
+	Vector3 globalTest2 = transTest1.GlobalPosition();
+	
+	AssertApprox(globalTest2.x,-1,"global position test 2 x-value");
+	AssertApprox(globalTest2.y,0,"global position test 2 y-value");
+	AssertApprox(globalTest2.z,3,"global position test 2 z-value");
+
 	//Scoping
 	{
 		CrtCheckMemory memCheck;
@@ -143,7 +162,7 @@ void AssertTrue(bool check, string error){
 	}
 }
 
-void AssertApprox(float actual, float expected, string error, float maxDifference){
+void AssertApprox(float expected, float actual, string error, float maxDifference){
 	testCount++;
 
 	float difference = actual - expected;
