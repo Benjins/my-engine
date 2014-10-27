@@ -8,7 +8,7 @@
 #include <GL/glew.h>
 #endif
 
-struct Material;
+struct Material; struct GameObject;
 
 struct DrawCall{
 	//Data for OpenGL
@@ -19,8 +19,9 @@ struct DrawCall{
 	int vertCount;
 	
 	Material* material;
+	GameObject* obj;
 	
-	DrawCall(const Model& model, Material* mat);
+	DrawCall(GameObject* _obj);
 	
 	void Draw() const;
 };

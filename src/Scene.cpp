@@ -63,7 +63,7 @@ GameObject* Scene::AddObject(GameObject* obj){
 
 	if(obj->material != NULL && obj->mesh != NULL){
 		cout << "Added draw call\n";
-		drawCalls.push_back(DrawCall(*(obj->mesh), obj->material));
+		drawCalls.push_back(DrawCall(obj));
 	}
 
 	return obj;
@@ -88,6 +88,9 @@ void Scene::Render(){
 	deltaTime = ((float)currTime - prevTime)/CLOCKS_PER_SEC;
 	prevTime = currTime;
 
+	GameObject* y = *objects.begin();
+	y->transform.rotation = Quaternion(Y_AXIS, ((float)currTime)/1000);
+
 	float aspectRatio = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
 	float fieldOfView = 80;
 	float nearZ = 0.1;
@@ -98,10 +101,11 @@ void Scene::Render(){
 
 	Mat4x4 camMatrix = camera.GetInverse().LocalToGlobalMatrix();
 
-	Mat4x4 finalMatrix = perspMatrix * camMatrix;
+	//Mat4x4 finalMatrix = perspMatrix * camMatrix;
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
-		glUniformMatrix4fv(iter->material->GetUniformByName("objectMatrix"), 1, GL_TRUE, &finalMatrix.m[0][0]);
+		glUniformMatrix4fv(iter->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
+		glUniformMatrix4fv(iter->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 
 		iter->Draw();	
 	}

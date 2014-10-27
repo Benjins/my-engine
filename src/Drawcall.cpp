@@ -1,4 +1,6 @@
 #include "../header/int/Drawcall.h"
+#include "../header/int/Gameobject.h"
+#include "../header/int/Mat4.h"
 #include "../header/int/Material.h"
 #include "../header/int/Texture.h"
 
@@ -9,19 +11,20 @@
 #include <GL/glut.h>
 #endif
 
-DrawCall::DrawCall(const Model& model, Material* mat){
-	material = mat;
-	int size = model.faces.size() * 3;
+DrawCall::DrawCall(GameObject* _obj){
+	obj = _obj;
+	material = _obj->material;
+	int size = _obj->mesh->faces.size() * 3;
 	vertCount = size;
 	vector<Vector3> Vertices;
 	vector<Vector2> uvCoords;
 
-    for(int i = 0; i < model.faces.size(); i++){
-		Face face = model.faces[i];
+    for(int i = 0; i < _obj->mesh->faces.size(); i++){
+		Face face = _obj->mesh->faces[i];
 		
-		Vertices.push_back(model.vertices[face.v2].position);
-		Vertices.push_back(model.vertices[face.v1].position);
-		Vertices.push_back(model.vertices[face.v0].position);
+		Vertices.push_back(_obj->mesh->vertices[face.v2].position);
+		Vertices.push_back(_obj->mesh->vertices[face.v1].position);
+		Vertices.push_back(_obj->mesh->vertices[face.v0].position);
 
 		//cout << Vertices[i].Magnitude() << endl;
 		
@@ -39,11 +42,13 @@ DrawCall::DrawCall(const Model& model, Material* mat){
 	glBindBuffer(GL_ARRAY_BUFFER, uvs);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vector2)*uvCoords.size(), &(uvCoords[0]), GL_STATIC_DRAW);
 	
-	glUniform1i(mat->GetUniformByName("_mainTex"), 0);
+	glUniform1i(material->GetUniformByName("_mainTex"), 0);
 }
 
 void DrawCall::Draw() const{
 	glUseProgram(material->shaderProgram);
+
+	glUniformMatrix4fv(material->GetUniformByName("_objectMatrix"), 1, GL_TRUE,  &obj->transform.LocalToGlobalMatrix().m[0][0]);
 	
 	glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertices);
@@ -59,7 +64,6 @@ void DrawCall::Draw() const{
 	
 	material->mainTexture->Bind(GL_TEXTURE0);
 	
-	//cout << "Vertcount: " << vertCount << endl;
 	glDrawArrays(GL_TRIANGLES, 0, vertCount);
 	
 	glDisableVertexAttribArray(0);
