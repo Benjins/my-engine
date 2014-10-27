@@ -26,6 +26,9 @@ void GameObject::AddMesh(string fileName){
 }
 
 void GameObject::AddMaterial(string matName, string textureName){
+	if(material != NULL){
+		delete material;
+	}
 	material = new Material(matName, textureName);
 }
 

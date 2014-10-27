@@ -18,7 +18,7 @@ struct DrawCall{
 	
 	int vertCount;
 	
-	Material* material;
+	//Material* material;
 	GameObject* obj;
 	
 	DrawCall(GameObject* _obj);

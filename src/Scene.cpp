@@ -17,6 +17,8 @@ Scene::Scene(){
 Scene::Scene(int argc, char** argv){
 	drawCalls = list<DrawCall>();
 	camera = SC_Transform();
+	camera.position = Z_AXIS * -5;
+	camera.rotation = Quaternion(Y_AXIS, 3.14159f);
 
 	glutInit(&argc, argv);
 
@@ -55,6 +57,31 @@ void Scene::Init(){
 	y->AddMaterial("shader", "Texture.bmp");
 	y->AddMesh("test.obj");
 	AddObject(y);
+
+	GameObject* z = new GameObject();
+	z->AddMaterial("shader", "Texture.bmp");
+	Model* model = new Model();
+
+	model->vertices.push_back(Vector3(-5,-3,-5));
+	model->vertices.push_back(Vector3(-5,-3, 5));
+	model->vertices.push_back(Vector3( 5,-3,-5));
+	model->vertices.push_back(Vector3( 5,-3, 5));
+
+	model->faces.push_back(Face(0,1,2));
+	model->faces.push_back(Face(3,2,1));
+
+	model->faces[0].uv0 = Vector2(-1,-1);
+	model->faces[0].uv1 = Vector2(-1, 1);
+	model->faces[0].uv2 = Vector2( 1,-1);
+
+	model->faces[1].uv0 = Vector2( 1, 1);
+	model->faces[1].uv1 = Vector2( 1,-1);
+	model->faces[1].uv2 = Vector2(-1, 1);
+
+	z->mesh = model;
+
+	AddObject(z);
+
 }
 
 GameObject* Scene::AddObject(GameObject* obj){
@@ -90,13 +117,13 @@ void Scene::Render(){
 
 	GameObject* y = *objects.begin();
 	y->transform.rotation = Quaternion(Y_AXIS, ((float)currTime)/1000);
-	y->transform.position.y = sinf(((float)currTime)/1000);
+	//y->transform.position.y = sinf(((float)currTime)/1000);
 
 	float aspectRatio = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
 	float fieldOfView = 80;
 	float nearZ = 0.1;
 	float farZ = 1000;
-
+	                                                                    
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Mat4x4 perspMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
@@ -105,8 +132,8 @@ void Scene::Render(){
 	//Mat4x4 finalMatrix = perspMatrix * camMatrix;
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
-		glUniformMatrix4fv(iter->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
-		glUniformMatrix4fv(iter->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
+		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
+		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 
 		iter->Draw();	
 	}
@@ -130,7 +157,7 @@ void Scene::OnPassiveMouse(int x, int y){
 	xRot = xRot + deltaX;
 	yRot = yRot + deltaY;
 
-	camera.rotation = Quaternion(X_AXIS, yRot/200) * Quaternion(Y_AXIS, xRot/200);
+	camera.rotation = Quaternion(Y_AXIS, xRot/200) * Quaternion(X_AXIS, yRot/200);
 
 	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
 
@@ -143,11 +170,11 @@ void Scene::OnKey(unsigned char key, int x, int y){
 		Stop();
 	}
 	else if(key == 'w'){
-		camera.position = camera.position - (Z_AXIS * deltaTime * 10);
+		camera.position = camera.position + (Z_AXIS * deltaTime * 10);
 		//cout << "Delta-time: " << deltaTime << endl;
 	}
 	else if(key == 's'){
-		camera.position = camera.position + (Z_AXIS * deltaTime * 10);
+		camera.position = camera.position - (Z_AXIS * deltaTime * 10);
 	}
 	else if(key == 'a'){
 		camera.position = camera.position - (X_AXIS * deltaTime * 10);

@@ -13,7 +13,6 @@
 
 DrawCall::DrawCall(GameObject* _obj){
 	obj = _obj;
-	material = _obj->material;
 	int size = _obj->mesh->faces.size() * 3;
 	vertCount = size;
 	vector<Vector3> Vertices;
@@ -42,10 +41,11 @@ DrawCall::DrawCall(GameObject* _obj){
 	glBindBuffer(GL_ARRAY_BUFFER, uvs);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vector2)*uvCoords.size(), &(uvCoords[0]), GL_STATIC_DRAW);
 	
-	glUniform1i(material->GetUniformByName("_mainTex"), 0);
+	glUniform1i(_obj->material->GetUniformByName("_mainTex"), 0);
 }
 
 void DrawCall::Draw() const{
+	Material* material = obj->material;
 	glUseProgram(material->shaderProgram);
 
 	glUniformMatrix4fv(material->GetUniformByName("_objectMatrix"), 1, GL_TRUE,  &obj->transform.LocalToGlobalMatrix().m[0][0]);

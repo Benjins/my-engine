@@ -127,7 +127,6 @@ string TrimWhitespace(string param){
 }
 
 vector<string> GetUniformNames(string shaderCode){
-	//TO-DO write this code.
 	vector<string> lines = SplitStringByDelimiter(shaderCode, "\n");
 
 	vector<string> uniformNames = vector<string>();
