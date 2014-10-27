@@ -39,7 +39,7 @@ DrawCall::DrawCall(const Model& model, Material* mat){
 	glBindBuffer(GL_ARRAY_BUFFER, uvs);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vector2)*uvCoords.size(), &(uvCoords[0]), GL_STATIC_DRAW);
 	
-	glUniform1i(mat->textureUniform, 0);
+	glUniform1i(mat->GetUniformByName("_mainTex"), 0);
 }
 
 void DrawCall::Draw() const{

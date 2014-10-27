@@ -40,9 +40,16 @@ Material::Material(string _shaderName, string textureName){
 			cout << "mainTexture made.\n";
 			mainTexture = new Texture(GL_TEXTURE_2D, textureName);
 			mainTexture->Load();
-			textureUniform = glGetUniformLocation(shaderProgram, "_mainTex");
-			cameraUniform = glGetUniformLocation(shaderProgram, "_cameraMatrix");
-			objectMatrixUniform = glGetUniformLocation(shaderProgram, "objectMatrix");
+
+			uniformNames = GetUniformNames(vshaderText + fshaderText);
+
+			for(int i = 0; i < uniformNames.size(); i++){
+				uniforms[i] = glGetUniformLocation(shaderProgram, uniformNames[i].c_str());
+			}
+
+			textureUniform = GetUniformByName("_mainTex");
+			cameraUniform = GetUniformByName("_cameraMatrix");
+			objectMatrixUniform = GetUniformByName("objectMatrix");
 			//cout << (textureUniform == 0xffffffff ? "TexUniform is null\n" : "Texuniform is not null, all clear.\n");
 		}
 		else{
@@ -135,6 +142,35 @@ vector<string> GetUniformNames(string shaderCode){
 	}
 
 	return uniformNames;
+}
+
+GLuint Material::GetUniformByName(string name){
+	for(int i = 0; i < uniformNames.size(); i++){
+		if(uniformNames[i] == name){
+			return glGetUniformLocation(shaderProgram, name.c_str());
+		}
+	}
+
+	return -1;
+}
+
+int Material::GetUniformIndexByName(string name){
+	for(int i = 0; i < uniformNames.size(); i++){
+		if(uniformNames[i] == name){
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+GLuint Material::GetUniformByIndex(int index){
+	if(index < MAX_NUMBER_OF_UNIFORMS && index > 0){
+		return uniforms[index];
+	}
+	else{
+		return -1;
+	}
 }
 
 Material::~Material(){

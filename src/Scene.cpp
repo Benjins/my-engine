@@ -101,9 +101,8 @@ void Scene::Render(){
 	Mat4x4 finalMatrix = perspMatrix * camMatrix;
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
-		glUniformMatrix4fv(iter->material->objectMatrixUniform, 1, GL_TRUE, &finalMatrix.m[0][0]);
-		
-		iter->material;
+		glUniformMatrix4fv(iter->material->GetUniformByName("objectMatrix"), 1, GL_TRUE, &finalMatrix.m[0][0]);
+
 		iter->Draw();	
 	}
 
