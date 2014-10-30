@@ -97,7 +97,11 @@ GameObject* Scene::AddObject(GameObject* obj){
 }
 
 void Scene::Start(){
-    glutMainLoop();
+	running = true;
+	while(running){
+		glutPostRedisplay();
+		glutMainLoopEvent();
+	}
 }
 
 void Scene::UpdateVertexBuffer(){
@@ -192,8 +196,9 @@ void Scene::OnKey(unsigned char key, int x, int y){
 
 void Scene::Stop(){
 #ifndef __APPLE__
-	glutLeaveMainLoop();
+	//glutLeaveMainLoop();
 #endif
+	running = false;
 }
 
 Scene::~Scene(){

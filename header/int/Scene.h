@@ -22,6 +22,8 @@ protected:
 	float xRot;
 	float yRot;
 
+	bool running;
+
 	clock_t prevTime;
 public:
 	
