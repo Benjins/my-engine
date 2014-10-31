@@ -127,8 +127,17 @@ int RunAllTests(){
 		boxCol1->size = Vector3(3,1.8f,1.8f);
 		AssertEqual<bool>(boxCol1->CollisionWith(sphereCol1).collide, true, "boxcol1 does collide with spherecol1 after box is grown");
 
+		SphereCollider* sphereCol2 = new SphereCollider();
+		sphereCol2->position = Vector3(2.0f,2.0f,2.8f);
+		sphereCol2->radius = 0.21f;
+		AssertEqual<bool>(sphereCol2->CollisionWith(sphereCol1).collide, true, "sphereCol2 does collide with spherecol1");
+
+		sphereCol2->radius = 0.19f;
+		AssertEqual<bool>(sphereCol2->CollisionWith(sphereCol1).collide, false, "sphereCol2 does not collide with spherecol1 atfer it shrinks");
+
 		delete boxCol1;
 		delete sphereCol1;
+		delete sphereCol2;
 	}
 
 	//Scoping
@@ -158,6 +167,12 @@ int RunAllTests(){
 	}
 
 	//--------------------------
+	//Performance testing
+	PerformanceTest(BoxSpherePerformance,20000, "BoxSphereCollision"); //21 -30
+	PerformanceTest(SphereSpherePerformance,20000, "SphereSpherePerformance");
+
+
+	//---------------------------
 
 
 	cout << endl << passedTests << " of " << testCount << " tests passed.\n";
@@ -183,6 +198,37 @@ void AssertTrue(bool check, string error){
 	}
 }
 
+static void BoxBoxPerformance(){
+	BoxCollider box1, box2;
+	box1.position = Vector3(2,5,-2);
+	box1.size = Vector3(3,2,8);
+	box2.position = Vector3(-2,4,-3);
+	box2.size = Vector3(1,2,1);
+
+	Collision x = DetectCollision(&box1, &box2);
+}
+
+static void BoxSpherePerformance(){
+	BoxCollider box1;
+	SphereCollider sphere1;
+	box1.position = Vector3(2,5,-2);
+	box1.size = Vector3(3,2,8);
+	sphere1.position = Vector3(-2,4,-3);
+	sphere1.radius = 0.5f;
+
+	Collision x = DetectCollision(&sphere1, &box1);
+}
+
+static void SphereSpherePerformance(){
+	SphereCollider sphere1, sphere2;
+	sphere2.position = Vector3(2,5,-2);
+	sphere2.radius = 1.2f;
+	sphere1.position = Vector3(-2,4,-3);
+	sphere1.radius = 0.5f;
+
+	Collision x = DetectCollision(&sphere1, &sphere2);
+}
+
 void AssertApprox(float expected, float actual, string error, float maxDifference){
 	testCount++;
 
@@ -194,6 +240,28 @@ void AssertApprox(float expected, float actual, string error, float maxDifferenc
 	else{
 		passedTests++;
 	}
+}
+
+double PerformanceTest(void (*func) (void), int count, string name){
+	int trueCount = count;
+
+	//If you're stupid enough to call with count < 0, I'm sorry.
+	if(trueCount < 0){
+		trueCount = 0;
+	}
+
+	clock_t start = clock();
+
+	for(int i = 0; i < trueCount; i++){
+		func();
+	}
+
+	clock_t end = clock();
+
+	double timeElapsed = (double(end-start))/CLOCKS_PER_SEC*1000;
+
+	cout << "\nPerformance test for: " << name << ", ran " << trueCount << " times in " << timeElapsed << " ms.\n";
+	return timeElapsed;
 }
 
 #endif
