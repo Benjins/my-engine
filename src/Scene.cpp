@@ -114,6 +114,10 @@ void Scene::OnUpdate(){
 	}
 }
 
+void PhysicsUpdate(){
+	
+}
+
 void Scene::Render(){
 	clock_t currTime = clock();
 	deltaTime = ((float)currTime - prevTime)/CLOCKS_PER_SEC;

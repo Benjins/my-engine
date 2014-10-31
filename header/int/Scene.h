@@ -50,6 +50,7 @@ public:
 	void OnUpdate();
 
 	void Render();
+	void PhysicsUpdate();
 
 	void OnMouse(int button, int state, int x, int y);
 	void OnPassiveMouse(int x, int y);

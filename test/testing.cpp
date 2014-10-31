@@ -6,6 +6,7 @@
 #include "../header/int/Material.h"
 #include "../header/int/Texture.h"
 #include "../header/int/Mat4.h"
+#include "../header/int/Collider.h"
 #include "testing.h"
 
 #include <string>
@@ -109,6 +110,26 @@ int RunAllTests(){
 	AssertApprox(globalTest2.x,-1,"global position test 2 x-value");
 	AssertApprox(globalTest2.y,0,"global position test 2 y-value");
 	AssertApprox(globalTest2.z,3,"global position test 2 z-value");
+
+	{
+		CrtCheckMemory memCheck;
+		BoxCollider* boxCol1 = new BoxCollider();
+		boxCol1->position = Vector3(0,0,0);
+		boxCol1->size = Vector3(1,1,1);
+		SphereCollider* sphereCol1 = new SphereCollider();
+		sphereCol1->position = Vector3(1.2f, 0, 0);
+		sphereCol1->radius = 0.6f;
+		AssertEqual<bool>(boxCol1->CollisionWith(sphereCol1).collide, true, "boxcol1 collides with spherecol1");
+
+		sphereCol1->position = Vector3(2.0f, 2.0f, 2.0f);
+		AssertEqual<bool>(boxCol1->CollisionWith(sphereCol1).collide, false, "boxcol1 doesn't collide with spherecol1 after it's moved");
+
+		boxCol1->size = Vector3(3,1.8f,1.8f);
+		AssertEqual<bool>(boxCol1->CollisionWith(sphereCol1).collide, true, "boxcol1 does collide with spherecol1 after box is grown");
+
+		delete boxCol1;
+		delete sphereCol1;
+	}
 
 	//Scoping
 	{

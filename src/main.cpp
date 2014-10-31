@@ -2,6 +2,7 @@
 #include "../header/int/GameObject.h"
 #include "../header/int/Component.h"
 #include "../header/int/Mat4.h"
+#include "../header/int/Collider.h"
 #include "../test/testing.h"
 #include <iomanip>
 
