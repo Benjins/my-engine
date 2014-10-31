@@ -52,6 +52,12 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 	bool withinExtendedY = yBoxInter && yExInter && zBoxInter;
 	bool withinExtendedZ = xBoxInter && yBoxInter && zExInter;
 
+	if(withinExtendedX || withinExtendedY || withinExtendedZ){
+		Collision col;
+		col.collide = true;
+		return col;
+	}
+
 	float xEdgeDist = min<float>(abs(col2->position.x - col2->size.x - col1->position.x), abs(col2->position.x + col2->size.x - col1->position.x));
 	float yEdgeDist = min<float>(abs(col2->position.y - col2->size.y - col1->position.y), abs(col2->position.y + col2->size.y - col1->position.y));
 	float zEdgeDist = min<float>(abs(col2->position.z - col2->size.z - col1->position.z), abs(col2->position.z + col2->size.z - col1->position.z));
@@ -64,18 +70,51 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 	bool withinEdgeXZ = xExInter && yBoxInter && zExInter && (xEdgeDistSqr + zEdgeDistSqr < radiusSqr);
 	bool withinEdgeYZ = xBoxInter && yExInter && zExInter && (yEdgeDistSqr + zEdgeDistSqr < radiusSqr);
 
+	if(withinEdgeXY || withinEdgeXZ || withinEdgeYZ){
+		Collision col;
+		col.collide = true;
+		return col;
+	}
+
 	bool withinCorner = xExInter && yExInter && zExInter && (xEdgeDistSqr + yEdgeDistSqr + zEdgeDistSqr < radiusSqr);
 
-	bool result = withinExtendedX || withinExtendedY || withinExtendedZ || withinEdgeXY || withinEdgeXZ || withinEdgeYZ || withinCorner;
-
+	if(withinCorner){
+		Collision col;
+		col.collide = true;
+		return col;
+	}
+	
 	Collision col;
-	col.collide = result;
+	col.collide = false;
+
 	return col;
 }
 
 Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
+	Vector3 maxOne = col1->position + col1->size;
+	Vector3 minOne = col1->position - col1->size;
+
+	Vector3 maxTwo = col2->position + col2->size;
+	Vector3 minTwo = col2->position - col2->size;
+
+	bool xIntersection =   RangeCheck(minOne.x, minTwo.x, maxOne.x) || RangeCheck(minOne.x, maxTwo.x, maxOne.x)
+						|| RangeCheck(minTwo.x, minOne.x, maxTwo.x) || RangeCheck(minTwo.x, maxOne.x, maxTwo.x);
+
+	bool yIntersection =   RangeCheck(minOne.y, minTwo.y, maxOne.y) || RangeCheck(minOne.y, maxTwo.y, maxOne.y)
+						|| RangeCheck(minTwo.y, minOne.y, maxTwo.y) || RangeCheck(minTwo.y, maxOne.y, maxTwo.y);
+
+	bool zIntersection =   RangeCheck(minOne.z, minTwo.z, maxOne.z) || RangeCheck(minOne.z, maxTwo.z, maxOne.z)
+						|| RangeCheck(minTwo.z, minOne.z, maxTwo.z) || RangeCheck(minTwo.z, maxOne.z, maxTwo.z);
+
+	
+
 	Collision x;
+	x.collide = xIntersection && yIntersection && zIntersection;
 	return x;
+}
+
+bool RangeCheck(float min, float mid, float max){
+	return min < mid && mid < max;
 }
 
 //Don't use these; pure virtual declaration caused errors in MSVC.

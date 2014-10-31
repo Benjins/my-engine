@@ -135,7 +135,17 @@ int RunAllTests(){
 		sphereCol2->radius = 0.19f;
 		AssertEqual<bool>(sphereCol2->CollisionWith(sphereCol1).collide, false, "sphereCol2 does not collide with spherecol1 atfer it shrinks");
 
+		BoxCollider* boxCol2 = new BoxCollider();
+		boxCol2->position = Vector3(4.01f, 3, 3);
+		boxCol2->size = Vector3(1,1,1);
+		AssertEqual<bool>(boxCol2->CollisionWith(boxCol1).collide, false, "boxCol1 does not collide with boxCol2 at first");
+
+		boxCol2->position = Vector3(2, 2, 2);
+		boxCol2->size = Vector3(1.2f,1.1f,1.1f);
+		AssertEqual<bool>(boxCol2->CollisionWith(boxCol1).collide, true, "boxCol1 does collide with boxCol2 when box2 grows");
+
 		delete boxCol1;
+		delete boxCol2;
 		delete sphereCol1;
 		delete sphereCol2;
 	}
@@ -168,8 +178,9 @@ int RunAllTests(){
 
 	//--------------------------
 	//Performance testing
-	PerformanceTest(BoxSpherePerformance,20000, "BoxSphereCollision"); //21 -30
+	PerformanceTest(BoxSpherePerformance,20000, "BoxSphereCollision");
 	PerformanceTest(SphereSpherePerformance,20000, "SphereSpherePerformance");
+	PerformanceTest(BoxBoxPerformance,20000, "BoxBoxPerformance");
 
 
 	//---------------------------

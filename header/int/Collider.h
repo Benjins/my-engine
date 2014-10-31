@@ -41,4 +41,6 @@ Collision DetectCollision(const SphereCollider* col1, const SphereCollider* col2
 Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2);
 Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2);
 
+bool RangeCheck(float min, float mid, float max);
+
 #endif
