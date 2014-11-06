@@ -111,6 +111,7 @@ int RunAllTests(){
 	AssertApprox(globalTest2.y,0,"global position test 2 y-value");
 	AssertApprox(globalTest2.z,3,"global position test 2 z-value");
 
+	//Scoping
 	{
 		CrtCheckMemory memCheck;
 		BoxCollider* boxCol1 = new BoxCollider();

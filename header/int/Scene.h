@@ -9,6 +9,8 @@
 
 using std::list;
 
+struct RigidBody;
+
 struct Scene{
 	SC_Transform camera;
 	float deltaTime;
@@ -23,6 +25,8 @@ protected:
 	float yRot;
 
 	bool running;
+
+	RigidBody* rb;
 
 	clock_t prevTime;
 public:

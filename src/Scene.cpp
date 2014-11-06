@@ -2,6 +2,7 @@
 #include "../header/int/Mat4.h"
 #include "../header/int/Material.h"
 #include "../header/int/Vector4.h"
+#include "../header/int/RigidBody.h"
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -44,7 +45,7 @@ Scene::Scene(int argc, char** argv){
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable (GL_DEPTH_TEST);
 
-	Init();
+	//Init();
 
 	xRot = 0;
 	yRot = 0;
@@ -54,9 +55,14 @@ Scene::Scene(int argc, char** argv){
 
 void Scene::Init(){
 	GameObject* y = new GameObject();
+	y->transform.position = Vector3(0, 5, 0);
 	y->AddMaterial("shader", "Texture.bmp");
 	y->AddMesh("test.obj");
 	AddObject(y);
+
+	rb = new RigidBody();
+	rb->transform = &(y->transform);
+	rb->state.position = rb->transform->position;
 
 	GameObject* z = new GameObject();
 	z->AddMaterial("shader", "Texture.bmp");
@@ -123,8 +129,10 @@ void Scene::Render(){
 	deltaTime = ((float)currTime - prevTime)/CLOCKS_PER_SEC;
 	prevTime = currTime;
 
+	rb->StepForward(deltaTime);
+
 	GameObject* y = *objects.begin();
-	y->transform.rotation = Quaternion(Y_AXIS, ((float)currTime)/1000);
+	//y->transform.rotation = Quaternion(Y_AXIS, ((float)currTime)/1000);
 	//y->transform.position.y = sinf(((float)currTime)/1000);
 
 	float aspectRatio = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
