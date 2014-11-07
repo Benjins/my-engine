@@ -15,6 +15,7 @@
 GameObject::GameObject(){
 	mesh = NULL;
 	material = NULL;
+	transform.gameObject = this;
 }
 
 GameObject::GameObject(Scene& sceneRef){

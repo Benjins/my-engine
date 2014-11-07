@@ -1,5 +1,8 @@
 #include "../header/int/PhysicsSim.h"
+#include "../header/int/GameObject.h"
+#include "../header/int/Transform.h"
 #include "../header/int/Collider.h"
+
 
 
 Collision BoxCollider::CollisionWith(const Collider* col) const{
@@ -12,8 +15,24 @@ Collision BoxCollider::CollisionWith(const SphereCollider* col) const{
 	return DetectCollision(col, this);
 }
 
+Collider::Collider(){
+	gameObject = NULL;
+}
+
+BoxCollider::BoxCollider(Vector3 _position, Vector3 _size){
+	gameObject = NULL;
+	position = _position;
+	size = _size;
+}
+
 void BoxCollider::AddToSim(PhysicsSim* sim){
 	sim->staticBoxBodies.push_back(this);
+}
+
+SphereCollider::SphereCollider(Vector3 _position, float _radius){
+	gameObject = NULL;
+	position = _position;
+	radius = _radius;
 }
 
 Collision SphereCollider::CollisionWith(const Collider* col) const{
@@ -35,7 +54,11 @@ Collision DetectCollision(const SphereCollider* col1, const SphereCollider* col2
 	float maxDistance = (col1->radius + col2->radius);
 	float maxDistanceSqr = maxDistance*maxDistance;
 
-	float distanceSqr = (col1->position - col2->position).MagnitudeSquared();
+	Vector3 col1TransformedPos = col1->position;
+	if(col2->gameObject != NULL && col2->gameObject != NULL){
+		col1TransformedPos = col2->gameObject->transform.GlobalToLocal(col1->gameObject->transform.LocalToGlobal(col1->position));
+	}
+	float distanceSqr = (col1TransformedPos - col2->position).MagnitudeSquared();
 
 	Collision collision;
 	collision.collide = distanceSqr < maxDistanceSqr;

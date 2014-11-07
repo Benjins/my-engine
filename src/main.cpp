@@ -20,7 +20,7 @@ using std::cout; using std::endl;
 
 int main(int argc, char** argv){
 
-#ifdef TESTING
+#ifdef TESTING 
 #if defined(_WIN32) || defined(_WIN64)
 	//Windows memory leak checking
 	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE );
@@ -48,5 +48,6 @@ int main(int argc, char** argv){
 	x.Start();
 	
 	return 0;
+
 #endif
 }

@@ -32,7 +32,7 @@ struct RigidBody{
 	RBState state;
 	RBDeriv deriv;
 
-	RigidBody(SC_Transform* _transform, Collider* _col);
+	RigidBody(SC_Transform* _transform, Collider* _col, float m_ass = 1.0f);
 
 	void AddForce(Vector3 force);
 

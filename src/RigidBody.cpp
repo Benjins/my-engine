@@ -6,16 +6,17 @@
 #include "../header/int/PhysicsSim.h"
 
 
-RigidBody::RigidBody(SC_Transform* _transform, Collider* _col){
+RigidBody::RigidBody(SC_Transform* _transform, Collider* _col, float _mass){
 	transform = _transform;
 	col = _col;
-	//cout << "transform->gameObject->scene: " << (long)transform->gameObject->scene << endl;
 	transform->gameObject->scene->physicsSim->AddRigidBody(this);
 	state.position = transform->position;
+
+	mass = _mass;
+	state.invMass = 1/_mass;
 }
 
 void RigidBody::AddForce(Vector3 force){
-
 	state.force = state.force + force;
 }
 
@@ -44,14 +45,9 @@ void RigidBody::StepForward(float deltaTime){
 
 RBDeriv Evaluate(const RBState& init, float dt, const RBDeriv& d){
 
-	RBState state;
-	state.position = init.position + d.instantVelocity * dt;
-	state.velocity = init.velocity + d.instantAcceleration * dt;
-
 	RBDeriv deriv;
-	deriv.instantVelocity = state.velocity;
-	deriv.instantAcceleration = state.position * -10 - state.velocity;
-	//For now, acceleration is hardcoded as a spring force
+	deriv.instantVelocity = init.velocity + d.instantAcceleration * dt;
+	deriv.instantAcceleration = init.force*init.invMass*dt;
 
 	return deriv;
 }

@@ -59,14 +59,14 @@ Scene::Scene(int argc, char** argv){
 void Scene::Init(){
 	GameObject* y = new GameObject();
 	y->transform.position = Vector3(0, 5, 0);
-	y->transform.gameObject = y;
+	//y->transform.gameObject = y;
 	y->AddMaterial("shader", "Texture.bmp");
 	y->AddMesh("test.obj");
 	AddObject(y);
 
 	rb = new RigidBody(&(y->transform), new BoxCollider());
-	//rb->transform = &(y->transform);
-	//rb->state.position = rb->transform->position;
+
+	rb->AddForce(Vector3(0,-2,0));
 
 	GameObject* z = new GameObject();
 	z->AddMaterial("shader", "Texture.bmp");

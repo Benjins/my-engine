@@ -177,6 +177,27 @@ int RunAllTests(){
 		delete obj;
 	}
 
+	{
+		CrtCheckMemory memCheck;
+
+		GameObject* obj1 = new GameObject();
+		obj1->AddComponent<SphereCollider>();
+		GameObject* obj2 = new GameObject();
+		obj2->AddComponent<SphereCollider>();
+
+		SphereCollider* col1 = obj1->GetComponent<SphereCollider>();
+		SphereCollider* col2 = obj2->GetComponent<SphereCollider>();
+
+		AssertTrue(DetectCollision(col1, col2).collide, "Two spheres attached to GO's in the same place collide");
+
+		obj1->transform.position = Vector3(0, 3, 0);
+
+		AssertTrue(!DetectCollision(col1, col2).collide, "Two spheres attached to offset GO's don't collide");
+
+		delete obj1;
+		delete obj2;
+	}
+
 	//--------------------------
 	//Performance testing
 	PerformanceTest(BoxSpherePerformance,20000, "BoxSphereCollision");
