@@ -4,6 +4,7 @@
 #include "../ext/3dbasics.h"
 
 struct SC_Transform;
+struct Collider;
 
 struct RBState{
 	Vector3 position;
@@ -26,12 +27,18 @@ struct RigidBody{
 
 	SC_Transform* transform;
 
+	Collider* col;
+
 	RBState state;
 	RBDeriv deriv;
+
+	RigidBody(SC_Transform* _transform, Collider* _col);
 
 	void AddForce(Vector3 force);
 
 	void StepForward(float deltaTime);
+
+	~RigidBody();
 
 };
 

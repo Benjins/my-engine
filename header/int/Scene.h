@@ -10,10 +10,13 @@
 using std::list;
 
 struct RigidBody;
+struct PhysicsSim;
 
 struct Scene{
 	SC_Transform camera;
 	float deltaTime;
+
+	PhysicsSim* physicsSim;
 
 protected:
 	list<GameObject*> objects;

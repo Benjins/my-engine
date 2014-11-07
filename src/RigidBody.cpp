@@ -1,8 +1,18 @@
 #include "../header/int/RigidBody.h"
 #include "../header/int/Transform.h"
+#include "../header/int/Collider.h"
+#include "../header/int/GameObject.h"
+#include "../header/int/Scene.h"
+#include "../header/int/PhysicsSim.h"
 
 
-
+RigidBody::RigidBody(SC_Transform* _transform, Collider* _col){
+	transform = _transform;
+	col = _col;
+	//cout << "transform->gameObject->scene: " << (long)transform->gameObject->scene << endl;
+	transform->gameObject->scene->physicsSim->AddRigidBody(this);
+	state.position = transform->position;
+}
 
 void RigidBody::AddForce(Vector3 force){
 
@@ -29,8 +39,6 @@ void RigidBody::StepForward(float deltaTime){
 
 	state.position = state.position + dxdt * deltaTime;
 	transform->position = state.position;
-	cout << "Updated Transform.position:";
-	transform->position.Print();
 	state.velocity = state.velocity + dvdt * deltaTime;
 }
 
@@ -45,7 +53,9 @@ RBDeriv Evaluate(const RBState& init, float dt, const RBDeriv& d){
 	deriv.instantAcceleration = state.position * -10 - state.velocity;
 	//For now, acceleration is hardcoded as a spring force
 
-	cout << "Evaluate: instantaneous accel.y " << deriv.instantAcceleration.y << endl;
-
 	return deriv;
+}
+
+RigidBody::~RigidBody(){
+	delete col;
 }

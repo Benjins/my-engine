@@ -6,6 +6,7 @@
 
 struct BoxCollider;
 struct SphereCollider;
+struct PhysicsSim;
 
 struct Collision{
 	bool collide;
@@ -19,6 +20,7 @@ struct Collider : Component{
 	virtual Collision CollisionWith(const Collider* col) const;
 	virtual Collision CollisionWith(const BoxCollider* col) const;
 	virtual Collision CollisionWith(const SphereCollider* col) const;
+	virtual void AddToSim(PhysicsSim* sim);
 };
 
 struct BoxCollider : Collider{
@@ -27,6 +29,7 @@ struct BoxCollider : Collider{
 	virtual Collision CollisionWith(const Collider* col) const;
 	virtual Collision CollisionWith(const BoxCollider* col) const;
 	virtual Collision CollisionWith(const SphereCollider* col) const;
+	virtual void AddToSim(PhysicsSim* sim);
 };
 
 struct SphereCollider : Collider{
@@ -35,6 +38,7 @@ struct SphereCollider : Collider{
 	virtual Collision CollisionWith(const Collider* col) const;
 	virtual Collision CollisionWith(const BoxCollider* col) const;
 	virtual Collision CollisionWith(const SphereCollider* col) const;
+	virtual void AddToSim(PhysicsSim* sim);
 };
 
 Collision DetectCollision(const SphereCollider* col1, const SphereCollider* col2);

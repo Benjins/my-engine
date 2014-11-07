@@ -1,3 +1,4 @@
+#include "../header/int/PhysicsSim.h"
 #include "../header/int/Collider.h"
 
 
@@ -11,6 +12,10 @@ Collision BoxCollider::CollisionWith(const SphereCollider* col) const{
 	return DetectCollision(col, this);
 }
 
+void BoxCollider::AddToSim(PhysicsSim* sim){
+	sim->staticBoxBodies.push_back(this);
+}
+
 Collision SphereCollider::CollisionWith(const Collider* col) const{
 	return col->CollisionWith(this);
 }
@@ -19,6 +24,10 @@ Collision SphereCollider::CollisionWith(const BoxCollider* col) const{
 }
 Collision SphereCollider::CollisionWith(const SphereCollider* col) const{
 	return DetectCollision(this, col);
+}
+
+void SphereCollider::AddToSim(PhysicsSim* sim){
+	sim->staticSphereBodies.push_back(this);
 }
 
 
@@ -121,3 +130,4 @@ bool RangeCheck(float min, float mid, float max){
 Collision Collider::CollisionWith(const Collider* col) const{Collision x; return x;}
 Collision Collider::CollisionWith(const BoxCollider* col) const{Collision x; return x;}
 Collision Collider::CollisionWith(const SphereCollider* col) const{Collision x; return x;}
+void Collider::AddToSim(PhysicsSim* sim){}

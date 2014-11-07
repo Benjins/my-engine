@@ -2,6 +2,8 @@
 #include "../header/int/Mat4.h"
 #include "../header/int/Material.h"
 #include "../header/int/Vector4.h"
+#include "../header/int/Collider.h"
+#include "../header/int/PhysicsSim.h"
 #include "../header/int/RigidBody.h"
 
 #ifdef __APPLE__
@@ -20,6 +22,7 @@ Scene::Scene(int argc, char** argv){
 	camera = SC_Transform();
 	camera.position = Z_AXIS * -5;
 	camera.rotation = Quaternion(Y_AXIS, 3.14159f);
+	physicsSim = new PhysicsSim();
 
 	glutInit(&argc, argv);
 
@@ -56,13 +59,14 @@ Scene::Scene(int argc, char** argv){
 void Scene::Init(){
 	GameObject* y = new GameObject();
 	y->transform.position = Vector3(0, 5, 0);
+	y->transform.gameObject = y;
 	y->AddMaterial("shader", "Texture.bmp");
 	y->AddMesh("test.obj");
 	AddObject(y);
 
-	rb = new RigidBody();
-	rb->transform = &(y->transform);
-	rb->state.position = rb->transform->position;
+	rb = new RigidBody(&(y->transform), new BoxCollider());
+	//rb->transform = &(y->transform);
+	//rb->state.position = rb->transform->position;
 
 	GameObject* z = new GameObject();
 	z->AddMaterial("shader", "Texture.bmp");
@@ -105,6 +109,7 @@ GameObject* Scene::AddObject(GameObject* obj){
 void Scene::Start(){
 	running = true;
 	while(running){
+		physicsSim->Advance(deltaTime);
 		glutPostRedisplay();
 		glutMainLoopEvent();
 	}
@@ -129,7 +134,7 @@ void Scene::Render(){
 	deltaTime = ((float)currTime - prevTime)/CLOCKS_PER_SEC;
 	prevTime = currTime;
 
-	rb->StepForward(deltaTime);
+	//rb->StepForward(deltaTime);
 
 	GameObject* y = *objects.begin();
 	//y->transform.rotation = Quaternion(Y_AXIS, ((float)currTime)/1000);
@@ -217,6 +222,8 @@ Scene::~Scene(){
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		delete (*iter);
 	}
+
+	delete physicsSim;
 }
 
 static void RenderScene(){
