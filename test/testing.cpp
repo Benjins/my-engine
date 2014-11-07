@@ -184,18 +184,24 @@ int RunAllTests(){
 		obj1->AddComponent<SphereCollider>();
 		GameObject* obj2 = new GameObject();
 		obj2->AddComponent<SphereCollider>();
+		GameObject* obj3 = new GameObject();
+		obj3->AddComponent<BoxCollider>();
 
 		SphereCollider* col1 = obj1->GetComponent<SphereCollider>();
 		SphereCollider* col2 = obj2->GetComponent<SphereCollider>();
+		BoxCollider*    col3 = obj3->GetComponent<BoxCollider>();
 
 		AssertTrue(DetectCollision(col1, col2).collide, "Two spheres attached to GO's in the same place collide");
-
 		obj1->transform.position = Vector3(0, 3, 0);
-
 		AssertTrue(!DetectCollision(col1, col2).collide, "Two spheres attached to offset GO's don't collide");
+
+		AssertTrue(DetectCollision(col2, col3).collide, "Sphere and Box attached to GO's in the same place collide");
+		obj3->transform.position = Vector3(0, 3, 0);
+		AssertTrue(!DetectCollision(col2, col3).collide, "Sphere and Box attached to offset GO's don't collide");
 
 		delete obj1;
 		delete obj2;
+		delete obj3;
 	}
 
 	//--------------------------

@@ -2,7 +2,7 @@
 #include "../header/int/GameObject.h"
 #include "../header/int/Transform.h"
 #include "../header/int/Collider.h"
-
+#include "../header/int/Scene.h"
 
 
 Collision BoxCollider::CollisionWith(const Collider* col) const{
@@ -29,6 +29,17 @@ void BoxCollider::AddToSim(PhysicsSim* sim){
 	sim->staticBoxBodies.push_back(this);
 }
 
+void BoxCollider::OnAwake(){
+	cout << "BoxCollider::OnAwake()" << endl;
+	if(gameObject->scene != NULL){
+		cout << "AddToSim(gameObject->scene->physicsSim);" << endl;
+		AddToSim(gameObject->scene->physicsSim);
+	}
+}
+
+BoxCollider::~BoxCollider(){
+}
+
 SphereCollider::SphereCollider(Vector3 _position, float _radius){
 	gameObject = NULL;
 	position = _position;
@@ -49,6 +60,15 @@ void SphereCollider::AddToSim(PhysicsSim* sim){
 	sim->staticSphereBodies.push_back(this);
 }
 
+void SphereCollider::OnAwake(){
+	if(gameObject->scene != NULL){
+		AddToSim(gameObject->scene->physicsSim);
+	}
+}
+
+SphereCollider::~SphereCollider(){
+
+}
 
 Collision DetectCollision(const SphereCollider* col1, const SphereCollider* col2){
 	float maxDistance = (col1->radius + col2->radius);
@@ -72,27 +92,36 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 
 	float radiusSqr = col1->radius * col1->radius;
 
-	bool xBoxInter = (col2->position.x - col2->size.x) < col1->position.x  && col1->position.x < (col2->position.x + col2->size.x);
-	bool yBoxInter = (col2->position.y - col2->size.y) < col1->position.y  && col1->position.y < (col2->position.y + col2->size.y);
-	bool zBoxInter = (col2->position.z - col2->size.z) < col1->position.z  && col1->position.z < (col2->position.z + col2->size.z);
+	Vector3 spherePos = col1->position;
 
-	bool xExInter = (col2->position.x - col2->size.x - col1->radius) < col1->position.x  && col1->position.x < (col2->position.x + col2->size.x + col1->radius);
-	bool yExInter = (col2->position.y - col2->size.y - col1->radius) < col1->position.y  && col1->position.y < (col2->position.y + col2->size.y + col1->radius);
-	bool zExInter = (col2->position.z - col2->size.z - col1->radius) < col1->position.z  && col1->position.z < (col2->position.z + col2->size.z + col1->radius);
+	if(col1->gameObject != NULL && col2->gameObject != NULL){
+		spherePos = col2->gameObject->transform.GlobalToLocal(col1->gameObject->transform.LocalToGlobal(col1->position));
+	}
+
+	
+	bool xBoxInter = RangeCheck(col2->position.x - col2->size.x, spherePos.x, col2->position.x + col2->size.x);
+	bool yBoxInter = RangeCheck(col2->position.y - col2->size.y, spherePos.y, col2->position.y + col2->size.y);
+	bool zBoxInter = RangeCheck(col2->position.z - col2->size.z, spherePos.z, col2->position.z + col2->size.z);
+
+	
+	bool xExInter = RangeCheck(col2->position.x - col2->size.x - col1->radius, spherePos.x, col2->position.x + col2->size.x + col1->radius);
+	bool yExInter = RangeCheck(col2->position.y - col2->size.y - col1->radius, spherePos.y, col2->position.y + col2->size.y + col1->radius);
+	bool zExInter = RangeCheck(col2->position.z - col2->size.z - col1->radius, spherePos.z, col2->position.z + col2->size.z + col1->radius);
 
 	bool withinExtendedX = xExInter && yBoxInter && zBoxInter;
-	bool withinExtendedY = yBoxInter && yExInter && zBoxInter;
+	bool withinExtendedY = xBoxInter && yExInter && zBoxInter;
 	bool withinExtendedZ = xBoxInter && yBoxInter && zExInter;
 
 	if(withinExtendedX || withinExtendedY || withinExtendedZ){
+		//cout << "Within: " << (withinExtendedX? " exX " : "") << (withinExtendedY? " exY " : "") << (withinExtendedZ? " exZ " : "") << endl;
 		Collision col;
 		col.collide = true;
 		return col;
 	}
 
-	float xEdgeDist = min<float>(abs(col2->position.x - col2->size.x - col1->position.x), abs(col2->position.x + col2->size.x - col1->position.x));
-	float yEdgeDist = min<float>(abs(col2->position.y - col2->size.y - col1->position.y), abs(col2->position.y + col2->size.y - col1->position.y));
-	float zEdgeDist = min<float>(abs(col2->position.z - col2->size.z - col1->position.z), abs(col2->position.z + col2->size.z - col1->position.z));
+	float xEdgeDist = min<float>(abs(col2->position.x - col2->size.x - spherePos.x), abs(col2->position.x + col2->size.x - spherePos.x));
+	float yEdgeDist = min<float>(abs(col2->position.y - col2->size.y - spherePos.y), abs(col2->position.y + col2->size.y - spherePos.y));
+	float zEdgeDist = min<float>(abs(col2->position.z - col2->size.z - spherePos.z), abs(col2->position.z + col2->size.z - spherePos.z));
 
 	float xEdgeDistSqr = xEdgeDist*xEdgeDist;
 	float yEdgeDistSqr = yEdgeDist*yEdgeDist;
@@ -103,6 +132,7 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 	bool withinEdgeYZ = xBoxInter && yExInter && zExInter && (yEdgeDistSqr + zEdgeDistSqr < radiusSqr);
 
 	if(withinEdgeXY || withinEdgeXZ || withinEdgeYZ){
+		cout << "Within EdgeXY, EdgeXZ,or EdgeYZ\n";
 		Collision col;
 		col.collide = true;
 		return col;
@@ -111,6 +141,7 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 	bool withinCorner = xExInter && yExInter && zExInter && (xEdgeDistSqr + yEdgeDistSqr + zEdgeDistSqr < radiusSqr);
 
 	if(withinCorner){
+		cout << "Within corner\n";
 		Collision col;
 		col.collide = true;
 		return col;
@@ -145,6 +176,11 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 	return x;
 }
 
+Collision DetectCollision(const BoxCollider* col1, const SphereCollider* col2){
+	return DetectCollision(col2, col1);
+}
+
+//Check that mid is less than min and greater than max
 bool RangeCheck(float min, float mid, float max){
 	return min < mid && mid < max;
 }
@@ -154,3 +190,7 @@ Collision Collider::CollisionWith(const Collider* col) const{Collision x; return
 Collision Collider::CollisionWith(const BoxCollider* col) const{Collision x; return x;}
 Collision Collider::CollisionWith(const SphereCollider* col) const{Collision x; return x;}
 void Collider::AddToSim(PhysicsSim* sim){}
+void Collider::OnAwake(){}
+Collider::~Collider(){
+
+}

@@ -58,24 +58,26 @@ Scene::Scene(int argc, char** argv){
 
 void Scene::Init(){
 	GameObject* y = new GameObject();
-	y->transform.position = Vector3(0, 5, 0);
-	//y->transform.gameObject = y;
+	y->scene = this;
+	y->transform.position = Vector3(0, 0.0f, 0);
 	y->AddMaterial("shader", "Texture.bmp");
 	y->AddMesh("test.obj");
+
 	AddObject(y);
 
-	rb = new RigidBody(&(y->transform), new BoxCollider());
+	rb = new RigidBody(&(y->transform), new SphereCollider(Vector3(0,0,0), 1.0f));
 
-	rb->AddForce(Vector3(0,-2,0));
+	rb->AddForce(Vector3(0,-5,0));
 
 	GameObject* z = new GameObject();
+	z->transform.position = Vector3(0,-3,0);
 	z->AddMaterial("shader", "Texture.bmp");
 	Model* model = new Model();
 
-	model->vertices.push_back(Vector3(-5,-3,-5));
-	model->vertices.push_back(Vector3(-5,-3, 5));
-	model->vertices.push_back(Vector3( 5,-3,-5));
-	model->vertices.push_back(Vector3( 5,-3, 5));
+	model->vertices.push_back(Vector3(-5,0,-5));
+	model->vertices.push_back(Vector3(-5,0, 5));
+	model->vertices.push_back(Vector3( 5,0,-5));
+	model->vertices.push_back(Vector3( 5,0, 5));
 
 	model->faces.push_back(Face(0,1,2));
 	model->faces.push_back(Face(3,2,1));
@@ -87,11 +89,15 @@ void Scene::Init(){
 	model->faces[1].uv0 = Vector2( 1, 1);
 	model->faces[1].uv1 = Vector2( 1,-1);
 	model->faces[1].uv2 = Vector2(-1, 1);
-
 	z->mesh = model;
+	
+	z->scene = this;
+
+	BoxCollider* zBox = z->AddComponent<BoxCollider>();
+	zBox->position = Vector3(0,0,0);
+	zBox->size = Vector3(5, 0.1f, 5);
 
 	AddObject(z);
-
 }
 
 GameObject* Scene::AddObject(GameObject* obj){
