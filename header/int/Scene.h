@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "Transform.h"
 #include "Drawcall.h"
+#include "Input.h"
 #include <time.h>
 
 using std::list;
@@ -17,6 +18,8 @@ struct Scene{
 	float deltaTime;
 
 	PhysicsSim* physicsSim;
+	Input input;
+	
 
 protected:
 	list<GameObject*> objects;

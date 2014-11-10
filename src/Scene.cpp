@@ -23,6 +23,7 @@ Scene::Scene(int argc, char** argv){
 	camera.position = Z_AXIS * -5;
 	camera.rotation = Quaternion(Y_AXIS, 3.14159f);
 	physicsSim = new PhysicsSim();
+	input = Input();
 
 	glutInit(&argc, argv);
 
@@ -67,9 +68,9 @@ void Scene::Init(){
 
 	AddObject(y);
 
-	//rb = new RigidBody(&(y->transform), new SphereCollider(Vector3(0,0,0), 1.0f));
+	rb = new RigidBody(&(y->transform), new SphereCollider(Vector3(0,0,0), 1.0f));
 
-	//rb->AddForce(Vector3(0,-5,0));
+	rb->AddForce(Vector3(0,-5,0));
 
 	GameObject* z = new GameObject();
 	z->transform.position = Vector3(0,-3,0);
@@ -120,6 +121,8 @@ void Scene::Start(){
 		physicsSim->Advance(deltaTime);
 		glutPostRedisplay();
 		glutMainLoopEvent();
+		OnUpdate();
+		input.EndFrame();
 	}
 }
 
@@ -130,6 +133,38 @@ void Scene::UpdateVertexBuffer(){
 void Scene::OnUpdate(){
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		(*iter)->OnUpdate();
+	}
+
+	const float speed = 5;
+
+	if(input.GetKey('x')){
+		Stop();
+	}
+	if(input.GetKey('w')){
+		Vector3 camForward = Rotate(Z_AXIS, Quaternion(Y_AXIS, xRot/80));
+		camForward.x *= -1;
+		camera.position = camera.position + (camForward * deltaTime * speed);
+	}
+	if(input.GetKey('s')){
+		Vector3 camForward = Rotate(Z_AXIS, Quaternion(Y_AXIS, xRot/80));
+		camForward.x *= -1;
+		camera.position = camera.position - (camForward * deltaTime * speed);
+	}
+	if(input.GetKey('a')){
+		Vector3 camRight = Rotate(X_AXIS, Quaternion(Y_AXIS, xRot/80));
+		camRight.z *= -1;
+		camera.position = camera.position - (camRight * deltaTime * speed);
+	}
+	if(input.GetKey('d')){
+		Vector3 camRight = Rotate(X_AXIS, Quaternion(Y_AXIS, xRot/80));
+		camRight.z *= -1;
+		camera.position = camera.position + (camRight * deltaTime * speed);
+	}
+	if(input.GetKey('q')){
+		camera.position = camera.position + (Y_AXIS * deltaTime * speed);
+	}
+	if(input.GetKey('z')){
+		camera.position = camera.position - (Y_AXIS * deltaTime * speed);
 	}
 }
 
@@ -195,43 +230,11 @@ void Scene::OnPassiveMouse(int x, int y){
 }
 
 void Scene::OnKey(unsigned char key, int x, int y){
-	cout << key << " was pressed.\n";
-
-	const float speed = 20;
-
-	if(key == 'x'){
-		Stop();
-	}
-	else if(key == 'w'){
-		Vector3 camForward = Rotate(Z_AXIS, Quaternion(Y_AXIS, xRot/80));
-		camForward.x *= -1;
-		camera.position = camera.position + (camForward * deltaTime * speed);
-	}
-	else if(key == 's'){
-		Vector3 camForward = Rotate(Z_AXIS, Quaternion(Y_AXIS, xRot/80));
-		camForward.x *= -1;
-		camera.position = camera.position - (camForward * deltaTime * speed);
-	}
-	else if(key == 'a'){
-		Vector3 camRight = Rotate(X_AXIS, Quaternion(Y_AXIS, xRot/80));
-		camRight.z *= -1;
-		camera.position = camera.position - (camRight * deltaTime * speed);
-	}
-	else if(key == 'd'){
-		Vector3 camRight = Rotate(X_AXIS, Quaternion(Y_AXIS, xRot/80));
-		camRight.z *= -1;
-		camera.position = camera.position + (camRight * deltaTime * speed);
-	}
-	else if(key == 'q'){
-		camera.position = camera.position + (Y_AXIS * deltaTime * speed);
-	}
-	else if(key == 'z'){
-		camera.position = camera.position - (Y_AXIS * deltaTime * speed);
-	}
+	input.PushKey(key);
 }
 
 void Scene::OnKeyUp(unsigned char key, int x, int y){
-
+	input.ReleaseKey(key);
 }
 
 void Scene::Stop(){
