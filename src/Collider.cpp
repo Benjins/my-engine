@@ -30,9 +30,7 @@ void BoxCollider::AddToSim(PhysicsSim* sim){
 }
 
 void BoxCollider::OnAwake(){
-	cout << "BoxCollider::OnAwake()" << endl;
 	if(gameObject->scene != NULL){
-		cout << "AddToSim(gameObject->scene->physicsSim);" << endl;
 		AddToSim(gameObject->scene->physicsSim);
 	}
 }
@@ -113,7 +111,6 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 	bool withinExtendedZ = xBoxInter && yBoxInter && zExInter;
 
 	if(withinExtendedX || withinExtendedY || withinExtendedZ){
-		//cout << "Within: " << (withinExtendedX? " exX " : "") << (withinExtendedY? " exY " : "") << (withinExtendedZ? " exZ " : "") << endl;
 		Collision col;
 		col.collide = true;
 		return col;
@@ -132,7 +129,6 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 	bool withinEdgeYZ = xBoxInter && yExInter && zExInter && (yEdgeDistSqr + zEdgeDistSqr < radiusSqr);
 
 	if(withinEdgeXY || withinEdgeXZ || withinEdgeYZ){
-		cout << "Within EdgeXY, EdgeXZ,or EdgeYZ\n";
 		Collision col;
 		col.collide = true;
 		return col;
@@ -141,7 +137,6 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 	bool withinCorner = xExInter && yExInter && zExInter && (xEdgeDistSqr + yEdgeDistSqr + zEdgeDistSqr < radiusSqr);
 
 	if(withinCorner){
-		cout << "Within corner\n";
 		Collision col;
 		col.collide = true;
 		return col;

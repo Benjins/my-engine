@@ -44,9 +44,11 @@ Scene::Scene(int argc, char** argv){
 	//glutMotionFunc(OnPassiveMouseFunc);
 	glutPassiveMotionFunc(OnPassiveMouseFunc);
 	glutKeyboardFunc(OnKeyFunc);
+	glutKeyboardUpFunc(OnKeyUpFunc);
 	
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable (GL_DEPTH_TEST);
+	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 
 	//Init();
 
@@ -65,9 +67,9 @@ void Scene::Init(){
 
 	AddObject(y);
 
-	rb = new RigidBody(&(y->transform), new SphereCollider(Vector3(0,0,0), 1.0f));
+	//rb = new RigidBody(&(y->transform), new SphereCollider(Vector3(0,0,0), 1.0f));
 
-	rb->AddForce(Vector3(0,-5,0));
+	//rb->AddForce(Vector3(0,-5,0));
 
 	GameObject* z = new GameObject();
 	z->transform.position = Vector3(0,-3,0);
@@ -184,7 +186,7 @@ void Scene::OnPassiveMouse(int x, int y){
 	xRot = xRot + deltaX;
 	yRot = yRot + deltaY;
 
-	camera.rotation = Quaternion(Y_AXIS, xRot/200) * Quaternion(X_AXIS, yRot/200);
+	camera.rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80);
 
 	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
 
@@ -193,34 +195,46 @@ void Scene::OnPassiveMouse(int x, int y){
 }
 
 void Scene::OnKey(unsigned char key, int x, int y){
+	cout << key << " was pressed.\n";
+
+	const float speed = 20;
+
 	if(key == 'x'){
 		Stop();
 	}
 	else if(key == 'w'){
-		camera.position = camera.position + (Z_AXIS * deltaTime * 10);
-		//cout << "Delta-time: " << deltaTime << endl;
+		Vector3 camForward = Rotate(Z_AXIS, Quaternion(Y_AXIS, xRot/80));
+		camForward.x *= -1;
+		camera.position = camera.position + (camForward * deltaTime * speed);
 	}
 	else if(key == 's'){
-		camera.position = camera.position - (Z_AXIS * deltaTime * 10);
+		Vector3 camForward = Rotate(Z_AXIS, Quaternion(Y_AXIS, xRot/80));
+		camForward.x *= -1;
+		camera.position = camera.position - (camForward * deltaTime * speed);
 	}
 	else if(key == 'a'){
-		camera.position = camera.position - (X_AXIS * deltaTime * 10);
+		Vector3 camRight = Rotate(X_AXIS, Quaternion(Y_AXIS, xRot/80));
+		camRight.z *= -1;
+		camera.position = camera.position - (camRight * deltaTime * speed);
 	}
 	else if(key == 'd'){
-		camera.position = camera.position + (X_AXIS * deltaTime * 10);
+		Vector3 camRight = Rotate(X_AXIS, Quaternion(Y_AXIS, xRot/80));
+		camRight.z *= -1;
+		camera.position = camera.position + (camRight * deltaTime * speed);
 	}
 	else if(key == 'q'){
-		camera.position = camera.position + (Y_AXIS * deltaTime * 10);
+		camera.position = camera.position + (Y_AXIS * deltaTime * speed);
 	}
 	else if(key == 'z'){
-		camera.position = camera.position - (Y_AXIS * deltaTime * 10);
+		camera.position = camera.position - (Y_AXIS * deltaTime * speed);
 	}
 }
 
+void Scene::OnKeyUp(unsigned char key, int x, int y){
+
+}
+
 void Scene::Stop(){
-#ifndef __APPLE__
-	//glutLeaveMainLoop();
-#endif
 	running = false;
 }
 
@@ -267,3 +281,8 @@ Mat4x4 GetPerspectiveMatrix(float aspectRatio, float fieldOfView, float nearZ, f
 	
 	return persp;
 }
+
+static void OnKeyUpFunc(unsigned char key, int x, int y){
+	Scene::getInstance().OnKeyUp(key, x, y);
+}
+
