@@ -7,6 +7,7 @@
 #include "Drawcall.h"
 #include "Input.h"
 #include <time.h>
+#include <random>
 
 using std::list;
 
@@ -71,6 +72,8 @@ public:
 
 	virtual ~Scene();
 };
+
+static std::default_random_engine myRandom;
 
 static void RenderScene();
 

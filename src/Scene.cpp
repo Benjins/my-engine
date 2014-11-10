@@ -5,6 +5,8 @@
 #include "../header/int/Collider.h"
 #include "../header/int/PhysicsSim.h"
 #include "../header/int/RigidBody.h"
+#include <time.h>
+#include <cstdlib>
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -24,6 +26,8 @@ Scene::Scene(int argc, char** argv){
 	camera.rotation = Quaternion(Y_AXIS, 3.14159f);
 	physicsSim = new PhysicsSim();
 	input = Input();
+
+	myRandom = default_random_engine(time(NULL));
 
 	glutInit(&argc, argv);
 
@@ -108,7 +112,6 @@ GameObject* Scene::AddObject(GameObject* obj){
 	obj->scene = this;
 
 	if(obj->material != NULL && obj->mesh != NULL){
-		cout << "Added draw call\n";
 		drawCalls.push_back(DrawCall(obj));
 	}
 
@@ -138,10 +141,13 @@ void Scene::OnUpdate(){
 	const float speed = 5;
 
 	if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
-		float randY = (((double)rand())/RAND_MAX);
+		float randX = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
+		float randY = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
+		float randZ = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
+
 		GameObject* y = new GameObject();
 		y->scene = this;
-		y->transform.position = Vector3(0, randY * 5, 0);
+		y->transform.position = Vector3(randX, randY * 5, randZ);
 		y->transform.scale = Vector3(1,(randY/2 + 0.1f), 1);
 		y->AddMaterial("shader", "Texture.bmp");
 		y->AddMesh("test.obj");
