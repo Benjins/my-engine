@@ -11,17 +11,20 @@
 #  define _CRTDBG_MAP_ALLOC
 #  define _CRTDBG_MAP_ALLOC_NEW
 #  include <crtdbg.h>
+#endif
+#endif
+#if defined(MEM_CHECK) || defined(TESTING)
 #  include <assert.h>
 #endif
-#endif
+
 
 #include <iostream>
 using std::cout; using std::endl;
 
 int main(int argc, char** argv){
 
-#ifdef TESTING 
-#if defined(_WIN32) || defined(_WIN64)
+
+#if (defined(_WIN32) || defined(_WIN64)) && (defined(TESTING) || defined(MEM_CHECK))
 	//Windows memory leak checking
 	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE );
 	_CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );
@@ -32,15 +35,10 @@ int main(int argc, char** argv){
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
+#ifdef TESTING 
+
 	int retVal = RunAllTests();
-
-#if defined(_WIN32) || defined(_WIN64)
-	assert(_CrtCheckMemory());
-#endif
-
-	return retVal;
 #else
-
 	Scene& x = Scene::getInstance(argc, argv);
 
 	x.Init();
@@ -48,6 +46,15 @@ int main(int argc, char** argv){
 	x.Start();
 	
 	return 0;
+#endif
+
+#if (defined(_WIN32) || defined(_WIN64)) && (defined(MEM_CHECK) || defined(TESTING))
+	assert(_CrtCheckMemory());
+#endif
+
+#ifdef TESTING 
+	return retVal;
+#else
 
 #endif
 }

@@ -137,6 +137,18 @@ void Scene::OnUpdate(){
 
 	const float speed = 5;
 
+	if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
+		float randY = (((double)rand())/RAND_MAX);
+		GameObject* y = new GameObject();
+		y->scene = this;
+		y->transform.position = Vector3(0, randY * 5, 0);
+		y->transform.scale = Vector3(1,(randY/2 + 0.1f), 1);
+		y->AddMaterial("shader", "Texture.bmp");
+		y->AddMesh("test.obj");
+
+		AddObject(y);
+	}
+
 	if(input.GetKey('x')){
 		Stop();
 	}
@@ -207,11 +219,11 @@ void Scene::Render(){
 
 void Scene::OnMouse(int button, int state, int x, int y){
 	if(state == GLUT_DOWN){
-		//cout << "Button down in callback.\n";
+		input.PushMouse(button);
 	}
-	
-	//prevX = x;
-	//prevY = y;
+	else if(state == GLUT_UP){
+		input.ReleaseMouse(button);
+	}
 }
 
 void Scene::OnPassiveMouse(int x, int y){
