@@ -60,11 +60,27 @@ Vector4 Mat4x4::GetRow(int index) const{
 	return Vector4( (float*)m[index]);
 }
 
+Mat4x4 Mat4x4::GetTranspose() const{
+	Mat4x4 transpose;
+	for(int i = 0; i < 4; i++){
+		transpose.SetRow(i, GetColumn(i));
+	}
+
+	return transpose;
+}
+
 void Mat4x4::SetRow(int index, const Vector4& value){
 	m[index][0] = value.w;
 	m[index][1] = value.x;
 	m[index][2] = value.y;
 	m[index][3] = value.z;
+}
+
+void Mat4x4::SetColumn(int index, const Vector4& value){
+	m[0][index] = value.w;
+	m[1][index] = value.x;
+	m[2][index] = value.y;
+	m[3][index] = value.z;
 }
 
 float DotProduct(const Vector4& param1, const Vector4& param2){

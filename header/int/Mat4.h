@@ -17,8 +17,10 @@ struct Mat4x4{
 
 	Vector4 GetColumn(int index) const;
 	Vector4 GetRow(int index) const;
+	Mat4x4 GetTranspose() const;
 
 	void SetRow(int index, const Vector4& value);
+	void SetColumn(int index, const Vector4& value);
 };
 
 float DotProduct(const Vector4& param1, const Vector4& param2);

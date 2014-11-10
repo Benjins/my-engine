@@ -4,6 +4,7 @@
 #include "../header/int/Mat4.h"
 #include "../header/int/Collider.h"
 #include "../test/testing.h"
+#include "../header/int/Vector4.h"
 #include <iomanip>
 
 #ifdef TESTING
@@ -22,6 +23,21 @@
 using std::cout; using std::endl;
 
 int main(int argc, char** argv){
+
+	/*
+	Mat4x4 mat;
+	mat.SetRow(0, Vector4(Rotate(X_AXIS,Quaternion(Vector3(Y_AXIS),1)), 0));
+	mat.SetRow(1, Vector4(0,1,0,0));
+	mat.SetRow(2, Vector4(Rotate(Z_AXIS,Quaternion(Vector3(Y_AXIS),1)), 0));
+	mat.SetRow(3, Vector4(0,0,0,1));
+
+	//test mat transforming some axes
+	Vector3 transVec = mat * Vector3(1,0,0);
+	transVec.Print();
+
+	Rotate(X_AXIS,Quaternion(Vector3(Y_AXIS),1)).Print();
+	Rotate(Z_AXIS,Quaternion(Vector3(Y_AXIS),1)).Print();
+	return 0;*/
 
 
 #if (defined(_WIN32) || defined(_WIN64)) && (defined(TESTING) || defined(MEM_CHECK))

@@ -31,10 +31,10 @@ Mat4x4 SC_Transform::LocalToGlobalMatrix() const{
 	Mat4x4 linMat;
 	Mat4x4 affMat;
 
-	linMat.SetRow(0, Vector4(Rotate(X_AXIS * scale.x, rotation), 0));
-	linMat.SetRow(1, Vector4(Rotate(Y_AXIS * scale.y, rotation), 0));
-	linMat.SetRow(2, Vector4(Rotate(Z_AXIS * scale.z, rotation), 0));
-	linMat.SetRow(3, Vector4(0,0,0,1));
+	linMat.SetColumn(0, Vector4(Rotate(X_AXIS * scale.x, rotation), 0));
+	linMat.SetColumn(1, Vector4(Rotate(Y_AXIS * scale.y, rotation), 0));
+	linMat.SetColumn(2, Vector4(Rotate(Z_AXIS * scale.z, rotation), 0));
+	linMat.SetColumn(3, Vector4(0,0,0,1));
 
 	affMat.SetRow(0, Vector4(X_AXIS, position.x));
 	affMat.SetRow(1, Vector4(Y_AXIS, position.y));
@@ -42,6 +42,10 @@ Mat4x4 SC_Transform::LocalToGlobalMatrix() const{
 	affMat.SetRow(3, Vector4(0,0,0,1));
 
 	transMat = linMat * affMat;
+
+	if(parent != NULL){
+		return transMat * parent->LocalToGlobalMatrix();
+	}
 
 	return transMat;
 }

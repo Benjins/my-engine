@@ -33,7 +33,7 @@ Scene::Scene(int argc, char** argv){
 
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
     glutInitWindowSize(1280, 720);
-    glutInitWindowPosition(100, 100);
+    glutInitWindowPosition(500, 100);
     glutCreateWindow("my-engine");
 
 #ifndef __APPLE__
@@ -141,14 +141,14 @@ void Scene::OnUpdate(){
 	const float speed = 5;
 
 	if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
-		float randX = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
 		float randY = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
 		float randZ = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
 
 		GameObject* y = new GameObject();
 		y->scene = this;
-		y->transform.position = Vector3(randX, randY * 5, randZ);
+		y->transform.position = Vector3(0, 0, 4 + randZ);
 		y->transform.scale = Vector3(1,(randY/2 + 0.1f), 1);
+		y->transform.parent = &camera;
 		y->AddMaterial("shader", "Texture.bmp");
 		y->AddMesh("test.obj");
 
@@ -159,30 +159,35 @@ void Scene::OnUpdate(){
 		Stop();
 	}
 	if(input.GetKey('w')){
-		Vector3 camForward = Rotate(Z_AXIS, Quaternion(Y_AXIS, xRot/80));
-		camForward.x *= -1;
-		camera.position = camera.position + (camForward * deltaTime * speed);
+		camera.position = camera.position + (camera.Forward() * deltaTime * speed);
 	}
 	if(input.GetKey('s')){
-		Vector3 camForward = Rotate(Z_AXIS, Quaternion(Y_AXIS, xRot/80));
-		camForward.x *= -1;
-		camera.position = camera.position - (camForward * deltaTime * speed);
+		camera.position = camera.position - (camera.Forward() * deltaTime * speed);
 	}
 	if(input.GetKey('a')){
-		Vector3 camRight = Rotate(X_AXIS, Quaternion(Y_AXIS, xRot/80));
-		camRight.z *= -1;
-		camera.position = camera.position - (camRight * deltaTime * speed);
+		camera.position = camera.position - (camera.Right() * deltaTime * speed);
 	}
 	if(input.GetKey('d')){
-		Vector3 camRight = Rotate(X_AXIS, Quaternion(Y_AXIS, xRot/80));
-		camRight.z *= -1;
-		camera.position = camera.position + (camRight * deltaTime * speed);
+		camera.position = camera.position + (camera.Right() * deltaTime * speed);
 	}
 	if(input.GetKey('q')){
 		camera.position = camera.position + (Y_AXIS * deltaTime * speed);
 	}
 	if(input.GetKey('z')){
 		camera.position = camera.position - (Y_AXIS * deltaTime * speed);
+	}
+	if(input.GetKey('e')){
+		camera.rotation = camera.rotation * (Quaternion(camera.Forward(), -0.012f));
+	}
+	if(input.GetKey('c')){
+		camera.rotation = camera.rotation * (Quaternion(camera.Forward(), 0.012f));
+	}
+	if(input.GetKeyUp('i')){
+		cout << "camera transformation on axes:";
+		Rotate(X_AXIS, camera.rotation).Print();
+		Rotate(Z_AXIS, camera.rotation).Print();
+		cout << "camera quat: ";
+		camera.rotation.Print();
 	}
 }
 
@@ -209,7 +214,7 @@ void Scene::Render(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Mat4x4 perspMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
-	Mat4x4 camMatrix = camera.GetInverse().LocalToGlobalMatrix();
+	Mat4x4 camMatrix = camera.GetInverse().LocalToGlobalMatrix();//.GetTranspose();
 
 	//Mat4x4 finalMatrix = perspMatrix * camMatrix;
 
@@ -239,10 +244,11 @@ void Scene::OnPassiveMouse(int x, int y){
 	xRot = xRot + deltaX;
 	yRot = yRot + deltaY;
 
-	camera.rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80);
+	camera.rotation = camera.rotation * (Quaternion(Y_AXIS, -deltaX/80) * Quaternion(camera.Right(), -deltaY/80));
 
 	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
 
+	//glutWarpPointer(prevX, prevY);
 	prevX = x;
 	prevY = y;
 }
