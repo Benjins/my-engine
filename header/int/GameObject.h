@@ -48,9 +48,9 @@ T* GameObject::AddComponent(){
 
 	//Ensure that T is of type component
 	if(T::isComponent){
+		components.push_back(component);
 		component->gameObject = this;
 		component->OnAwake();
-		components.push_back(component);
 		
 		return component;
 	}

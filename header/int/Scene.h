@@ -9,9 +9,14 @@
 
 using std::list;
 
+struct RigidBody;
+struct PhysicsSim;
+
 struct Scene{
 	SC_Transform camera;
 	float deltaTime;
+
+	PhysicsSim* physicsSim;
 
 protected:
 	list<GameObject*> objects;
@@ -23,6 +28,8 @@ protected:
 	float yRot;
 
 	bool running;
+
+	RigidBody* rb;
 
 	clock_t prevTime;
 public:
@@ -50,10 +57,12 @@ public:
 	void OnUpdate();
 
 	void Render();
+	void PhysicsUpdate();
 
 	void OnMouse(int button, int state, int x, int y);
 	void OnPassiveMouse(int x, int y);
 	void OnKey(unsigned char key, int x, int y);
+	void OnKeyUp(unsigned char key, int x, int y);
 
 	void Stop();
 
@@ -69,5 +78,7 @@ static void OnPassiveMouseFunc(int x, int y);
 static void OnKeyFunc(unsigned char key, int x, int y);
 
 Mat4x4 GetPerspectiveMatrix(float aspectRatio, float fieldOfView, float nearZ, float farZ);
+
+static void OnKeyUpFunc(unsigned char key, int x, int y);
 
 #endif

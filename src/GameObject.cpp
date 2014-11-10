@@ -13,8 +13,10 @@
 #endif
 
 GameObject::GameObject(){
+	scene = NULL;
 	mesh = NULL;
 	material = NULL;
+	transform.gameObject = this;
 }
 
 GameObject::GameObject(Scene& sceneRef){

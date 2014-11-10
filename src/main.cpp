@@ -2,6 +2,7 @@
 #include "../header/int/GameObject.h"
 #include "../header/int/Component.h"
 #include "../header/int/Mat4.h"
+#include "../header/int/Collider.h"
 #include "../test/testing.h"
 #include <iomanip>
 
@@ -19,7 +20,7 @@ using std::cout; using std::endl;
 
 int main(int argc, char** argv){
 
-#ifdef TESTING
+#ifdef TESTING 
 #if defined(_WIN32) || defined(_WIN64)
 	//Windows memory leak checking
 	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE );
@@ -31,15 +32,7 @@ int main(int argc, char** argv){
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
-	//int* y = new int[6];
-
 	int retVal = RunAllTests();
-
-	//Scene x = Scene::getInstance(argc, argv);
-	//x.Init();
-	//x.Start();
-
-	//int* z = new int[1];
 
 #if defined(_WIN32) || defined(_WIN64)
 	assert(_CrtCheckMemory());
@@ -48,13 +41,13 @@ int main(int argc, char** argv){
 	return retVal;
 #else
 
-
 	Scene& x = Scene::getInstance(argc, argv);
 
-	//x.Init();
+	x.Init();
 
 	x.Start();
 	
 	return 0;
+
 #endif
 }

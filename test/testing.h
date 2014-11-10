@@ -44,6 +44,12 @@ void AssertTrue(bool check, string error);
 
 void AssertApprox(float expected, float actual, string error, float maxDifference = 0.0001f);
 
+double PerformanceTest(void (*func) (void), int count, string name);
+
+static void BoxBoxPerformance();
+static void BoxSpherePerformance();
+static void SphereSpherePerformance();
+
 #endif
 
 #endif

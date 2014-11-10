@@ -6,6 +6,7 @@
 #include "../header/int/Material.h"
 #include "../header/int/Texture.h"
 #include "../header/int/Mat4.h"
+#include "../header/int/Collider.h"
 #include "testing.h"
 
 #include <string>
@@ -113,6 +114,46 @@ int RunAllTests(){
 	//Scoping
 	{
 		CrtCheckMemory memCheck;
+		BoxCollider* boxCol1 = new BoxCollider();
+		boxCol1->position = Vector3(0,0,0);
+		boxCol1->size = Vector3(1,1,1);
+		SphereCollider* sphereCol1 = new SphereCollider();
+		sphereCol1->position = Vector3(1.2f, 0, 0);
+		sphereCol1->radius = 0.6f;
+		AssertEqual<bool>(boxCol1->CollisionWith(sphereCol1).collide, true, "boxcol1 collides with spherecol1");
+
+		sphereCol1->position = Vector3(2.0f, 2.0f, 2.0f);
+		AssertEqual<bool>(boxCol1->CollisionWith(sphereCol1).collide, false, "boxcol1 doesn't collide with spherecol1 after it's moved");
+
+		boxCol1->size = Vector3(3,1.8f,1.8f);
+		AssertEqual<bool>(boxCol1->CollisionWith(sphereCol1).collide, true, "boxcol1 does collide with spherecol1 after box is grown");
+
+		SphereCollider* sphereCol2 = new SphereCollider();
+		sphereCol2->position = Vector3(2.0f,2.0f,2.8f);
+		sphereCol2->radius = 0.21f;
+		AssertEqual<bool>(sphereCol2->CollisionWith(sphereCol1).collide, true, "sphereCol2 does collide with spherecol1");
+
+		sphereCol2->radius = 0.19f;
+		AssertEqual<bool>(sphereCol2->CollisionWith(sphereCol1).collide, false, "sphereCol2 does not collide with spherecol1 atfer it shrinks");
+
+		BoxCollider* boxCol2 = new BoxCollider();
+		boxCol2->position = Vector3(4.01f, 3, 3);
+		boxCol2->size = Vector3(1,1,1);
+		AssertEqual<bool>(boxCol2->CollisionWith(boxCol1).collide, false, "boxCol1 does not collide with boxCol2 at first");
+
+		boxCol2->position = Vector3(2, 2, 2);
+		boxCol2->size = Vector3(1.2f,1.1f,1.1f);
+		AssertEqual<bool>(boxCol2->CollisionWith(boxCol1).collide, true, "boxCol1 does collide with boxCol2 when box2 grows");
+
+		delete boxCol1;
+		delete boxCol2;
+		delete sphereCol1;
+		delete sphereCol2;
+	}
+
+	//Scoping
+	{
+		CrtCheckMemory memCheck;
 
 		GameObject* obj = new GameObject();
 		obj->AddComponent<Component>();
@@ -136,7 +177,41 @@ int RunAllTests(){
 		delete obj;
 	}
 
+	{
+		CrtCheckMemory memCheck;
+
+		GameObject* obj1 = new GameObject();
+		obj1->AddComponent<SphereCollider>();
+		GameObject* obj2 = new GameObject();
+		obj2->AddComponent<SphereCollider>();
+		GameObject* obj3 = new GameObject();
+		obj3->AddComponent<BoxCollider>();
+
+		SphereCollider* col1 = obj1->GetComponent<SphereCollider>();
+		SphereCollider* col2 = obj2->GetComponent<SphereCollider>();
+		BoxCollider*    col3 = obj3->GetComponent<BoxCollider>();
+
+		AssertTrue(DetectCollision(col1, col2).collide, "Two spheres attached to GO's in the same place collide");
+		obj1->transform.position = Vector3(0, 3, 0);
+		AssertTrue(!DetectCollision(col1, col2).collide, "Two spheres attached to offset GO's don't collide");
+
+		AssertTrue(DetectCollision(col2, col3).collide, "Sphere and Box attached to GO's in the same place collide");
+		obj3->transform.position = Vector3(0, 3, 0);
+		AssertTrue(!DetectCollision(col2, col3).collide, "Sphere and Box attached to offset GO's don't collide");
+
+		delete obj1;
+		delete obj2;
+		delete obj3;
+	}
+
 	//--------------------------
+	//Performance testing
+	PerformanceTest(BoxSpherePerformance,20000, "BoxSphereCollision");
+	PerformanceTest(SphereSpherePerformance,20000, "SphereSpherePerformance");
+	PerformanceTest(BoxBoxPerformance,20000, "BoxBoxPerformance");
+
+
+	//---------------------------
 
 
 	cout << endl << passedTests << " of " << testCount << " tests passed.\n";
@@ -162,6 +237,37 @@ void AssertTrue(bool check, string error){
 	}
 }
 
+static void BoxBoxPerformance(){
+	BoxCollider box1, box2;
+	box1.position = Vector3(2,5,-2);
+	box1.size = Vector3(3,2,8);
+	box2.position = Vector3(-2,4,-3);
+	box2.size = Vector3(1,2,1);
+
+	Collision x = DetectCollision(&box1, &box2);
+}
+
+static void BoxSpherePerformance(){
+	BoxCollider box1;
+	SphereCollider sphere1;
+	box1.position = Vector3(2,5,-2);
+	box1.size = Vector3(3,2,8);
+	sphere1.position = Vector3(-2,4,-3);
+	sphere1.radius = 0.5f;
+
+	Collision x = DetectCollision(&sphere1, &box1);
+}
+
+static void SphereSpherePerformance(){
+	SphereCollider sphere1, sphere2;
+	sphere2.position = Vector3(2,5,-2);
+	sphere2.radius = 1.2f;
+	sphere1.position = Vector3(-2,4,-3);
+	sphere1.radius = 0.5f;
+
+	Collision x = DetectCollision(&sphere1, &sphere2);
+}
+
 void AssertApprox(float expected, float actual, string error, float maxDifference){
 	testCount++;
 
@@ -173,6 +279,28 @@ void AssertApprox(float expected, float actual, string error, float maxDifferenc
 	else{
 		passedTests++;
 	}
+}
+
+double PerformanceTest(void (*func) (void), int count, string name){
+	int trueCount = count;
+
+	//If you're stupid enough to call with count < 0, I'm sorry.
+	if(trueCount < 0){
+		trueCount = 0;
+	}
+
+	clock_t start = clock();
+
+	for(int i = 0; i < trueCount; i++){
+		func();
+	}
+
+	clock_t end = clock();
+
+	double timeElapsed = (double(end-start))/CLOCKS_PER_SEC*1000;
+
+	cout << "\nPerformance test for: " << name << ", ran " << trueCount << " times in " << timeElapsed << " ms.\n";
+	return timeElapsed;
 }
 
 #endif
