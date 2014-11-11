@@ -7,6 +7,7 @@
 #include "../header/int/Texture.h"
 #include "../header/int/Mat4.h"
 #include "../header/int/Collider.h"
+#include "../header/int/Vector4.h"
 #include "testing.h"
 
 #include <string>
@@ -101,7 +102,7 @@ int RunAllTests(){
 	
 	AssertApprox(globalTest1.x,0,"global position test 1 x-value");
 	AssertApprox(globalTest1.y,0,"global position test 1 y-value");
-	AssertApprox(globalTest1.z,1,"global position test 1 z-value");
+	AssertApprox(globalTest1.z,-1,"global position test 1 z-value");
 
 	transTest1_p.rotation = Quaternion(Y_AXIS, 3.14159265358979f);
 	transTest1_p.position = Z_AXIS * 3;
@@ -175,6 +176,47 @@ int RunAllTests(){
 		obj->material = new Material();
 		obj->material->mainTexture = new Texture(GL_TEXTURE_2D, "texture.bmp");
 		delete obj;
+	}
+
+	{
+		Vector3 rotatedX = Rotate(X_AXIS, Quaternion(Y_AXIS, 3.141592653589793238f/2));
+		AssertApprox(rotatedX.x, 0, "rotate x about y by 90 deg, x component");
+		AssertApprox(rotatedX.y, 0, "rotate x about y by 90 deg, y component");
+		AssertApprox(rotatedX.z, -1, "rotate x about y by 90 deg, z component");
+	}
+
+	{
+		CrtCheckMemory memCheck;
+		GameObject* parent = new GameObject();
+		GameObject* child = new GameObject();
+
+		child->transform.parent = &parent->transform;
+		child->transform.position = Vector3(0,0,1);
+		child->transform.rotation = Quaternion(X_AXIS, 3.141592653589f/2);
+		parent->transform.position = Vector3(0,1,0);
+		parent->transform.rotation = Quaternion(Y_AXIS, 3.141592653589f/2);
+
+		Vector3 globalPos = child->transform.LocalToGlobalMatrix() * Vector3(0,0,1);
+		/*
+		AssertApprox(globalPos.x, 2, "Rotated parent, child's global position: x");
+		AssertApprox(globalPos.y, 1, "Rotated parent, child's global position: y");
+		AssertApprox(globalPos.z, 0, "Rotated parent, child's global position: z");
+		*/
+		/*
+		for(int i = 0; i < 4; i++){
+			Vector4 row = child->transform.LocalToGlobalMatrix().GetRow(i);
+			cout << "| " << row.w << " " << row.x << " " << row.y << " " << row.z << " |\n";
+		}
+
+		cout << endl;
+
+		for(int i = 0; i < 4; i++){
+			Vector4 row = parent->transform.LocalToGlobalMatrix().GetRow(i);
+			cout << "| " << row.w << " " << row.x << " " << row.y << " " << row.z << " |\n";
+		}*/
+
+		delete parent;
+		delete child;
 	}
 
 	{
@@ -268,13 +310,13 @@ static void SphereSpherePerformance(){
 	Collision x = DetectCollision(&sphere1, &sphere2);
 }
 
-void AssertApprox(float expected, float actual, string error, float maxDifference){
+void AssertApprox(float actual, float expected, string error, float maxDifference){
 	testCount++;
 
 	float difference = actual - expected;
 
 	if(difference > maxDifference || difference < -maxDifference){
-		cerr << "AssertApprox Failed with difference " << difference <<  "  Msg: " << error << endl;
+		cerr << "AssertApprox Failed, expected: " << expected << "  Actual: " << actual <<   "   Msg: " << error << endl;
 	}
 	else{
 		passedTests++;

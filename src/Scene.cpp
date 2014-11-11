@@ -66,15 +66,15 @@ Scene::Scene(int argc, char** argv){
 void Scene::Init(){
 	GameObject* y = new GameObject();
 	y->scene = this;
-	y->transform.position = Vector3(0, 0.0f, 0);
+	y->transform.position = Vector3(0, 2.0f, 0);
 	y->AddMaterial("shader", "Texture.bmp");
 	y->AddMesh("test.obj");
 
 	AddObject(y);
 
-	rb = new RigidBody(&(y->transform), new SphereCollider(Vector3(0,0,0), 1.0f));
+	//rb = new RigidBody(&(y->transform), new SphereCollider(Vector3(0,0,0), 1.0f));
 
-	rb->AddForce(Vector3(0,-5,0));
+	//rb->AddForce(Vector3(0,-5,0));
 
 	GameObject* z = new GameObject();
 	z->transform.position = Vector3(0,-3,0);
@@ -105,6 +105,16 @@ void Scene::Init(){
 	zBox->size = Vector3(5, 0.1f, 5);
 
 	AddObject(z);
+
+	GameObject* z2 = new GameObject();
+	z2->scene = this;
+	z2->transform.parent = &(y->transform);
+	z2->transform.position = Vector3(3, 0.0f, 0);
+	z2->transform.scale = Vector3(0.2f, 0.2f, 0.2f);
+	z2->AddMaterial("shader", "Texture.bmp");
+	z2->AddMesh("test.obj");
+
+	AddObject(z2);
 }
 
 GameObject* Scene::AddObject(GameObject* obj){
@@ -134,6 +144,12 @@ void Scene::UpdateVertexBuffer(){
 }
 
 void Scene::OnUpdate(){
+	GameObject* parent = (*objects.begin());
+	GameObject* child  = (*objects.rbegin());
+
+	parent->transform.rotation = parent->transform.rotation * Quaternion(Y_AXIS, deltaTime);
+	//child->transform.position = child->transform.position + Vector3(2 + sin(((float)prevTime)/1000),0,0);
+
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		(*iter)->OnUpdate();
 	}
@@ -161,6 +177,18 @@ void Scene::OnUpdate(){
 	if(input.GetKey('w')){
 		camera.position = camera.position + (camera.Forward() * deltaTime * speed);
 	}
+	if(input.GetKey('k')){
+		child->transform.position = child->transform.position + (Vector3(1,0,0) * deltaTime);
+	}
+	if(input.GetKey('m')){
+		child->transform.position = child->transform.position - (Vector3(1,0,0) * deltaTime);
+	}
+	if(input.GetKey('l')){
+		parent->transform.position = parent->transform.position + (Vector3(1,1,0) * deltaTime);
+	}
+	if(input.GetKey(',')){
+		parent->transform.position = parent->transform.position - (Vector3(1,1,0) * deltaTime);
+	}
 	if(input.GetKey('s')){
 		camera.position = camera.position - (camera.Forward() * deltaTime * speed);
 	}
@@ -183,11 +211,12 @@ void Scene::OnUpdate(){
 		camera.rotation = camera.rotation * (Quaternion(camera.Forward(), 0.012f));
 	}
 	if(input.GetKeyUp('i')){
-		cout << "camera transformation on axes:";
-		Rotate(X_AXIS, camera.rotation).Print();
-		Rotate(Z_AXIS, camera.rotation).Print();
-		cout << "camera quat: ";
-		camera.rotation.Print();
+		auto cameraChildIter = objects.end();
+		cameraChildIter--;
+		GameObject* cameraChild = (*cameraChildIter);
+
+		cout << "\ncameraChild->transform.GlobalPosition(): ";
+		cameraChild->transform.GlobalPosition().Print();
 	}
 }
 
@@ -214,9 +243,7 @@ void Scene::Render(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Mat4x4 perspMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
-	Mat4x4 camMatrix = camera.GetInverse().LocalToGlobalMatrix();//.GetTranspose();
-
-	//Mat4x4 finalMatrix = perspMatrix * camMatrix;
+	Mat4x4 camMatrix = camera.GetCameraMatrix();
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
@@ -244,7 +271,7 @@ void Scene::OnPassiveMouse(int x, int y){
 	xRot = xRot + deltaX;
 	yRot = yRot + deltaY;
 
-	camera.rotation = camera.rotation * (Quaternion(Y_AXIS, -deltaX/80) * Quaternion(camera.Right(), -deltaY/80));
+	camera.rotation = camera.rotation * (Quaternion(Y_AXIS, deltaX/80) * Quaternion(camera.Right(), deltaY/80));
 
 	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
 

@@ -32,6 +32,8 @@ struct SC_Transform{
 
     //Transform a vector from this transfom's space to global
 	Vector3 LocalToGlobal(const Vector3& original) const;
+
+	Mat4x4 GetCameraMatrix() const;
 };
 
 #endif

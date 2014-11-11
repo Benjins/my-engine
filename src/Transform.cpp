@@ -41,11 +41,32 @@ Mat4x4 SC_Transform::LocalToGlobalMatrix() const{
 	affMat.SetRow(2, Vector4(Z_AXIS, position.z));
 	affMat.SetRow(3, Vector4(0,0,0,1));
 
-	transMat = linMat * affMat;
+	transMat = affMat * linMat;
 
 	if(parent != NULL){
-		return transMat * parent->LocalToGlobalMatrix();
+		return parent->LocalToGlobalMatrix() * transMat;
 	}
+
+	return transMat;
+}
+
+Mat4x4 SC_Transform::GetCameraMatrix() const{
+	Mat4x4 transMat;
+
+	Mat4x4 linMat;
+	Mat4x4 affMat;
+
+	linMat.SetColumn(0, Vector4(Rotate(X_AXIS / scale.x, rotation.Conjugate()), 0));
+	linMat.SetColumn(1, Vector4(Rotate(Y_AXIS / scale.y, rotation.Conjugate()), 0));
+	linMat.SetColumn(2, Vector4(Rotate(Z_AXIS / scale.z, rotation.Conjugate()), 0));
+	linMat.SetColumn(3, Vector4(0,0,0,1));
+
+	affMat.SetRow(0, Vector4(X_AXIS, -position.x));
+	affMat.SetRow(1, Vector4(Y_AXIS, -position.y));
+	affMat.SetRow(2, Vector4(Z_AXIS, -position.z));
+	affMat.SetRow(3, Vector4(0,0,0,1));
+
+	transMat = linMat * affMat;
 
 	return transMat;
 }
@@ -86,7 +107,7 @@ Vector3 SC_Transform::GlobalToLocal(const Vector3& global) const{
 Vector3 SC_Transform::LocalToGlobal(const Vector3& local) const{
     Vector3 globalVec = local;
 	if(parent != NULL){
-		globalVec = parent->GlobalToLocal(local);
+		globalVec = parent->LocalToGlobal(local);
 	}
     globalVec = globalVec.Scaled(scale);
     globalVec = Rotate(globalVec, rotation);
