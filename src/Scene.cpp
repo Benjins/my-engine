@@ -271,7 +271,7 @@ void Scene::OnPassiveMouse(int x, int y){
 	xRot = xRot + deltaX;
 	yRot = yRot + deltaY;
 
-	camera.rotation = camera.rotation * (Quaternion(Y_AXIS, deltaX/80) * Quaternion(camera.Right(), deltaY/80));
+	camera.rotation = camera.rotation * (Quaternion(Y_AXIS, -deltaX/80) * Quaternion(camera.Right(), -deltaY/80));
 
 	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
 
