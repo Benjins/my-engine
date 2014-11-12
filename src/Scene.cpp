@@ -162,7 +162,7 @@ void Scene::OnUpdate(){
 
 		GameObject* y = new GameObject();
 		y->scene = this;
-		y->transform.position = Vector3(0, 0, 4 + randZ);
+		y->transform.position = Vector3(1, -0.6, randZ/2);
 		y->transform.scale = Vector3(1,(randY/2 + 0.1f), 1);
 		y->transform.parent = &camera;
 		y->AddMaterial("shader", "Texture.bmp");
@@ -211,12 +211,8 @@ void Scene::OnUpdate(){
 		camera.rotation = camera.rotation * (Quaternion(camera.Forward(), 0.012f));
 	}
 	if(input.GetKeyUp('i')){
-		auto cameraChildIter = objects.end();
-		cameraChildIter--;
-		GameObject* cameraChild = (*cameraChildIter);
-
-		cout << "\ncameraChild->transform.GlobalPosition(): ";
-		cameraChild->transform.GlobalPosition().Print();
+		//camera.Right().Print();
+		camera.rotation.Print();
 	}
 }
 
@@ -271,7 +267,8 @@ void Scene::OnPassiveMouse(int x, int y){
 	xRot = xRot + deltaX;
 	yRot = yRot + deltaY;
 
-	camera.rotation = camera.rotation * (Quaternion(Y_AXIS, -deltaX/80) * Quaternion(camera.Right(), -deltaY/80));
+	camera.rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
+	//camera.rotation = camera.rotation * (Quaternion(Y_AXIS, deltaX/80) * Quaternion(camera.Right(), deltaY/80));
 
 	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
 
