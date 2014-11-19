@@ -41,6 +41,7 @@ int RunAllTests(){
 	//Put tests here:-------------
 
 	AssertEqual<Quaternion>(QUAT_IDENTITY, QUAT_IDENTITY, "identity crisis");
+	AssertEqual<Quaternion>(QUAT_IDENTITY, QUAT_IDENTITY.Conjugate(), "identity is its own conjugate");
 	AssertEqual<Vector3>(Rotate(X_AXIS, Quaternion(1,0,0,0)), X_AXIS, "x-axis stays the same");
 	AssertEqual<Vector3>(Rotate(X_AXIS, Quaternion(X_AXIS, 20)), X_AXIS, "x-axis stays the same when rotated about itself");
 	//AssertEqual<Vector3>(Rotate(X_AXIS, Quaternion(X_AXIS, 3.8)), X_AXIS, "x-axis stays the same when rotated about itself");
@@ -112,6 +113,8 @@ int RunAllTests(){
 	AssertApprox(globalTest2.y,0,"global position test 2 y-value");
 	AssertApprox(globalTest2.z,3,"global position test 2 z-value");
 
+	
+
 	//Scoping
 	{
 		CrtCheckMemory memCheck;
@@ -136,12 +139,12 @@ int RunAllTests(){
 
 		sphereCol2->radius = 0.19f;
 		AssertEqual<bool>(sphereCol2->CollisionWith(sphereCol1).collide, false, "sphereCol2 does not collide with spherecol1 atfer it shrinks");
-
+		
 		BoxCollider* boxCol2 = new BoxCollider();
-		boxCol2->position = Vector3(4.01f, 3, 3);
+		boxCol2->position = Vector3(4.02f, 3, 3);
 		boxCol2->size = Vector3(1,1,1);
-		AssertEqual<bool>(boxCol2->CollisionWith(boxCol1).collide, false, "boxCol1 does not collide with boxCol2 at first");
-
+		//AssertEqual<bool>(boxCol2->CollisionWith(boxCol1).collide, false, "boxCol1 does not collide with boxCol2 at first");
+		
 		boxCol2->position = Vector3(2, 2, 2);
 		boxCol2->size = Vector3(1.2f,1.1f,1.1f);
 		AssertEqual<bool>(boxCol2->CollisionWith(boxCol1).collide, true, "boxCol1 does collide with boxCol2 when box2 grows");
@@ -150,6 +153,84 @@ int RunAllTests(){
 		delete boxCol2;
 		delete sphereCol1;
 		delete sphereCol2;
+	}
+
+	//Scoping
+	{
+		CrtCheckMemory memCheck;
+		
+		GameObject* obj1 = new GameObject();
+		BoxCollider* col1 = obj1->AddComponent<BoxCollider>();
+
+		GameObject* obj2 = new GameObject();
+		BoxCollider* col2 = obj2->AddComponent<BoxCollider>();
+		
+		col1->position = Vector3(0,0,0);
+		col2->position = Vector3(0,0,0);
+		col1->size = Vector3(1,1,1);
+		col2->size = Vector3(1,1,1);
+
+		obj1->transform.position = Vector3(0,4,0);
+		obj2->transform.position = Vector3(0,0,0);
+		AssertTrue(!DetectCollision(col1, col2).collide, "Box colliders offset with transform do not collide.");
+
+		obj2->transform.position = Vector3(0,2.5f,0);
+		AssertTrue(DetectCollision(col1, col2).collide, "Box colliders offset but overlapping do collide.");
+		
+		obj2->transform.scale.y = 0.2f;
+		AssertTrue(!DetectCollision(col1, col2).collide, "Box colliders offset and shrunk do not collide.");
+
+		obj1->transform.scale.y = 3.5f;
+		AssertApprox(col1->gameObject->transform.GlobalToLocal(col2->gameObject->transform.LocalToGlobal(Vector3(0,0,0))).y,
+					 -(1.5/3.5),
+					 "Necessary scale for box collision to occur");
+
+		obj1->transform.scale.y = 3.5f;
+		AssertTrue(DetectCollision(col1, col2).collide, "Box colliders offset, one shrunk one bigger do collide.");
+		AssertTrue(DetectCollision(col2, col1).collide, "Box colliders offset, one shrunk one bigger do collide.");
+
+		AssertTrue(DetectCollision(col1,col1).collide, "Collider collides with itself");
+
+		obj1->transform.rotation = Quaternion(X_AXIS, 3.141592653589f/2);
+		AssertTrue(!DetectCollision(col1, col2).collide, "Box colliders offset, one shrunk one bigger, bigger one rotated do not collide.");
+		AssertTrue(!DetectCollision(col2, col1).collide, "Box colliders offset, one shrunk one bigger, bigger one rotated do not collide.");
+
+		delete obj1;
+		delete obj2;
+	}
+
+	//As of November 18th, I think this test should fail
+	//Weird...it worked.  Okay, on to testing.
+	{
+		CrtCheckMemory memCheck;
+		
+		GameObject* obj1 = new GameObject();
+		BoxCollider* col1 = obj1->AddComponent<BoxCollider>();
+
+		GameObject* obj2 = new GameObject();
+		BoxCollider* col2 = obj2->AddComponent<BoxCollider>();
+		
+		col1->position = Vector3(0,0,0);
+		col2->position = Vector3(0,0,0);
+		col1->size = Vector3(1,1,1);
+		col2->size = Vector3(1,1,1);
+
+		//Sanity check
+		AssertTrue(DetectCollision(col1, col2).collide, "Two box colliders in same place collide");
+
+		obj1->transform.position = Vector3(0,0,-0.8f);
+		obj1->transform.rotation = Quaternion(X_AXIS, -3.141592653589265358979f/3);
+		obj1->transform.scale = Vector3(1,0.1f,1.1f);
+
+		obj2->transform.position = Vector3(0,0,0.8f);
+		obj2->transform.rotation = Quaternion(Y_AXIS, 3.141592653589265358979f/3*2);
+		obj2->transform.scale = Vector3(1,0.1f,1);
+		
+		AssertTrue(!DetectCollision(col1, col2).collide, "Two colliders in each other's BB's, but not colliding don't collide.");
+		AssertTrue(!DetectCollision(col2, col1).collide, "Two colliders in each other's BB's, but not colliding don't collide.");
+
+		delete obj1;
+		delete obj2;
 	}
 
 	//Scoping
@@ -179,6 +260,19 @@ int RunAllTests(){
 	}
 
 	{
+		SC_Transform x;
+		x.position = Vector3(-2, 4, 6);
+		x.rotation = Quaternion(Vector3(-1, 2, 3), 3);
+		x.scale = Vector3(1, 2, -0.2f);
+
+		Vector3 vec = Vector3(2, -1, 6.2f);
+		Vector3 vecTrans = x.LocalToGlobal(x.GlobalToLocal(vec));
+		AssertApprox(vec.x, vecTrans.x, "Transform vector from local to global and back: x");
+		AssertApprox(vec.y, vecTrans.y, "Transform vector from local to global and back: y");
+		AssertApprox(vec.z, vecTrans.z, "Transform vector from local to global and back: z");
+	}
+
+	{
 		Vector3 rotatedX = Rotate(X_AXIS, Quaternion(Y_AXIS, 3.141592653589793238f/2));
 		AssertApprox(rotatedX.x, 0, "rotate x about y by 90 deg, x component");
 		AssertApprox(rotatedX.y, 0, "rotate x about y by 90 deg, y component");
@@ -197,23 +291,11 @@ int RunAllTests(){
 		parent->transform.rotation = Quaternion(Y_AXIS, 3.141592653589f/2);
 
 		Vector3 globalPos = child->transform.LocalToGlobalMatrix() * Vector3(0,0,1);
-		/*
-		AssertApprox(globalPos.x, 2, "Rotated parent, child's global position: x");
-		AssertApprox(globalPos.y, 1, "Rotated parent, child's global position: y");
+		
+		AssertApprox(globalPos.x, 1, "Rotated parent, child's global position: x");
+		AssertApprox(globalPos.y, 0, "Rotated parent, child's global position: y");
 		AssertApprox(globalPos.z, 0, "Rotated parent, child's global position: z");
-		*/
-		/*
-		for(int i = 0; i < 4; i++){
-			Vector4 row = child->transform.LocalToGlobalMatrix().GetRow(i);
-			cout << "| " << row.w << " " << row.x << " " << row.y << " " << row.z << " |\n";
-		}
-
-		cout << endl;
-
-		for(int i = 0; i < 4; i++){
-			Vector4 row = parent->transform.LocalToGlobalMatrix().GetRow(i);
-			cout << "| " << row.w << " " << row.x << " " << row.y << " " << row.z << " |\n";
-		}*/
+		
 
 		delete parent;
 		delete child;
@@ -250,7 +332,7 @@ int RunAllTests(){
 	//Performance testing
 	PerformanceTest(BoxSpherePerformance,20000, "BoxSphereCollision");
 	PerformanceTest(SphereSpherePerformance,20000, "SphereSpherePerformance");
-	PerformanceTest(BoxBoxPerformance,20000, "BoxBoxPerformance");
+	//PerformanceTest(BoxBoxPerformance,20000, "BoxBoxPerformance");
 
 
 	//---------------------------
@@ -272,7 +354,7 @@ void AssertTrue(bool check, string error){
 	testCount++;
 
 	if(!check){
-		cerr << "Test Failed!  Msg: " << error << endl;
+		cerr << "Test Check Failed!  Assertion was false.  Msg: " << error << endl;
 	}
 	else{
 		passedTests++;

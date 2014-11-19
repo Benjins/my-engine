@@ -30,7 +30,7 @@ void BoxCollider::AddToSim(PhysicsSim* sim){
 }
 
 void BoxCollider::OnAwake(){
-	if(gameObject->scene != NULL){
+	if(gameObject != NULL && gameObject->scene != NULL){
 		AddToSim(gameObject->scene->physicsSim);
 	}
 }
@@ -151,20 +151,30 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 	Vector3 maxOne = col1->position + col1->size;
 	Vector3 minOne = col1->position - col1->size;
+	Vector3 transMaxOne = maxOne;
+	Vector3 transMinOne = minOne;
+	if(col1->gameObject != NULL && col2->gameObject != NULL){
+		transMaxOne = col2->gameObject->transform.GlobalToLocal(col1->gameObject->transform.LocalToGlobal(maxOne));
+		transMinOne = col2->gameObject->transform.GlobalToLocal(col1->gameObject->transform.LocalToGlobal(minOne));
+	}
 
 	Vector3 maxTwo = col2->position + col2->size;
 	Vector3 minTwo = col2->position - col2->size;
+	Vector3 transMaxTwo = maxOne;
+	Vector3 transMinTwo = minOne;
+	if(col1->gameObject != NULL && col2->gameObject != NULL){
+		transMaxTwo = col1->gameObject->transform.GlobalToLocal(col2->gameObject->transform.LocalToGlobal(maxTwo));
+		transMinTwo = col1->gameObject->transform.GlobalToLocal(col2->gameObject->transform.LocalToGlobal(minTwo));
+	}
 
-	bool xIntersection =   RangeCheck(minOne.x, minTwo.x, maxOne.x) || RangeCheck(minOne.x, maxTwo.x, maxOne.x)
-						|| RangeCheck(minTwo.x, minOne.x, maxTwo.x) || RangeCheck(minTwo.x, maxOne.x, maxTwo.x);
+	bool xIntersection =   RangeCheck(minOne.x, transMinTwo.x, maxOne.x) || RangeCheck(minOne.x, transMaxTwo.x, maxOne.x)
+						|| RangeCheck(minTwo.x, transMinOne.x, maxTwo.x) || RangeCheck(minTwo.x, transMaxOne.x, maxTwo.x);
 
-	bool yIntersection =   RangeCheck(minOne.y, minTwo.y, maxOne.y) || RangeCheck(minOne.y, maxTwo.y, maxOne.y)
-						|| RangeCheck(minTwo.y, minOne.y, maxTwo.y) || RangeCheck(minTwo.y, maxOne.y, maxTwo.y);
+	bool yIntersection =   RangeCheck(minOne.y, transMinTwo.y, maxOne.y) || RangeCheck(minOne.y, transMaxTwo.y, maxOne.y)
+						|| RangeCheck(minTwo.y, transMinOne.y, maxTwo.y) || RangeCheck(minTwo.y, transMaxOne.y, maxTwo.y);
 
-	bool zIntersection =   RangeCheck(minOne.z, minTwo.z, maxOne.z) || RangeCheck(minOne.z, maxTwo.z, maxOne.z)
-						|| RangeCheck(minTwo.z, minOne.z, maxTwo.z) || RangeCheck(minTwo.z, maxOne.z, maxTwo.z);
-
-	
+	bool zIntersection =   RangeCheck(minOne.z, transMinTwo.z, maxOne.z) || RangeCheck(minOne.z, transMaxTwo.z, maxOne.z)
+						|| RangeCheck(minTwo.z, transMinOne.z, maxTwo.z) || RangeCheck(minTwo.z, transMaxOne.z, maxTwo.z);
 
 	Collision x;
 	x.collide = xIntersection && yIntersection && zIntersection;
@@ -177,7 +187,7 @@ Collision DetectCollision(const BoxCollider* col1, const SphereCollider* col2){
 
 //Check that mid is less than min and greater than max
 bool RangeCheck(float min, float mid, float max){
-	return min < mid && mid < max;
+	return min <= mid && mid <= max;
 }
 
 //Don't use these; pure virtual declaration caused errors in MSVC.
