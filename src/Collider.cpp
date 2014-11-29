@@ -1,8 +1,10 @@
 #include "../header/int/PhysicsSim.h"
 #include "../header/int/GameObject.h"
 #include "../header/int/Transform.h"
+#include "../header/int/Mat4.h"
 #include "../header/int/Collider.h"
 #include "../header/int/Scene.h"
+#include "../header/int/AABB.h"
 
 
 Collision BoxCollider::CollisionWith(const Collider* col) const{
@@ -23,6 +25,10 @@ BoxCollider::BoxCollider(Vector3 _position, Vector3 _size){
 	gameObject = NULL;
 	position = _position;
 	size = _size;
+}
+
+AABB BoxCollider::GetBounds(bool globalSpace) const{
+	return AABB(this, globalSpace);
 }
 
 void BoxCollider::AddToSim(PhysicsSim* sim){
@@ -149,6 +155,31 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 }
 
 Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
+	AABB col1TransBounds = AABB(col1->GetBounds(),col2->gameObject->transform.GlobalToLocalMatrix());
+	AABB col2TransBounds = AABB(col2->GetBounds(),col1->gameObject->transform.GlobalToLocalMatrix());
+
+	AABB col1Bounds = col1->GetBounds(false);
+	AABB col2Bounds = col2->GetBounds(false);
+
+	if(col1Bounds.CollideWith(col2TransBounds).collide){
+		Collision x;
+		x.collide = true;
+		return x;
+	}
+
+	if(col2Bounds.CollideWith(col1TransBounds).collide){
+		Collision x;
+		x.collide = true;
+		return x;
+	}
+
+	Collision x;
+	x.collide = false;
+	return x;
+}
+
+/*
+Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 	Vector3 maxOne = col1->position + col1->size;
 	Vector3 minOne = col1->position - col1->size;
 	Vector3 transMaxOne = maxOne;
@@ -180,6 +211,7 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 	x.collide = xIntersection && yIntersection && zIntersection;
 	return x;
 }
+*/
 
 Collision DetectCollision(const BoxCollider* col1, const SphereCollider* col2){
 	return DetectCollision(col2, col1);

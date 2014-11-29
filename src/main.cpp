@@ -60,8 +60,6 @@ int main(int argc, char** argv){
 	x.Init();
 
 	x.Start();
-	
-	return 0;
 #endif
 
 #if (defined(_WIN32) || defined(_WIN64)) && (defined(MEM_CHECK) || defined(TESTING))
@@ -71,6 +69,6 @@ int main(int argc, char** argv){
 #ifdef TESTING 
 	return retVal;
 #else
-
+	return 0;
 #endif
 }

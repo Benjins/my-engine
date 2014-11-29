@@ -22,6 +22,7 @@ struct SC_Transform{
 	Vector3 Right() const;
 	
 	Mat4x4 LocalToGlobalMatrix() const;
+	Mat4x4 GlobalToLocalMatrix() const;
 
 	SC_Transform GetInverse() const;
 

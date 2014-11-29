@@ -24,6 +24,7 @@ Scene::Scene(int argc, char** argv){
 	camera = SC_Transform();
 	camera.position = Z_AXIS * -5;
 	camera.rotation = Quaternion(Y_AXIS, 3.14159f);
+	rb = NULL;
 	physicsSim = new PhysicsSim();
 	input = Input();
 
@@ -113,6 +114,7 @@ void Scene::Init(){
 	z2->transform.scale = Vector3(0.2f, 0.2f, 0.2f);
 	z2->AddMaterial("shader", "Texture.bmp");
 	z2->AddMesh("test.obj");
+	z2->AddComponent<BoxCollider>();
 
 	AddObject(z2);
 }
@@ -147,7 +149,7 @@ void Scene::OnUpdate(){
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());
 
-	parent->transform.rotation = parent->transform.rotation * Quaternion(Y_AXIS, deltaTime);
+	parent->transform.rotation = parent->transform.rotation * Quaternion(Y_AXIS, deltaTime/3);
 	//child->transform.position = child->transform.position + Vector3(2 + sin(((float)prevTime)/1000),0,0);
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
@@ -169,6 +171,9 @@ void Scene::OnUpdate(){
 		y->AddMesh("test.obj");
 
 		AddObject(y);
+
+		//The rigidbody gets added to the physics sim, whihc manages its memory
+		rb = new RigidBody(&(y->transform), new BoxCollider());
 	}
 
 	if(input.GetKey('x')){

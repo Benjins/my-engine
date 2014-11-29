@@ -7,6 +7,7 @@
 struct BoxCollider;
 struct SphereCollider;
 struct PhysicsSim;
+struct AABB;
 
 struct Collision{
 	bool collide;
@@ -31,6 +32,8 @@ struct BoxCollider : Collider{
 	Vector3 size;
 
 	BoxCollider(Vector3 _position = Vector3(0,0,0), Vector3 _size = Vector3(1,1,1));
+
+	AABB GetBounds(bool globalSpace = true) const;
 
 	virtual Collision CollisionWith(const Collider* col) const;
 	virtual Collision CollisionWith(const BoxCollider* col) const;

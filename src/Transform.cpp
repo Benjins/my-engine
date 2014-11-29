@@ -50,6 +50,31 @@ Mat4x4 SC_Transform::LocalToGlobalMatrix() const{
 	return transMat;
 }
 
+Mat4x4 SC_Transform::GlobalToLocalMatrix() const{
+	Mat4x4 transMat;
+
+	Mat4x4 linMat;
+	Mat4x4 affMat;
+
+	linMat.SetColumn(0, Vector4(Rotate(X_AXIS, rotation.Conjugate()) / scale.x, 0));
+	linMat.SetColumn(1, Vector4(Rotate(Y_AXIS, rotation.Conjugate()) / scale.y, 0));
+	linMat.SetColumn(2, Vector4(Rotate(Z_AXIS, rotation.Conjugate()) / scale.z, 0));
+	linMat.SetColumn(3, Vector4(0,0,0,1));
+
+	affMat.SetRow(0, Vector4(X_AXIS, -position.x));
+	affMat.SetRow(1, Vector4(Y_AXIS, -position.y));
+	affMat.SetRow(2, Vector4(Z_AXIS, -position.z));
+	affMat.SetRow(3, Vector4(0,0,0,1));
+
+	transMat = linMat * affMat;
+
+	if(parent != NULL){
+		return parent->GlobalToLocalMatrix() * transMat;
+	}
+
+	return transMat;
+}
+
 Mat4x4 SC_Transform::GetCameraMatrix() const{
 	Mat4x4 transMat;
 
