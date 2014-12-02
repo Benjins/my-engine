@@ -18,6 +18,8 @@ struct GameObject{
 	
 	public:
 	SC_Transform transform;
+
+	string name;
 	
 	Material* material;
 	Model* mesh;

@@ -155,8 +155,10 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 }
 
 Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
-	AABB col1TransBounds = AABB(col1->GetBounds(),col2->gameObject->transform.GlobalToLocalMatrix());
-	AABB col2TransBounds = AABB(col2->GetBounds(),col1->gameObject->transform.GlobalToLocalMatrix());
+	Mat4x4 col2ToCol1Matrix = col1->gameObject->transform.GlobalToLocalMatrix();
+
+	AABB col1TransBounds = AABB(col1->GetBounds(), col2->gameObject->transform.GlobalToLocalMatrix());
+	AABB col2TransBounds = AABB(col2->GetBounds(), col2ToCol1Matrix);
 
 	AABB col1Bounds = col1->GetBounds(false);
 	AABB col2Bounds = col2->GetBounds(false);
@@ -172,46 +174,106 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 		x.collide = true;
 		return x;
 	}
+	 
+	Vector3 transformedCol2Axes[3] = { col2ToCol1Matrix * col2->gameObject->transform.Right(),
+									   col2ToCol1Matrix * col2->gameObject->transform.Up(),
+									   col2ToCol1Matrix * col2->gameObject->transform.Forward()};
+
+	Vector3 testAxes[15];
+	//0-8
+	for(int i = 0; i < 3; i++){
+		Vector3 transformedAxis = transformedCol2Axes[i];
+		//Crossed with X, Y, and Z axes
+		testAxes[3*i]   = Vector3(0,                   transformedAxis.y, -transformedAxis.x);
+		testAxes[3*i+1] = Vector3(transformedAxis.x,  -transformedAxis.z,                  0);
+		testAxes[3*i+2] = Vector3(-transformedAxis.y, 0,                   transformedAxis.z);
+	}
+
+	//9-11
+	for(int i = 0; i < 3; i++){
+		testAxes[9+i] = transformedCol2Axes[i];
+	}
+
+	//12-14
+	testAxes[12] = X_AXIS;
+	testAxes[13] = Y_AXIS;
+	testAxes[14] = Z_AXIS;
+
+	Vector3 col1Min = col1->position - col1->size;
+	Vector3 col1Max = col1->position + col1->size;
+	Vector3 col2Min = col2->position - col2->size;
+	Vector3 col2Max = col2->position + col2->size;
+
+	Mat4x4 col2LocToCol1LocMatrix = col2ToCol1Matrix * col2->gameObject->transform.LocalToGlobalMatrix();
+
+	Vector3 col1Corners[8] = {  Vector3(col1Min.x, col1Min.y, col1Min.z),
+								Vector3(col1Min.x, col1Min.y, col1Max.z),
+								Vector3(col1Min.x, col1Max.y, col1Min.z),
+								Vector3(col1Min.x, col1Max.y, col1Max.z),
+								Vector3(col1Max.x, col1Min.y, col1Min.z),
+								Vector3(col1Max.x, col1Min.y, col1Max.z),
+								Vector3(col1Max.x, col1Max.y, col1Min.z),
+								Vector3(col1Max.x, col1Max.y, col1Max.z)};
+
+	Vector3 col2Corners[8] = {  col2LocToCol1LocMatrix * Vector3(col2Min.x, col2Min.y, col2Min.z),
+								col2LocToCol1LocMatrix * Vector3(col2Min.x, col2Min.y, col2Max.z),
+								col2LocToCol1LocMatrix * Vector3(col2Min.x, col2Max.y, col2Min.z),
+								col2LocToCol1LocMatrix * Vector3(col2Min.x, col2Max.y, col2Max.z),
+								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Min.y, col2Min.z),
+								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Min.y, col2Max.z),
+								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Max.y, col2Min.z),
+								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Max.y, col2Max.z)};
+
+	for(int i = 0; i < 9; i++){
+		Vector3 testAxis = testAxes[i];
+		Collision potentialCollision = SeparateAxisTheorem(testAxes[i], col1Corners, col2Corners);
+		if(!potentialCollision.collide){
+			//cout << "Not collide.\n";
+			Collision x;
+			x.collide = false;
+			return x;
+		}
+		else{
+			//Add it to potential cols, find actual col?
+		}
+	}
+
+	Collision x;
+	x.collide = true;
+	return x;
+}
+
+Collision SeparateAxisTheorem(Vector3 axis, Vector3* points1, Vector3* points2){
+	float point1Min = FLT_MAX;
+	float point1Max = FLT_MIN;
+
+	for(int i = 0; i < 8; i++){
+		float projection = DotProduct(axis, points1[i]);
+		point1Max = max(point1Max,projection);
+		point1Min = min(point1Min,projection);
+	}
+
+	float point2Min = FLT_MAX;
+	float point2Max = FLT_MIN;
+
+	for(int i = 0; i < 8; i++){
+		float projection = DotProduct(axis, points2[i]);
+		point2Max = max(point2Max,projection);
+		point2Min = min(point2Min,projection);
+	}
+
+	if(point2Min < point1Max && point2Max > point1Min){
+		//Handle collisions
+		Collision x;
+		x.collide = true;
+		return x;
+	}
 
 	Collision x;
 	x.collide = false;
 	return x;
 }
 
-/*
-Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
-	Vector3 maxOne = col1->position + col1->size;
-	Vector3 minOne = col1->position - col1->size;
-	Vector3 transMaxOne = maxOne;
-	Vector3 transMinOne = minOne;
-	if(col1->gameObject != NULL && col2->gameObject != NULL){
-		transMaxOne = col2->gameObject->transform.GlobalToLocal(col1->gameObject->transform.LocalToGlobal(maxOne));
-		transMinOne = col2->gameObject->transform.GlobalToLocal(col1->gameObject->transform.LocalToGlobal(minOne));
-	}
-
-	Vector3 maxTwo = col2->position + col2->size;
-	Vector3 minTwo = col2->position - col2->size;
-	Vector3 transMaxTwo = maxOne;
-	Vector3 transMinTwo = minOne;
-	if(col1->gameObject != NULL && col2->gameObject != NULL){
-		transMaxTwo = col1->gameObject->transform.GlobalToLocal(col2->gameObject->transform.LocalToGlobal(maxTwo));
-		transMinTwo = col1->gameObject->transform.GlobalToLocal(col2->gameObject->transform.LocalToGlobal(minTwo));
-	}
-
-	bool xIntersection =   RangeCheck(minOne.x, transMinTwo.x, maxOne.x) || RangeCheck(minOne.x, transMaxTwo.x, maxOne.x)
-						|| RangeCheck(minTwo.x, transMinOne.x, maxTwo.x) || RangeCheck(minTwo.x, transMaxOne.x, maxTwo.x);
-
-	bool yIntersection =   RangeCheck(minOne.y, transMinTwo.y, maxOne.y) || RangeCheck(minOne.y, transMaxTwo.y, maxOne.y)
-						|| RangeCheck(minTwo.y, transMinOne.y, maxTwo.y) || RangeCheck(minTwo.y, transMaxOne.y, maxTwo.y);
-
-	bool zIntersection =   RangeCheck(minOne.z, transMinTwo.z, maxOne.z) || RangeCheck(minOne.z, transMaxTwo.z, maxOne.z)
-						|| RangeCheck(minTwo.z, transMinOne.z, maxTwo.z) || RangeCheck(minTwo.z, transMaxOne.z, maxTwo.z);
-
-	Collision x;
-	x.collide = xIntersection && yIntersection && zIntersection;
-	return x;
-}
-*/
 
 Collision DetectCollision(const BoxCollider* col1, const SphereCollider* col2){
 	return DetectCollision(col2, col1);
