@@ -156,24 +156,6 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 
 Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 	Mat4x4 col2ToCol1Matrix = col1->gameObject->transform.GlobalToLocalMatrix();
-
-	AABB col1TransBounds = AABB(col1->GetBounds(), col2->gameObject->transform.GlobalToLocalMatrix());
-	AABB col2TransBounds = AABB(col2->GetBounds(), col2ToCol1Matrix);
-
-	AABB col1Bounds = col1->GetBounds(false);
-	AABB col2Bounds = col2->GetBounds(false);
-
-	if(col1Bounds.CollideWith(col2TransBounds).collide){
-		Collision x;
-		x.collide = true;
-		return x;
-	}
-
-	if(col2Bounds.CollideWith(col1TransBounds).collide){
-		Collision x;
-		x.collide = true;
-		return x;
-	}
 	 
 	Vector3 transformedCol2Axes[3] = { col2ToCol1Matrix * col2->gameObject->transform.Right(),
 									   col2ToCol1Matrix * col2->gameObject->transform.Up(),
@@ -225,6 +207,7 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Max.y, col2Max.z)};
 
 	for(int i = 0; i < 9; i++){
+
 		Vector3 testAxis = testAxes[i];
 		Collision potentialCollision = SeparateAxisTheorem(testAxes[i], col1Corners, col2Corners);
 		if(!potentialCollision.collide){

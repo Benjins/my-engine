@@ -7,7 +7,7 @@
 #include "../header/int/Vector4.h"
 #include <iomanip>
 
-#ifdef TESTING
+#if defined(MEM_CHECK) || defined(TESTING)
 #if defined(_WIN32) || defined(_WIN64)
 #  define _CRTDBG_MAP_ALLOC
 #  define _CRTDBG_MAP_ALLOC_NEW
@@ -18,27 +18,32 @@
 #  include <assert.h>
 #endif
 
-
 #include <iostream>
 using std::cout; using std::endl;
 
 int main(int argc, char** argv){
-
 	/*
-	Mat4x4 mat;
-	mat.SetRow(0, Vector4(Rotate(X_AXIS,Quaternion(Vector3(Y_AXIS),1)), 0));
-	mat.SetRow(1, Vector4(0,1,0,0));
-	mat.SetRow(2, Vector4(Rotate(Z_AXIS,Quaternion(Vector3(Y_AXIS),1)), 0));
-	mat.SetRow(3, Vector4(0,0,0,1));
+	GameObject* y = new GameObject();
+	BoxCollider* yBox = y->AddComponent<BoxCollider>();
+	y->transform.position = Vector3(0,2.5f,0);
+	y->transform.rotation = Quaternion(1,0,0,0);
+	y->transform.scale = Vector3(1,1,1);
 
-	//test mat transforming some axes
-	Vector3 transVec = mat * Vector3(1,0,0);
-	transVec.Print();
+	GameObject* z = new GameObject();
+	BoxCollider* zBox = z->AddComponent<BoxCollider>();
+	z->transform.position = Vector3(0,0,0);
+	z->transform.rotation = Quaternion(X_AXIS, 3.14159265358979f/2);
+	z->transform.scale = Vector3(1,2,1);
 
-	Rotate(X_AXIS,Quaternion(Vector3(Y_AXIS),1)).Print();
-	Rotate(Z_AXIS,Quaternion(Vector3(Y_AXIS),1)).Print();
-	return 0;*/
+	Collision col = DetectCollision(yBox, zBox);
 
+	cout << (col.collide? "Collide" : "NoCollide") << endl;
+
+	delete y;
+	delete z;
+
+	return 0;
+	*/
 
 #if (defined(_WIN32) || defined(_WIN64)) && (defined(TESTING) || defined(MEM_CHECK))
 	//Windows memory leak checking
