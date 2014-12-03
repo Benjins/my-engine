@@ -206,7 +206,7 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Max.y, col2Min.z),
 								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Max.y, col2Max.z)};
 
-	for(int i = 0; i < 9; i++){
+	for(int i = 0; i < 15; i++){
 
 		Vector3 testAxis = testAxes[i];
 		Collision potentialCollision = SeparateAxisTheorem(testAxes[i], col1Corners, col2Corners);

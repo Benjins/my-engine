@@ -35,7 +35,7 @@ void PhysicsSim::StepForward(){
 			//Vector3 pos2 = (*iter2)->gameObject->transform.GlobalPosition();
 			//cout << "Colliders'distance: " << (pos1 - pos2).Magnitude() << endl;
 			if((*iter)->col->CollisionWith(*iter2).collide){
-				cout << "Collision! " << (*iter2)->gameObject->name << endl;
+				cout << "Collision! " << (*iter2)->gameObject->name << "  " << rand() % 100 << endl;
 			}
 		}
 	}

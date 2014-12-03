@@ -155,7 +155,7 @@ void Scene::OnUpdate(){
 	GameObject* child  = (*objects.rbegin());
 
 	if(child->transform.parent == &camera){
-		child->transform.rotation = camera.rotation.Conjugate();
+		//child->transform.rotation = camera.rotation.Conjugate();
 	}
 
 	parent->transform.rotation = parent->transform.rotation * Quaternion(Y_AXIS, deltaTime/3);
@@ -173,16 +173,18 @@ void Scene::OnUpdate(){
 
 		GameObject* y = new GameObject();
 		y->scene = this;
-		y->transform.position = camera.position;
-		y->transform.rotation = camera.rotation;
-		y->transform.scale = Vector3(1,1,1);
-		//y->transform.parent = &camera;
+		//y->transform.position = camera.position;
+		//y->transform.rotation = camera.rotation;
+		//y->transform.position = Vector3(0,0,2);
+		y->transform.scale = Vector3(0.02f,0.02f,22);
+		y->transform.parent = &camera;
 		y->AddMaterial("shader", "Texture.bmp");
 		y->AddMesh("test.obj");
 		y->name = "cameraSpawn";
 
 		AddObject(y);
 
+		/*
 		GameObject* yChild = new GameObject();
 		yChild->scene = this;
 		yChild->transform.parent = &(y->transform);
@@ -192,11 +194,12 @@ void Scene::OnUpdate(){
 		yChild->AddMaterial("shader", "Texture.bmp");
 		yChild->AddMesh("test.obj");
 		yChild->name = "cameraSpawnChild";
-
+		
 		AddObject(yChild);
+		*/
 
 		//The rigidbody gets added to the physics sim, whihc manages its memory
-		rb = new RigidBody(&(yChild->transform), new BoxCollider(Vector3(0.0f,0.0f,0.0f), Vector3(0.5f,0.5f,0.5f)));
+		rb = new RigidBody(&(y->transform), new BoxCollider(Vector3(0.0f,0.0f,0.0f), Vector3(0.5f,0.5f,0.5f)));
 	}
 
 	if(input.GetKey('x')){

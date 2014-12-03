@@ -82,7 +82,7 @@ Mat4x4 SC_Transform::GlobalToLocalMatrix() const{
 	transMat = linMat * affMat;
 
 	if(parent != NULL){
-		return parent->GlobalToLocalMatrix() * transMat;
+		return transMat * parent->GlobalToLocalMatrix();
 	}
 
 	return transMat;

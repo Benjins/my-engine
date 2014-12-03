@@ -22,28 +22,6 @@
 using std::cout; using std::endl;
 
 int main(int argc, char** argv){
-	/*
-	GameObject* y = new GameObject();
-	BoxCollider* yBox = y->AddComponent<BoxCollider>();
-	y->transform.position = Vector3(0,2.5f,0);
-	y->transform.rotation = Quaternion(1,0,0,0);
-	y->transform.scale = Vector3(1,1,1);
-
-	GameObject* z = new GameObject();
-	BoxCollider* zBox = z->AddComponent<BoxCollider>();
-	z->transform.position = Vector3(0,0,0);
-	z->transform.rotation = Quaternion(X_AXIS, 3.14159265358979f/2);
-	z->transform.scale = Vector3(1,2,1);
-
-	Collision col = DetectCollision(yBox, zBox);
-
-	cout << (col.collide? "Collide" : "NoCollide") << endl;
-
-	delete y;
-	delete z;
-
-	return 0;
-	*/
 
 #if (defined(_WIN32) || defined(_WIN64)) && (defined(TESTING) || defined(MEM_CHECK))
 	//Windows memory leak checking
