@@ -16,6 +16,12 @@
 #include <GL/freeglut.h>
 #endif
 
+struct TestComp : Component{
+	virtual void OnCollision(Collider* col){
+		cout << "Collision: " << col->gameObject->name << endl;
+	}
+};
+
 Scene::Scene(){
 }
 
@@ -180,6 +186,7 @@ void Scene::OnUpdate(){
 		y->transform.parent = &camera;
 		y->AddMaterial("shader", "Texture.bmp");
 		y->AddMesh("test.obj");
+		y->AddComponent<TestComp>();
 		y->name = "cameraSpawn";
 
 		AddObject(y);

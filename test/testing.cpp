@@ -339,11 +339,12 @@ int RunAllTests(){
 
 	//--------------------------
 	//Performance testing
-	PerformanceTest(BoxSpherePerformance,20000, "BoxSphereCollision");
-	PerformanceTest(SphereSpherePerformance,20000, "SphereSpherePerformance");
-	//PerformanceTest(BoxBoxPerformance,20000, "BoxBoxPerformance");
-
-
+	//PerformanceTest(BoxSpherePerformance,     50000,      "BoxSphereCollision");
+	//PerformanceTest(SphereSpherePerformance,  50000, "SphereSpherePerformance");
+	PerformanceTest(BoxBoxPerformance,        500000,       "BoxBoxPerformance");
+	//PerformanceTest(MatrixMultPerformance,    50000,   "MatrixMultPerformance");
+	PerformanceTest(SeparateAxisPerformance,  750000,   "SeparateAxisPerformance");
+	
 	//---------------------------
 
 
@@ -399,6 +400,21 @@ static void SphereSpherePerformance(){
 	sphere1.radius = 0.5f;
 
 	Collision x = DetectCollision(&sphere1, &sphere2);
+}
+
+static void MatrixMultPerformance(){
+	Mat4x4 mat;
+	Vector3 x = Vector3(2,2,2);
+	Vector3 y = mat * x;
+}
+
+static void SeparateAxisPerformance(){
+	Vector3 axis = Vector3(-1,2,-4);
+
+	Vector3 points1[8] = {X_AXIS, Y_AXIS, Z_AXIS, X_AXIS * 2, X_AXIS, Y_AXIS, Z_AXIS, X_AXIS * 2};
+	Vector3 points2[8] = {X_AXIS, Y_AXIS, Z_AXIS, X_AXIS * 2, X_AXIS, Y_AXIS, Z_AXIS, X_AXIS * 2};
+
+	Collision x = SeparateAxisTheorem(axis, points1, points2);
 }
 
 void AssertApprox(float actual, float expected, string error, float maxDifference){

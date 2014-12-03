@@ -2,6 +2,7 @@
 #define COMPONENT_H
 
 struct GameObject;
+struct Collider;
 
 struct Component{
 	const static bool isComponent = true;
@@ -12,6 +13,8 @@ struct Component{
 	virtual void OnAwake();
 	
 	virtual void OnUpdate();
+
+	virtual void OnCollision(Collider* col);
 	
 	virtual ~Component();
 };

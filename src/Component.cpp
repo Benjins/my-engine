@@ -10,6 +10,9 @@ void Component::OnAwake(){
 void Component::OnUpdate(){
 }
 
+void Component::OnCollision(Collider* col){
+}
+
 Component::~Component(){
 	
 }

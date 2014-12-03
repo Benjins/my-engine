@@ -49,6 +49,9 @@ double PerformanceTest(void (*func) (void), int count, string name);
 static void BoxBoxPerformance();
 static void BoxSpherePerformance();
 static void SphereSpherePerformance();
+static void MatrixMultPerformance();
+static void SeparateAxisPerformance();
+
 
 #endif
 

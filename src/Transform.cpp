@@ -7,6 +7,7 @@ SC_Transform::SC_Transform(){
 	rotation = QUAT_IDENTITY;
 	scale = Vector3(1,1,1);
 	
+	gameObject = NULL;
 	parent = NULL;
 }
 
@@ -15,6 +16,7 @@ SC_Transform::SC_Transform(const Vector3& _position, const Quaternion& _rotation
 	rotation  = _rotation;
 	scale     = _scale;
 	parent    = _parent;
+	gameObject = NULL;
 }
 
 Vector3 SC_Transform::Forward() const{

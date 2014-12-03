@@ -101,7 +101,6 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 	if(col1->gameObject != NULL && col2->gameObject != NULL){
 		spherePos = col2->gameObject->transform.GlobalToLocal(col1->gameObject->transform.LocalToGlobal(col1->position));
 	}
-
 	
 	bool xBoxInter = RangeCheck(col2->position.x - col2->size.x, spherePos.x, col2->position.x + col2->size.x);
 	bool yBoxInter = RangeCheck(col2->position.y - col2->size.y, spherePos.y, col2->position.y + col2->size.y);
@@ -155,11 +154,23 @@ Collision DetectCollision(const SphereCollider* col1, const BoxCollider* col2){
 }
 
 Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
-	Mat4x4 col2ToCol1Matrix = col1->gameObject->transform.GlobalToLocalMatrix();
+	Mat4x4 col2ToCol1Matrix;
+	if(col1->gameObject != NULL){
+		col2ToCol1Matrix = col1->gameObject->transform.GlobalToLocalMatrix();
+	}
+
+	bool col2HasGameObject = (col2->gameObject != NULL);
+	Vector3 right=X_AXIS,up=Y_AXIS,forward=Z_AXIS;
+	if(col2HasGameObject){
+		SC_Transform col2Trans = col2->gameObject->transform;
+		right = col2Trans.Right();
+		up = col2Trans.Up();
+		forward = col2Trans.Forward();
+	}
 	 
-	Vector3 transformedCol2Axes[3] = { col2ToCol1Matrix * col2->gameObject->transform.Right(),
-									   col2ToCol1Matrix * col2->gameObject->transform.Up(),
-									   col2ToCol1Matrix * col2->gameObject->transform.Forward()};
+	Vector3 transformedCol2Axes[3] = { col2ToCol1Matrix * right,
+									   col2ToCol1Matrix * up,
+									   col2ToCol1Matrix * forward};
 
 	Vector3 testAxes[15];
 	//0-8
@@ -186,7 +197,10 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 	Vector3 col2Min = col2->position - col2->size;
 	Vector3 col2Max = col2->position + col2->size;
 
-	Mat4x4 col2LocToCol1LocMatrix = col2ToCol1Matrix * col2->gameObject->transform.LocalToGlobalMatrix();
+	Mat4x4 col2LocToCol1LocMatrix = col2ToCol1Matrix;
+	if(col2HasGameObject){
+		col2LocToCol1LocMatrix = col2ToCol1Matrix * col2->gameObject->transform.LocalToGlobalMatrix();
+	}
 
 	Vector3 col1Corners[8] = {  Vector3(col1Min.x, col1Min.y, col1Min.z),
 								Vector3(col1Min.x, col1Min.y, col1Max.z),
@@ -207,9 +221,8 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Max.y, col2Max.z)};
 
 	for(int i = 0; i < 15; i++){
-
 		Vector3 testAxis = testAxes[i];
-		Collision potentialCollision = SeparateAxisTheorem(testAxes[i], col1Corners, col2Corners);
+		Collision potentialCollision = SeparateAxisTheorem(testAxis, col1Corners, col2Corners);
 		if(!potentialCollision.collide){
 			//cout << "Not collide.\n";
 			Collision x;
@@ -230,33 +243,30 @@ Collision SeparateAxisTheorem(Vector3 axis, Vector3* points1, Vector3* points2){
 	float point1Min = FLT_MAX;
 	float point1Max = FLT_MIN;
 
-	for(int i = 0; i < 8; i++){
-		float projection = DotProduct(axis, points1[i]);
-		point1Max = max(point1Max,projection);
-		point1Min = min(point1Min,projection);
-	}
-
 	float point2Min = FLT_MAX;
 	float point2Max = FLT_MIN;
 
 	for(int i = 0; i < 8; i++){
-		float projection = DotProduct(axis, points2[i]);
-		point2Max = max(point2Max,projection);
-		point2Min = min(point2Min,projection);
-	}
+		float projection1 = DotProduct(axis, points1[i]);
+		point1Max = max(point1Max,projection1);
+		point1Min = min(point1Min,projection1);
+		
+		float projection2 = DotProduct(axis, points2[i]);
+		point2Max = max(point2Max,projection2);
+		point2Min = min(point2Min,projection2);
 
-	if(point2Min < point1Max && point2Max > point1Min){
-		//Handle collisions
-		Collision x;
-		x.collide = true;
-		return x;
+		if(point2Min < point1Max && point2Max > point1Min){
+			//Handle collisions
+			Collision x;
+			x.collide = true;
+			return x;
+		}
 	}
 
 	Collision x;
 	x.collide = false;
 	return x;
 }
-
 
 Collision DetectCollision(const BoxCollider* col1, const SphereCollider* col2){
 	return DetectCollision(col2, col1);

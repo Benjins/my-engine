@@ -11,6 +11,7 @@ struct Component;
 struct Material;
 struct Model;
 struct Scene;
+struct Collider;
 
 struct GameObject{
 	private : list<Component*> components;
@@ -33,6 +34,7 @@ struct GameObject{
 	void AddMaterial(string matName, string textureName = "");
 
 	void OnUpdate();
+	void OnCollision(Collider* col);
 	
 	int GLVertexCount() const;
 	Model* GetMesh();

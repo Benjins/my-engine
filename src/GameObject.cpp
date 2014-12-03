@@ -40,6 +40,17 @@ void GameObject::OnUpdate(){
 	}
 }
 
+void GameObject::OnCollision(Collider* col){
+	for(auto iter = components.begin(); iter != components.end(); iter++){
+		(*iter)->OnCollision(col);
+	}
+
+	if(transform.parent != NULL && transform.parent->gameObject != NULL){
+		transform.parent->gameObject->OnCollision(col);
+	}
+}
+
+
 int GameObject::GLVertexCount() const{
 	if(mesh == NULL){
 		return 0;
