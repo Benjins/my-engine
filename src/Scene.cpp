@@ -22,13 +22,40 @@ struct TestComp : Component{
 	}
 };
 
+struct ChangeColOnCollision : Component{
+	bool collided;
+
+	virtual void OnAwake(){
+		cout << "ChangeColOnCollision::OnAwake()" << endl;
+		collided = false;
+	}
+
+	virtual void OnCollision(Collider* col){
+		//cout << "ChangeColOnCollision::OnCollision()" << (collided? "collided" : "notcollided") << endl;
+		if(true){
+			//cout << "ChangeColOnCollision::OnCollision() if statement" << endl;
+			if(col->gameObject->material != NULL){
+				//cout << "ChangeColOnCollision change uniform " << "Gameobject name: " << gameObject->name << endl;
+				//glUniform4f(col->gameObject->material->GetUniformByName("_color"),1.0f,0.2f,1.0f,1.0f);
+				double x = rand();
+				double ratio = x/RAND_MAX;
+				glUniform4f(gameObject->material->GetUniformByName("_color"),1.0f,(float)ratio,1.0f,1.0f);
+			}
+
+			//collided = true;
+		}
+		
+	}
+};
+
+
 Scene::Scene(){
 }
 
 Scene::Scene(int argc, char** argv){
 	drawCalls = list<DrawCall>();
 	camera = SC_Transform();
-	camera.position = Z_AXIS * -5;
+	camera.position = Z_AXIS * -5 + Y_AXIS * 4;
 	camera.rotation = Quaternion(Y_AXIS, 3.14159f);
 	rb = NULL;
 	physicsSim = new PhysicsSim();
@@ -113,7 +140,7 @@ void Scene::Init(){
 
 	BoxCollider* zBox = z->AddComponent<BoxCollider>();
 	zBox->position = Vector3(0,0,0);
-	zBox->size = Vector3(5, 0.1f, 5);
+	zBox->size = Vector3(8, 0.1f, 8);
 
 	AddObject(z);
 
@@ -125,9 +152,23 @@ void Scene::Init(){
 	z2->AddMaterial("shader", "Texture.bmp");
 	z2->AddMesh("test.obj");
 	z2->AddComponent<BoxCollider>();
+	z2->AddComponent<ChangeColOnCollision>();
 	z2->name = "Child_ball";
 
 	AddObject(z2);
+
+	GameObject* camChild = new GameObject();
+	camChild->scene = this;
+	camChild->transform.position = camera.position;
+	camChild->transform.scale = Vector3(0.3f,0.3f,0.3f);
+	camChild->name = "CamChild";
+	//camChild->AddComponent<BoxCollider>();
+
+	AddObject(camChild);
+
+	rb = new RigidBody(&(camChild->transform), new BoxCollider(Vector3(0,0,0), Vector3(1,1,1)));
+
+	//camChild->AddComponent<ChangeColOnCollision>();
 }
 
 GameObject* Scene::AddObject(GameObject* obj){
@@ -186,7 +227,7 @@ void Scene::OnUpdate(){
 		y->transform.parent = &camera;
 		y->AddMaterial("shader", "Texture.bmp");
 		y->AddMesh("test.obj");
-		y->AddComponent<TestComp>();
+		y->AddComponent<ChangeColOnCollision>();
 		y->name = "cameraSpawn";
 
 		AddObject(y);

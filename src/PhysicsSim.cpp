@@ -36,8 +36,12 @@ void PhysicsSim::StepForward(){
 			//cout << "Colliders'distance: " << (pos1 - pos2).Magnitude() << endl;
 			if((*iter)->col->CollisionWith(*iter2).collide){
 				//cout << "Collision! " << (*iter2)->gameObject->name << "  " << rand() % 100 << endl;
-				(*iter)->col->gameObject->OnCollision(*iter2);
-				//(*iter2)->gameObject->OnCollision((*iter)->col);
+
+				GameObject* obj1 = (*iter)->col->gameObject;
+				GameObject* obj2 = (*iter2)->gameObject;
+
+				obj1->OnCollision(*iter2);
+				obj2->OnCollision((*iter)->col);
 			}
 		}
 	}
