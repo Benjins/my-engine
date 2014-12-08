@@ -2,6 +2,7 @@
 #include "../header/int/Component.h"
 #include "../header/int/Model.h"
 #include "../header/int/Material.h"
+#include "../header/int/Collider.h"
 
 #ifdef TESTING
 #if defined(_WIN32) || defined(_WIN64)
@@ -41,6 +42,8 @@ void GameObject::OnUpdate(){
 }
 
 void GameObject::OnCollision(Collider* col){
+	//cout << "Gameobject::OnCollision(), on: " << name << ", with: " << col->gameObject->name << endl;
+
 	for(auto iter = components.begin(); iter != components.end(); iter++){
 		(*iter)->OnCollision(col);
 	}

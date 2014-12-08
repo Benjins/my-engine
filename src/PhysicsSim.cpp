@@ -40,7 +40,7 @@ void PhysicsSim::StepForward(){
 				GameObject* obj1 = (*iter)->col->gameObject;
 				GameObject* obj2 = (*iter2)->gameObject;
 
-				obj1->OnCollision(*iter2);
+				//obj1->OnCollision(*iter2);
 				obj2->OnCollision((*iter)->col);
 			}
 		}

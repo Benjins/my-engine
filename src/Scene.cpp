@@ -26,23 +26,22 @@ struct ChangeColOnCollision : Component{
 	bool collided;
 
 	virtual void OnAwake(){
-		cout << "ChangeColOnCollision::OnAwake()" << endl;
 		collided = false;
 	}
 
 	virtual void OnCollision(Collider* col){
-		//cout << "ChangeColOnCollision::OnCollision()" << (collided? "collided" : "notcollided") << endl;
-		if(true){
-			//cout << "ChangeColOnCollision::OnCollision() if statement" << endl;
-			if(col->gameObject->material != NULL){
-				//cout << "ChangeColOnCollision change uniform " << "Gameobject name: " << gameObject->name << endl;
-				//glUniform4f(col->gameObject->material->GetUniformByName("_color"),1.0f,0.2f,1.0f,1.0f);
+		if(col->gameObject->transform.parent == &(col->gameObject->scene->camera)){
+			if(gameObject->material != NULL){
 				double x = rand();
 				double ratio = x/RAND_MAX;
-				glUniform4f(gameObject->material->GetUniformByName("_color"),1.0f,(float)ratio,1.0f,1.0f);
-			}
 
-			//collided = true;
+				//TODO: Set variables on material directly, avoid all this cal
+				GLint currProgram;
+				glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+				glUseProgram(gameObject->material->shaderProgram);
+				glUniform4f(gameObject->material->GetUniformByName("_color"),1.0f,(float)ratio,1.0f,1.0f);
+				glUseProgram(currProgram);
+			}
 		}
 		
 	}
