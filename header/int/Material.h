@@ -14,6 +14,8 @@
 using std::string;
 
 struct Texture;
+struct Vector4;
+struct Mat4x4;
 
 struct Material{
 	string shaderName;
@@ -26,7 +28,6 @@ struct Material{
 	GLuint uniforms[MAX_NUMBER_OF_UNIFORMS];
 	vector<string> uniformNames;
 
-	
 	GLuint textureUniform;
 	GLuint cameraUniform;
 	GLuint objectMatrixUniform;
@@ -36,6 +37,22 @@ struct Material{
 	Material(string _shaderName, string textureName = "");
 	
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
+
+	
+	void SetFloatUniform(string name, float value);
+	void SetVec2Uniform(string name, Vector2 value);
+	void SetVec3Uniform(string name, Vector3 value);
+	void SetVec4Uniform(string name, Vector4 value);
+	void SetMat4Uniform(string name, Mat4x4 value);
+	void SetTextureUniform(string name, Texture* value);
+
+	void SetFloatUniform(int index, float value);
+	void SetVec2Uniform(int index, Vector2 value);
+	void SetVec3Uniform(int index, Vector3 value);
+	void SetVec4Uniform(int index, Vector4 value);
+	void SetMat4Uniform(int index, Mat4x4 value);
+	void SetTextureUniform(int index, Texture* value);
+	
 
 	GLuint GetUniformByName(string name);
 	int GetUniformIndexByName(string name);

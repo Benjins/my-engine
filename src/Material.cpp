@@ -1,5 +1,7 @@
 #include "../header/int/Material.h"
 #include "../header/int/Texture.h"
+#include "../header/int/Mat4.h"
+#include "../header/int/Vector4.h"
 #include <fstream>
 #include <iostream>
 #include <cstring>
@@ -50,7 +52,6 @@ Material::Material(string _shaderName, string textureName){
 			textureUniform = GetUniformByName("_mainTex");
 			cameraUniform = GetUniformByName("_cameraMatrix");
 			objectMatrixUniform = GetUniformByName("objectMatrix");
-			//cout << (textureUniform == 0xffffffff ? "TexUniform is null\n" : "Texuniform is not null, all clear.\n");
 		}
 		else{
 			mainTexture = NULL;
@@ -73,6 +74,73 @@ void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum S
     glCompileShader(ShaderObj);
 	
     glAttachShader(ShaderProgram, ShaderObj);
+}
+
+void Material::SetFloatUniform(string name, float value){
+	SetFloatUniform(GetUniformIndexByName(name), value);
+}
+
+void Material::SetVec2Uniform(string name, Vector2 value){
+	SetVec2Uniform(GetUniformIndexByName(name), value);
+}
+void Material::SetVec3Uniform(string name, Vector3 value){
+	SetVec3Uniform(GetUniformIndexByName(name), value);
+}
+
+void Material::SetVec4Uniform(string name, Vector4 value){
+	SetVec4Uniform(GetUniformIndexByName(name), value);
+}
+
+void Material::SetMat4Uniform(string name, Mat4x4 value){
+	SetMat4Uniform(GetUniformIndexByName(name), value);
+}
+
+void Material::SetTextureUniform(string name, Texture* value){
+	cerr << "At the moment, SetTextureUniform() is unimplemented." << endl;
+}
+
+void Material::SetFloatUniform(int index, float value){
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	glUseProgram(shaderProgram);
+	glUniform1f(GetUniformByIndex(index),value);
+	glUseProgram(currProgram);
+}
+
+void Material::SetVec2Uniform(int index, Vector2 value){
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	glUseProgram(shaderProgram);
+	glUniform2f(GetUniformByIndex(index),value.x, value.y);
+	glUseProgram(currProgram);
+}
+
+void Material::SetVec3Uniform(int index, Vector3 value){
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	glUseProgram(shaderProgram);
+	glUniform3f(GetUniformByIndex(index),value.x, value.y, value.z);
+	glUseProgram(currProgram);
+}
+
+void Material::SetVec4Uniform(int index, Vector4 value){
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	glUseProgram(shaderProgram);
+	glUniform4f(GetUniformByIndex(index), value.w, value.x, value.y, value.z);
+	glUseProgram(currProgram);
+}
+
+void Material::SetMat4Uniform(int index, Mat4x4 value){
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	glUseProgram(shaderProgram);
+	glUniformMatrix4fv(GetUniformByIndex(index),1, GL_TRUE, &(value.m[0][0]));
+	glUseProgram(currProgram);
+}
+
+void Material::SetTextureUniform(int index, Texture* value){
+	cerr << "At the moment, SetTextureUniform() is unimplemented." << endl;
 }
 
 bool ReadFile(string fileName, string& readInto){

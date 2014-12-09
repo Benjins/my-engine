@@ -35,15 +35,9 @@ struct ChangeColOnCollision : Component{
 				double x = rand();
 				double ratio = x/RAND_MAX;
 
-				//TODO: Set variables on material directly, avoid all this cal
-				GLint currProgram;
-				glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-				glUseProgram(gameObject->material->shaderProgram);
-				glUniform4f(gameObject->material->GetUniformByName("_color"),1.0f,(float)ratio,1.0f,1.0f);
-				glUseProgram(currProgram);
+				gameObject->material->SetVec4Uniform("_color",Vector4(1.0f, (float)ratio,1.0f,1.0f));
 			}
 		}
-		
 	}
 };
 
@@ -55,7 +49,7 @@ Scene::Scene(int argc, char** argv){
 	drawCalls = list<DrawCall>();
 	camera = SC_Transform();
 	camera.position = Z_AXIS * -5 + Y_AXIS * 4;
-	camera.rotation = Quaternion(Y_AXIS, 3.14159f);
+	camera.rotation = QUAT_IDENTITY;//Quaternion(Y_AXIS, 3.14159f);
 	rb = NULL;
 	physicsSim = new PhysicsSim();
 	input = Input();
@@ -113,7 +107,7 @@ void Scene::Init(){
 
 	GameObject* z = new GameObject();
 	z->transform.position = Vector3(0,-3,0);
-	z->AddMaterial("shader", "Texture.bmp");
+	z->AddMaterial("shader", "Texture2.bmp");
 	Model* model = new Model();
 
 	model->vertices.push_back(Vector3(-5,0,-5));
@@ -158,10 +152,10 @@ void Scene::Init(){
 
 	GameObject* camChild = new GameObject();
 	camChild->scene = this;
-	camChild->transform.position = camera.position;
-	camChild->transform.scale = Vector3(0.3f,0.3f,0.3f);
+	camChild->transform.position = Vector3(0,0,0);
+	camChild->transform.scale = Vector3(1,1,1);
 	camChild->name = "CamChild";
-	//camChild->AddComponent<BoxCollider>();
+	camChild->AddComponent<BoxCollider>();
 
 	AddObject(camChild);
 
