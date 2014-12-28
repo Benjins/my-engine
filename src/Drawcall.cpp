@@ -1,5 +1,5 @@
 #include "../header/int/Drawcall.h"
-#include "../header/int/Gameobject.h"
+#include "../header/int/GameObject.h"
 #include "../header/int/Mat4.h"
 #include "../header/int/Material.h"
 #include "../header/int/Texture.h"

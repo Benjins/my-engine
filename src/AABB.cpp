@@ -2,6 +2,7 @@
 #include "../header/int/Collider.h"
 #include "../header/int/Mat4.h" 
 #include "../header/int/GameObject.h" 
+#include <cfloat>
 
 AABB::AABB(){
 	minCorner = Vector3(0,0,0);
