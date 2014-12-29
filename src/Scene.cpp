@@ -8,6 +8,10 @@
 #include <time.h>
 #include <cstdlib>
 
+#if !defined(__APPLE__) && !defined(__WIN32) && !defined(__WIN64)
+#include <sys/time.h>
+#endif 
+
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #include <GLUT/glut.h>
@@ -176,6 +180,14 @@ GameObject* Scene::AddObject(GameObject* obj){
 }
 
 void Scene::Start(){
+#if !defined(__APPLE__) && !defined(__WIN32) && !defined(__WIN64)
+	timeval start;
+	gettimeofday(&start, NULL);
+	prevTime = start.tv_sec*1000 + start.tv_usec/1000;
+#else
+	prevTime = clock();
+#endif
+
 	running = true;
 	while(running){
 		physicsSim->Advance(deltaTime);
@@ -191,6 +203,20 @@ void Scene::UpdateVertexBuffer(){
 }
 
 void Scene::OnUpdate(){
+	int divisor = CLOCKS_PER_SEC;
+	clock_t currTime;
+#if !defined(__APPLE__) && !defined(__WIN32) && !defined(__WIN64)
+	divisor = 1000;
+	timeval start;
+	gettimeofday(&start, NULL);
+	currTime = start.tv_sec*1000 + start.tv_usec/1000;
+#else
+	currTime = clock();
+#endif
+	cout << "Scene::Update(): " << ((double)currTime - prevTime) << endl;
+	deltaTime = ((double)currTime - prevTime)/divisor;
+	prevTime = currTime;
+
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());
 
@@ -293,9 +319,7 @@ void PhysicsUpdate(){
 }
 
 void Scene::Render(){
-	clock_t currTime = clock();
-	deltaTime = ((float)currTime - prevTime)/CLOCKS_PER_SEC;
-	prevTime = currTime;
+	
 
 	//rb->StepForward(deltaTime);
 
