@@ -62,7 +62,7 @@ Scene::Scene(int argc, char** argv){
 
 	glutInit(&argc, argv);
 
-	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
     glutInitWindowSize(1280, 720);
     glutInitWindowPosition(500, 100);
     glutCreateWindow("my-engine");
@@ -83,9 +83,11 @@ Scene::Scene(int argc, char** argv){
 	glutKeyboardUpFunc(OnKeyUpFunc);
 	
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	//glDepthFunc(GL_LESS);
+	
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 
 	//Init();
@@ -336,7 +338,7 @@ void Scene::Render(){
 
 	Mat4x4 camMatrix = camera.GetCameraMatrix();
 
-	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
+	for(auto iter = drawCalls.rbegin(); iter != drawCalls.rend(); iter++){
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 
