@@ -1,7 +1,6 @@
 #version 130
 
 in vec3 Position;
-in vec2 a;
 in vec2 UV;
 
 out vec2 uv_coord;

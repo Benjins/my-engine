@@ -213,7 +213,7 @@ void Scene::OnUpdate(){
 #else
 	currTime = clock();
 #endif
-	cout << "Scene::Update(): " << ((double)currTime - prevTime) << endl;
+	//cout << "Scene::Update(): " << ((double)currTime - prevTime) << endl;
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
 
@@ -239,10 +239,7 @@ void Scene::OnUpdate(){
 
 		GameObject* y = new GameObject();
 		y->scene = this;
-		//y->transform.position = camera.position;
-		//y->transform.rotation = camera.rotation;
-		//y->transform.position = Vector3(0,0,2);
-		y->transform.scale = Vector3(0.02f,0.02f,22);
+		y->transform.scale = Vector3(0.005f,0.005f,22);
 		y->transform.parent = &camera;
 		y->AddMaterial("shader", "Texture.bmp");
 		y->AddMesh("test.obj");
@@ -364,11 +361,9 @@ void Scene::OnPassiveMouse(int x, int y){
 	yRot = yRot + deltaY;
 
 	camera.rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
+	
 	//camera.rotation = camera.rotation * (Quaternion(Y_AXIS, deltaX/80) * Quaternion(camera.Right(), deltaY/80));
-
 	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
-
-	//glutWarpPointer(prevX, prevY);
 	prevX = x;
 	prevY = y;
 }
