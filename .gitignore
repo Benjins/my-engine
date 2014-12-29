@@ -31,11 +31,17 @@ build/*
 *.h~
 *.cpp~
 .gitignore~
+build.b
+run.b
 
 #mac specific
 .DS_Store
 
 #misc
+*.cpp~
+*.h~
+*.fs~
+*.vs~
 EngineNP++Work.txt
 *.vcxproj
 *.vcxproj.filters
