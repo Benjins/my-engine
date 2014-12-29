@@ -83,7 +83,9 @@ Scene::Scene(int argc, char** argv){
 	glutKeyboardUpFunc(OnKeyUpFunc);
 	
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glEnable (GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 
 	//Init();
