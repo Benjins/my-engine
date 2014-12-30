@@ -1,6 +1,7 @@
 #include "../header/int/Scene.h"
 #include "../header/int/Mat4.h"
 #include "../header/int/Material.h"
+#include "../header/int/Texture.h"
 #include "../header/int/Vector4.h"
 #include "../header/int/Collider.h"
 #include "../header/int/PhysicsSim.h"
@@ -8,7 +9,7 @@
 #include <time.h>
 #include <cstdlib>
 
-#if !defined(__APPLE__) && !defined(__WIN32) && !defined(__WIN64)
+#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 #include <sys/time.h>
 #endif 
 
@@ -28,9 +29,11 @@ struct TestComp : Component{
 
 struct ChangeColOnCollision : Component{
 	bool collided;
+	Texture* tex;
 
 	virtual void OnAwake(){
 		collided = false;
+		tex = gameObject->material->mainTexture;
 	}
 
 	virtual void OnCollision(Collider* col){
@@ -39,7 +42,14 @@ struct ChangeColOnCollision : Component{
 				double x = rand();
 				double ratio = x/RAND_MAX;
 
-				gameObject->material->SetVec4Uniform("_color",Vector4(1.0f, (float)ratio,1.0f,1.0f));
+				for(int i = 0; i < 256; i++){
+					for(int j = 0; j < 256; j++){
+						tex->SetPixel(i,j,0.8,0.8,0.8);
+					}
+				}
+
+				tex->Apply();
+				//gameObject->material->SetVec4Uniform("_color",Vector4(1.0f, (float)ratio,1.0f,1.0f));
 			}
 		}
 	}
@@ -84,7 +94,7 @@ Scene::Scene(int argc, char** argv){
 	
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_LESS);
 	
@@ -184,7 +194,7 @@ GameObject* Scene::AddObject(GameObject* obj){
 }
 
 void Scene::Start(){
-#if !defined(__APPLE__) && !defined(__WIN32) && !defined(__WIN64)
+#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 	timeval start;
 	gettimeofday(&start, NULL);
 	prevTime = start.tv_sec*1000 + start.tv_usec/1000;
@@ -209,7 +219,7 @@ void Scene::UpdateVertexBuffer(){
 void Scene::OnUpdate(){
 	int divisor = CLOCKS_PER_SEC;
 	clock_t currTime;
-#if !defined(__APPLE__) && !defined(__WIN32) && !defined(__WIN64)
+#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 	divisor = 1000;
 	timeval start;
 	gettimeofday(&start, NULL);

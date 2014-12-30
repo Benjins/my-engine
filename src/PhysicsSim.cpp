@@ -31,16 +31,12 @@ void PhysicsSim::StepForward(){
 	for(auto iter = dynamicBodies.begin(); iter != dynamicBodies.end(); iter++){
 		(*iter)->StepForward(timeStep);
 		for(auto iter2 = staticBoxBodies.begin(); iter2 != staticBoxBodies.end(); iter2++){
-			//Vector3 pos1 = (*iter)->transform->GlobalPosition();
-			//Vector3 pos2 = (*iter2)->gameObject->transform.GlobalPosition();
-			//cout << "Colliders'distance: " << (pos1 - pos2).Magnitude() << endl;
-			if((*iter)->col->CollisionWith(*iter2).collide){
-				//cout << "Collision! " << (*iter2)->gameObject->name << "  " << rand() % 100 << endl;
 
+			if((*iter)->col->CollisionWith(*iter2).collide){
 				GameObject* obj1 = (*iter)->col->gameObject;
 				GameObject* obj2 = (*iter2)->gameObject;
 
-				//obj1->OnCollision(*iter2);
+				obj1->OnCollision(*iter2);
 				obj2->OnCollision((*iter)->col);
 			}
 		}

@@ -29,6 +29,10 @@ struct Texture{
 
     void Load(void);
 
+	void SetPixel(int x, int y, float r, float g, float b);
+	void GetPixel(int x, int y);
+	void Apply();
+
     void Bind(GLenum TextureUnit);
 
 	~Texture();
