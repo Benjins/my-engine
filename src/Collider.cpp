@@ -5,6 +5,7 @@
 #include "../header/int/Collider.h"
 #include "../header/int/Scene.h"
 #include "../header/int/AABB.h"
+#include <cfloat>
 
 
 Collision BoxCollider::CollisionWith(const Collider* col) const{

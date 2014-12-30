@@ -1,5 +1,5 @@
 #include "../header/int/Drawcall.h"
-#include "../header/int/Gameobject.h"
+#include "../header/int/GameObject.h"
 #include "../header/int/Mat4.h"
 #include "../header/int/Material.h"
 #include "../header/int/Texture.h"
@@ -58,9 +58,9 @@ void DrawCall::Draw() const{
 	//glBindBuffer(GL_ARRAY_BUFFER, colors);
 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	
-	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, uvs);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	
 	material->mainTexture->Bind(GL_TEXTURE0);
 	
@@ -68,5 +68,5 @@ void DrawCall::Draw() const{
 	
 	glDisableVertexAttribArray(0);
 	//glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
 }

@@ -8,6 +8,10 @@
 #include <time.h>
 #include <cstdlib>
 
+#if !defined(__APPLE__) && !defined(__WIN32) && !defined(__WIN64)
+#include <sys/time.h>
+#endif 
+
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #include <GLUT/glut.h>
@@ -58,7 +62,7 @@ Scene::Scene(int argc, char** argv){
 
 	glutInit(&argc, argv);
 
-	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
     glutInitWindowSize(1280, 720);
     glutInitWindowPosition(500, 100);
     glutCreateWindow("my-engine");
@@ -79,7 +83,11 @@ Scene::Scene(int argc, char** argv){
 	glutKeyboardUpFunc(OnKeyUpFunc);
 	
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glEnable (GL_DEPTH_TEST);
+    
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_LESS);
+	
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 
 	//Init();
@@ -176,6 +184,14 @@ GameObject* Scene::AddObject(GameObject* obj){
 }
 
 void Scene::Start(){
+#if !defined(__APPLE__) && !defined(__WIN32) && !defined(__WIN64)
+	timeval start;
+	gettimeofday(&start, NULL);
+	prevTime = start.tv_sec*1000 + start.tv_usec/1000;
+#else
+	prevTime = clock();
+#endif
+
 	running = true;
 	while(running){
 		physicsSim->Advance(deltaTime);
@@ -191,6 +207,20 @@ void Scene::UpdateVertexBuffer(){
 }
 
 void Scene::OnUpdate(){
+	int divisor = CLOCKS_PER_SEC;
+	clock_t currTime;
+#if !defined(__APPLE__) && !defined(__WIN32) && !defined(__WIN64)
+	divisor = 1000;
+	timeval start;
+	gettimeofday(&start, NULL);
+	currTime = start.tv_sec*1000 + start.tv_usec/1000;
+#else
+	currTime = clock();
+#endif
+	//cout << "Scene::Update(): " << ((double)currTime - prevTime) << endl;
+	deltaTime = ((double)currTime - prevTime)/divisor;
+	prevTime = currTime;
+
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());
 
@@ -213,10 +243,7 @@ void Scene::OnUpdate(){
 
 		GameObject* y = new GameObject();
 		y->scene = this;
-		//y->transform.position = camera.position;
-		//y->transform.rotation = camera.rotation;
-		//y->transform.position = Vector3(0,0,2);
-		y->transform.scale = Vector3(0.02f,0.02f,22);
+		y->transform.scale = Vector3(0.005f,0.005f,22);
 		y->transform.parent = &camera;
 		y->AddMaterial("shader", "Texture.bmp");
 		y->AddMesh("test.obj");
@@ -293,9 +320,7 @@ void PhysicsUpdate(){
 }
 
 void Scene::Render(){
-	clock_t currTime = clock();
-	deltaTime = ((float)currTime - prevTime)/CLOCKS_PER_SEC;
-	prevTime = currTime;
+	
 
 	//rb->StepForward(deltaTime);
 
@@ -313,7 +338,7 @@ void Scene::Render(){
 
 	Mat4x4 camMatrix = camera.GetCameraMatrix();
 
-	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
+	for(auto iter = drawCalls.rbegin(); iter != drawCalls.rend(); iter++){
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 
@@ -340,11 +365,9 @@ void Scene::OnPassiveMouse(int x, int y){
 	yRot = yRot + deltaY;
 
 	camera.rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
+	
 	//camera.rotation = camera.rotation * (Quaternion(Y_AXIS, deltaX/80) * Quaternion(camera.Right(), deltaY/80));
-
 	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
-
-	//glutWarpPointer(prevX, prevY);
 	prevX = x;
 	prevY = y;
 }

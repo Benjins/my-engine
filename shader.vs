@@ -1,8 +1,7 @@
-#version 330
+#version 130
 
-layout (location = 0) in vec3 Position;
-
-layout (location = 2) in vec2 UV;
+in vec3 Position;
+in vec2 UV;
 
 out vec2 uv_coord;
 
