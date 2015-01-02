@@ -27,6 +27,21 @@ struct TestComp : Component{
 	}
 };
 
+struct ColorizerComp : Component{
+	virtual void OnCollision(Collider* col){
+		Material* mat = col->gameObject->material;
+		if(mat != NULL){
+			double x = rand();
+			double ratio = x/RAND_MAX;
+			mat->SetVec4Uniform("_color",Vector4(0.6,0.6,ratio,1.0));
+			for(auto iter = col->gameObject->transform.children.begin(); iter != col->gameObject->transform.children.end(); iter++){
+				Material* childMat = (*iter)->gameObject->material;
+				childMat->SetVec4Uniform("_color",Vector4(1.0,0,0,1.0));
+			}
+		}
+	}
+};
+
 struct ChangeColOnCollision : Component{
 	bool collided;
 	Texture* tex;
@@ -37,14 +52,14 @@ struct ChangeColOnCollision : Component{
 	}
 
 	virtual void OnCollision(Collider* col){
-		if(col->gameObject->transform.parent == &(col->gameObject->scene->camera)){
+		if(col->gameObject->transform.GetParent() == &(col->gameObject->scene->camera)){
 			if(gameObject->material != NULL){
 				double x = rand();
 				double ratio = x/RAND_MAX;
 
 				for(int i = 0; i < 256; i++){
 					for(int j = 0; j < 256; j++){
-						tex->SetPixel(i,j,0.8,0.8,0.8);
+						tex->SetPixel(i,j,ratio,ratio,ratio);
 					}
 				}
 
@@ -84,8 +99,8 @@ Scene::Scene(int argc, char** argv){
     }
 #endif
 
-	glutDisplayFunc(RenderScene);
-	glutIdleFunc(RenderScene);
+	//glutDisplayFunc(RenderScene);
+	//glutIdleFunc(RenderScene);
 	glutMouseFunc(OnMouseFunc);
 	//glutMotionFunc(OnPassiveMouseFunc);
 	glutPassiveMotionFunc(OnPassiveMouseFunc);
@@ -114,6 +129,8 @@ void Scene::Init(){
 	y->transform.position = Vector3(0, 2.0f, 0);
 	y->AddMaterial("shader", "Texture.bmp");
 	y->AddMesh("test.obj");
+	BoxCollider* yBox = y->AddComponent<BoxCollider>();
+	yBox->size = Vector3(1,1,1);
 
 	y->name = "Rotating_centre";
 
@@ -157,19 +174,21 @@ void Scene::Init(){
 
 	GameObject* z2 = new GameObject();
 	z2->scene = this;
-	z2->transform.parent = &(y->transform);
+	z2->transform.SetParent(&(y->transform));
 	z2->transform.position = Vector3(3, 0.0f, 0);
 	z2->transform.scale = Vector3(0.2f, 0.2f, 0.2f);
 	z2->AddMaterial("shader", "Texture.bmp");
 	z2->AddMesh("test.obj");
 	z2->AddComponent<BoxCollider>();
-	z2->AddComponent<ChangeColOnCollision>();
+	//z2->AddComponent<ChangeColOnCollision>();
 	z2->name = "Child_ball";
 
 	AddObject(z2);
 
 	GameObject* camChild = new GameObject();
 	camChild->scene = this;
+	camChild->AddMaterial("shader", "Texture.bmp");
+	camChild->AddMesh("test.obj");
 	camChild->transform.position = Vector3(0,0,0);
 	camChild->transform.scale = Vector3(1,1,1);
 	camChild->name = "CamChild";
@@ -204,10 +223,13 @@ void Scene::Start(){
 
 	running = true;
 	while(running){
-		physicsSim->Advance(deltaTime);
-		glutPostRedisplay();
 		glutMainLoopEvent();
 		OnUpdate();
+		physicsSim->Advance(deltaTime);
+
+		Render();
+		glutPostRedisplay();
+
 		input.EndFrame();
 	}
 }
@@ -234,7 +256,7 @@ void Scene::OnUpdate(){
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());
 
-	if(child->transform.parent == &camera){
+	if(child->transform.GetParent() == &camera){
 		//child->transform.rotation = camera.rotation.Conjugate();
 	}
 
@@ -254,10 +276,10 @@ void Scene::OnUpdate(){
 		GameObject* y = new GameObject();
 		y->scene = this;
 		y->transform.scale = Vector3(0.005f,0.005f,22);
-		y->transform.parent = &camera;
+		y->transform.SetParent(&camera);
 		y->AddMaterial("shader", "Texture.bmp");
 		y->AddMesh("test.obj");
-		y->AddComponent<ChangeColOnCollision>();
+		y->AddComponent<ColorizerComp>();
 		y->name = "cameraSpawn";
 
 		AddObject(y);
@@ -330,8 +352,6 @@ void PhysicsUpdate(){
 }
 
 void Scene::Render(){
-	
-
 	//rb->StepForward(deltaTime);
 
 	GameObject* y = *objects.begin();
@@ -403,7 +423,6 @@ Scene::~Scene(){
 }
 
 static void RenderScene(){
-	Scene::getInstance().Render();
 }
 
 static void OnMouseFunc(int button, int state, int x, int y){

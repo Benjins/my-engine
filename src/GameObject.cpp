@@ -48,8 +48,8 @@ void GameObject::OnCollision(Collider* col){
 		(*iter)->OnCollision(col);
 	}
 
-	if(transform.parent != NULL && transform.parent->gameObject != NULL){
-		transform.parent->gameObject->OnCollision(col);
+	if(transform.GetParent() != NULL && transform.GetParent()->gameObject != NULL){
+		transform.GetParent()->gameObject->OnCollision(col);
 	}
 }
 

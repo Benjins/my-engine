@@ -15,7 +15,9 @@ SC_Transform::SC_Transform(const Vector3& _position, const Quaternion& _rotation
 	position  = _position;
 	rotation  = _rotation;
 	scale     = _scale;
-	parent    = _parent;
+	
+	SetParent(_parent);
+
 	gameObject = NULL;
 }
 
@@ -38,6 +40,39 @@ Vector3 SC_Transform::Right() const{
 		return Rotate(parent->Right(), rotation);
 	}
 	return Rotate(X_AXIS, rotation);
+}
+
+void SC_Transform::SetParent(SC_Transform* _parent){
+	if(parent != NULL){
+		for(auto iter = parent->children.begin(); iter != parent->children.end(); iter++){
+			if(*iter == this){
+				parent->children.erase(iter);
+				break;
+			}
+		}
+	}
+
+	parent = _parent;
+
+	if(parent == NULL){
+		return;
+	}
+
+	bool alreadyThere = false;
+	for(auto iter = parent->children.begin(); iter != parent->children.end(); iter++){
+		if(*iter == this){
+			alreadyThere = true;
+			break;
+		}
+	}
+
+	if(!alreadyThere){
+		parent->children.push_back(this);
+	}
+}
+
+SC_Transform* SC_Transform::GetParent() const{
+	return parent;
 }
 
 Mat4x4 SC_Transform::LocalToGlobalMatrix() const{

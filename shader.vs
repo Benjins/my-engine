@@ -1,7 +1,7 @@
 #version 130
 
-in vec3 Position;
-in vec2 UV;
+attribute vec3 Position;
+attribute vec2 UV;
 
 out vec2 uv_coord;
 

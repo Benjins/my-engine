@@ -2,6 +2,9 @@
 #define SC_TRANSFORM_H
 
 #include "../ext/3dbasics.h"
+#include <vector>
+
+using std::vector;
 
 struct GameObject;
 struct Mat4x4;
@@ -12,7 +15,14 @@ struct SC_Transform{
 	Vector3 scale;
 	
 	GameObject* gameObject;
+	
+
+	vector<SC_Transform*> children;
+
+private:
 	SC_Transform* parent;
+
+public:
 	
 	SC_Transform();
     SC_Transform(const Vector3& _position, const Quaternion& _rotation, const Vector3& _scale, SC_Transform* _parent = NULL);
@@ -20,6 +30,9 @@ struct SC_Transform{
 	Vector3 Forward() const;
 	Vector3 Up() const;
 	Vector3 Right() const;
+
+	void SetParent(SC_Transform* _parent);
+	SC_Transform* GetParent() const;
 	
 	Mat4x4 LocalToGlobalMatrix() const;
 	Mat4x4 GlobalToLocalMatrix() const;
