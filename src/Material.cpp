@@ -99,6 +99,18 @@ void Material::SetTextureUniform(string name, Texture* value){
 	cerr << "At the moment, SetTextureUniform() is unimplemented." << endl;
 }
 
+void Material::SetMainTexture(Texture* value){
+	if(mainTexture == value){
+		return;
+	}
+
+	if(mainTexture != NULL){
+		delete mainTexture;
+	}
+
+	mainTexture = value;
+}
+
 void Material::SetFloatUniform(int index, float value){
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
@@ -137,10 +149,6 @@ void Material::SetMat4Uniform(int index, Mat4x4 value){
 	glUseProgram(shaderProgram);
 	glUniformMatrix4fv(GetUniformByIndex(index),1, GL_TRUE, &(value.m[0][0]));
 	glUseProgram(currProgram);
-}
-
-void Material::SetTextureUniform(int index, Texture* value){
-	cerr << "At the moment, SetTextureUniform() is unimplemented." << endl;
 }
 
 bool ReadFile(string fileName, string& readInto){

@@ -3,9 +3,10 @@
 #include "../header/int/Material.h"
 #include "../header/int/Texture.h"
 #include "../header/int/Vector4.h"
+#include "../header/int/RaycastHit.h"
+#include "../header/int/RigidBody.h"
 #include "../header/int/Collider.h"
 #include "../header/int/PhysicsSim.h"
-#include "../header/int/RigidBody.h"
 #include <time.h>
 #include <cstdlib>
 
@@ -24,6 +25,36 @@
 struct TestComp : Component{
 	virtual void OnCollision(Collider* col){
 		cout << "Collision: " << col->gameObject->name << endl;
+	}
+};
+
+struct OscillateUp : Component{
+	float time;
+	int frameCount;
+
+	virtual void OnAwake(){
+		time = 0;
+		frameCount = 0;
+	}
+
+	virtual void OnUpdate(){
+		time += gameObject->scene->deltaTime;
+		frameCount++;
+		gameObject->transform.position.y = sinf(time)*2;
+
+		if(frameCount % 60 == -1){
+			GameObject* z2 = new GameObject();
+			z2->scene = gameObject->scene;
+			//z2->transform.SetParent(gameObject->transform.GetParent());
+			z2->transform.position = gameObject->transform.GlobalPosition();
+			z2->transform.scale = Vector3(0.15f, 0.15f, 0.15f);
+			z2->AddMaterial("shader", "Texture.bmp");
+			z2->AddMesh("test.obj");
+			z2->AddComponent<BoxCollider>();
+			z2->name = "Child_ball_clone";
+
+			gameObject->scene->AddObject(z2);
+		}
 	}
 };
 
@@ -180,10 +211,22 @@ void Scene::Init(){
 	z2->AddMaterial("shader", "Texture.bmp");
 	z2->AddMesh("test.obj");
 	z2->AddComponent<BoxCollider>();
-	//z2->AddComponent<ChangeColOnCollision>();
-	z2->name = "Child_ball";
+	z2->name = "Child_ball_clone";
 
 	AddObject(z2);
+
+	GameObject* z3 = new GameObject();
+	z3->scene = this;
+	z3->transform.SetParent(&(y->transform));
+	z3->transform.position = Vector3(-3, 0.0f, 0);
+	z3->transform.scale = Vector3(0.2f, 0.2f, 0.2f);
+	z3->AddMaterial("shader", "Texture.bmp");
+	z3->AddMesh("test.obj");
+	z3->AddComponent<BoxCollider>();
+	z3->AddComponent<OscillateUp>();
+	z3->name = "Child_ball2";
+
+	AddObject(z3);
 
 	GameObject* camChild = new GameObject();
 	camChild->scene = this;
@@ -249,9 +292,9 @@ void Scene::OnUpdate(){
 #else
 	currTime = clock();
 #endif
-	//cout << "Scene::Update(): " << ((double)currTime - prevTime) << endl;
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
+	cout << "Scene::Update(): " << deltaTime << endl;
 
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());
@@ -268,6 +311,15 @@ void Scene::OnUpdate(){
 	}
 
 	const float speed = 5;
+
+	if(input.GetKeyUp('v')){
+		RaycastHit hit = physicsSim->Raycast(camera.GlobalPosition(), camera.Forward());
+		if(hit.hit){
+			double x = rand();
+			double ratio = x/RAND_MAX;
+			hit.col->gameObject->material->SetVec4Uniform("_color", Vector4(ratio,1.0,ratio,1.0));
+		}
+	}
 
 	if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
 		float randY = (((double)(myRandom() % RAND_MAX))/RAND_MAX);

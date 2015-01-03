@@ -21,7 +21,6 @@ struct Scene{
 	PhysicsSim* physicsSim;
 	Input input;
 	
-
 protected:
 	list<GameObject*> objects;
 	list<DrawCall> drawCalls;

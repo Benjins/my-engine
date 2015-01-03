@@ -24,6 +24,8 @@ protected:
 	void PushMouse(int button);
 	void ReleaseMouse(int button);
 
+	void EndFrame();
+
 public:
 	Input();
 
@@ -34,9 +36,6 @@ public:
 	bool GetMouse(int button) const;
 	bool GetMouseUp(int button) const;
 	bool GetMouseDown(int button) const;
-
-	void EndFrame();
-
 
 };
 

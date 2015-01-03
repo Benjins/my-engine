@@ -46,6 +46,8 @@ struct Material{
 	void SetMat4Uniform(string name, Mat4x4 value);
 	void SetTextureUniform(string name, Texture* value);
 
+	void SetMainTexture(Texture* value);
+
 	void SetFloatUniform(int index, float value);
 	void SetVec2Uniform(int index, Vector2 value);
 	void SetVec3Uniform(int index, Vector3 value);
