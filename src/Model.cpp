@@ -60,6 +60,8 @@ void Model::ImportFromOBJ(string fileName){
 		cerr << "Error: Could not open OBJ file" << fileName << ": File does not exist.\n";
 		return;
 	}
+
+	name = fileName;
 	
 	string line = "";
 

@@ -33,6 +33,8 @@ struct Vertex{
 struct Model{
 	vector<Vertex> vertices;
 	vector<Face> faces;
+
+	string name;
 	
 	Model(void);
 	Model(const Model& model);
@@ -50,6 +52,5 @@ Vector2 ParseUVLine(string line);
 Face ParseFaceLine(string line, const vector<Vector2>& uvs);
 
 vector<string> SplitStringByDelimiter(string searchIn, string delimiter);
-
 
 #endif

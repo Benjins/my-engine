@@ -171,6 +171,7 @@ void Scene::Init(){
 
 	//rb->AddForce(Vector3(0,-5,0));
 
+	/*
 	GameObject* z = new GameObject();
 	z->transform.position = Vector3(0,-3,0);
 	z->AddMaterial("shader", "Texture2.bmp");
@@ -202,6 +203,7 @@ void Scene::Init(){
 	zBox->size = Vector3(8, 0.1f, 8);
 
 	AddObject(z);
+	*/
 
 	GameObject* z2 = new GameObject();
 	z2->scene = this;
@@ -325,6 +327,7 @@ void Scene::OnUpdate(){
 		float randY = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
 		float randZ = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
 
+		
 		GameObject* y = new GameObject();
 		y->scene = this;
 		y->transform.scale = Vector3(0.005f,0.005f,22);
@@ -336,22 +339,9 @@ void Scene::OnUpdate(){
 
 		AddObject(y);
 
-		/*
-		GameObject* yChild = new GameObject();
-		yChild->scene = this;
-		yChild->transform.parent = &(y->transform);
-		yChild->transform.position = Vector3(0,1.8f,2);
-		yChild->transform.rotation = Quaternion(Y_AXIS, 1) * Quaternion(X_AXIS, 0.2);
-		yChild->transform.scale = Vector3(0.2f,0.2f,0.2f);
-		yChild->AddMaterial("shader", "Texture.bmp");
-		yChild->AddMesh("test.obj");
-		yChild->name = "cameraSpawnChild";
-		
-		AddObject(yChild);
-		*/
-
-		//The rigidbody gets added to the physics sim, whihc manages its memory
+		//The rigidbody gets added to the physics sim, which manages its memory
 		rb = new RigidBody(&(y->transform), new BoxCollider(Vector3(0.0f,0.0f,0.0f), Vector3(0.5f,0.5f,0.5f)));
+		
 	}
 
 	if(input.GetKey('x')){

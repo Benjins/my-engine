@@ -6,6 +6,7 @@
 #include "Transform.h"
 #include "Drawcall.h"
 #include "Input.h"
+#include "ResourceManager.h"
 #include <time.h>
 #include <random>
 
@@ -20,6 +21,7 @@ struct Scene{
 
 	PhysicsSim* physicsSim;
 	Input input;
+	ResourceManager resources;
 	
 protected:
 	list<GameObject*> objects;

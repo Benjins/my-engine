@@ -3,6 +3,8 @@
 #include "../header/int/Model.h"
 #include "../header/int/Material.h"
 #include "../header/int/Collider.h"
+#include "../header/int/Scene.h"
+
 
 #ifdef TESTING
 #if defined(_WIN32) || defined(_WIN64)
@@ -25,14 +27,17 @@ GameObject::GameObject(Scene& sceneRef){
 }
 
 void GameObject::AddMesh(string fileName){
-	mesh = new Model(fileName);
+	if(mesh != NULL){
+		scene->resources.Release(mesh);
+	}
+	mesh = scene->resources.LoadMesh(fileName);
 }
 
 void GameObject::AddMaterial(string matName, string textureName){
 	if(material != NULL){
-		delete material;
+		scene->resources.Release(material);
 	}
-	material = new Material(matName, textureName);
+	material = scene->resources.LoadMaterial(matName, textureName);
 }
 
 void GameObject::OnUpdate(){
@@ -70,10 +75,10 @@ GameObject::~GameObject(){
 	}
 
 	if(mesh != NULL){
-		delete mesh;
+		scene->resources.Release(mesh);
 	}
 
 	if(material != NULL){
-		delete material;
+		scene->resources.Release(material);
 	}
 }

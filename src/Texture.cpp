@@ -1,5 +1,11 @@
 #include "../header/int/Texture.h"
+#include "../header/int/ResourceManager.h"
 #include "../header/ext/EasyBMP.h"
+
+Texture::Texture(){
+
+}
+
 
 Texture::Texture(GLenum TextureTarget, const std::string& _fileName){
     textureTarget = TextureTarget;
@@ -55,9 +61,18 @@ void Texture::Bind(GLenum TextureUnit){
     glBindTexture(textureTarget, textureObj);
 }
 
+void Texture::Release(ResourceManager* manager){
+	glDeleteTextures(1, &textureObj);
+	if(pixelData != NULL){
+		delete[] pixelData;
+		pixelData = NULL;
+	}
+
+	fileName = "";
+}
 
 Texture::~Texture(){
 	if(pixelData != NULL){
-		delete[] pixelData;
+		//delete[] pixelData;
 	}
 }

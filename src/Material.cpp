@@ -2,6 +2,7 @@
 #include "../header/int/Texture.h"
 #include "../header/int/Mat4.h"
 #include "../header/int/Vector4.h"
+#include "../header/int/ResourceManager.h"
 #include <fstream>
 #include <iostream>
 #include <cstring>
@@ -23,9 +24,10 @@ Material::Material(void){
 
 
 //Requires an OpenGL context
-Material::Material(string _shaderName, string textureName){
+Material::Material(string _shaderName, ResourceManager* manager, string textureName){
 	shaderProgram = glCreateProgram();
 	shaderName = _shaderName;
+	matName = _shaderName + textureName;
 	
 	vshaderText = fshaderText = ""; 
 	
@@ -40,8 +42,8 @@ Material::Material(string _shaderName, string textureName){
 		
 		if(textureName != ""){
 			cout << "mainTexture made.\n";
-			mainTexture = new Texture(GL_TEXTURE_2D, textureName);
-			mainTexture->Load();
+			mainTexture = manager->LoadTexture(textureName);
+			//mainTexture->Load();
 
 			uniformNames = GetUniformNames(vshaderText + fshaderText);
 
@@ -248,8 +250,17 @@ GLuint Material::GetUniformByIndex(int index){
 	}
 }
 
+void Material::Release(ResourceManager* manager){
+	if(mainTexture != NULL){
+		manager->Release(mainTexture);
+		mainTexture = NULL;
+	}
+
+	matName = "";
+}
+
 Material::~Material(){
 	if(mainTexture != NULL){
-		delete mainTexture;
+		//delete mainTexture;
 	}
 }

@@ -16,11 +16,13 @@ using std::string;
 struct Texture;
 struct Vector4;
 struct Mat4x4;
+struct ResourceManager;
 
 struct Material{
 	string shaderName;
 	string vshaderText;
 	string fshaderText;
+	string matName;
 	
 	GLuint shaderProgram;
 	Texture* mainTexture;
@@ -34,10 +36,9 @@ struct Material{
 	
 	Material(void);
 
-	Material(string _shaderName, string textureName = "");
+	Material(string _shaderName, ResourceManager*, string textureName = "");
 	
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
-
 	
 	void SetFloatUniform(string name, float value);
 	void SetVec2Uniform(string name, Vector2 value);
@@ -59,6 +60,8 @@ struct Material{
 	GLuint GetUniformByName(string name);
 	int GetUniformIndexByName(string name);
 	GLuint GetUniformByIndex(int index);
+
+	void Release(ResourceManager* manager);
 
 	~Material();
 };

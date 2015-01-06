@@ -11,6 +11,7 @@
 using std::string;
 
 struct RGBApixel;
+struct ResourceManager;
 
 struct Texture{
 	//mip maps
@@ -25,6 +26,8 @@ struct Texture{
 	int width;
 	int height;
 	
+	Texture();
+
 	Texture(GLenum TextureTarget, const string& FileName);
 
     void Load(void);
@@ -34,6 +37,8 @@ struct Texture{
 	void Apply();
 
     void Bind(GLenum TextureUnit);
+
+	void Release(ResourceManager* manager);
 
 	~Texture();
 };

@@ -62,19 +62,19 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 	Vector3 colMin = col->position - col->size;
 	Vector3 colMax = col->position + col->size;
 
-	SC_Transform trans= col->gameObject->transform;
+	SC_Transform trans = col->gameObject->transform;
 	Vector3 transformedOrigin = trans.GlobalToLocal(origin);
 	Vector3 transformedDirection = Rotate(direction, trans.rotation);
 
 	Vector3 corner1 = origin - colMin;
 	Vector3 corner2 = origin - colMax;
 
-	Vector3 diffMin = Vector3(  min(corner1.x, corner2.x),
-								min(corner1.y, corner2.y),
-								min(corner1.z, corner2.z));
-	Vector3 diffMax = Vector3(  max(corner1.x, corner2.x),
-								max(corner1.y, corner2.y),
-								max(corner1.z, corner2.z));
+	Vector3 diffMin = Vector3(min(corner1.x, corner2.x),
+							  min(corner1.y, corner2.y),
+							  min(corner1.z, corner2.z));
+	Vector3 diffMax = Vector3(max(corner1.x, corner2.x),
+							  max(corner1.y, corner2.y),
+							  max(corner1.z, corner2.z));
 
 	Interval xInter = Interval(diffMin.x / direction.x, diffMax.x / direction.x, true);
 	Interval yInter = Interval(diffMin.y / direction.y, diffMax.y / direction.y, true);
@@ -84,7 +84,7 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 
 	Interval lineInterval = xInter.Intersection(yzInter);
 
-	if(lineInterval.IsValid() && lineInterval.min > 0){
+	if(lineInterval.IsValid() && lineInterval.max > 0){
 		RaycastHit x;
 		x.hit = true;
 		x.col = col;

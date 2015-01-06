@@ -10,6 +10,7 @@ struct RaycastHit{
 	Vector3 worldPos;
 	bool hit;
 	Vector2 texCoords;
+	float depth;
 
 	Collider* col;
 
