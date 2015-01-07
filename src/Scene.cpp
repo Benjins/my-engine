@@ -171,39 +171,20 @@ void Scene::Init(){
 
 	//rb->AddForce(Vector3(0,-5,0));
 
-	/*
+	
 	GameObject* z = new GameObject();
+	z->scene = this;
 	z->transform.position = Vector3(0,-3,0);
 	z->AddMaterial("shader", "Texture2.bmp");
-	Model* model = new Model();
-
-	model->vertices.push_back(Vector3(-5,0,-5));
-	model->vertices.push_back(Vector3(-5,0, 5));
-	model->vertices.push_back(Vector3( 5,0,-5));
-	model->vertices.push_back(Vector3( 5,0, 5));
-
-	model->faces.push_back(Face(0,1,2));
-	model->faces.push_back(Face(3,2,1));
-
-	model->faces[0].uv0 = Vector2(-1,-1);
-	model->faces[0].uv1 = Vector2(-1, 1);
-	model->faces[0].uv2 = Vector2( 1,-1);
-
-	model->faces[1].uv0 = Vector2( 1, 1);
-	model->faces[1].uv1 = Vector2( 1,-1);
-	model->faces[1].uv2 = Vector2(-1, 1);
-	z->mesh = model;
-
+	z->AddMesh("floor.obj");
 	z->name = "Floor";
-	
-	z->scene = this;
 
 	BoxCollider* zBox = z->AddComponent<BoxCollider>();
 	zBox->position = Vector3(0,0,0);
 	zBox->size = Vector3(8, 0.1f, 8);
 
 	AddObject(z);
-	*/
+	
 
 	GameObject* z2 = new GameObject();
 	z2->scene = this;
@@ -296,7 +277,7 @@ void Scene::OnUpdate(){
 #endif
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
-	cout << "Scene::Update(): " << deltaTime << endl;
+	//cout << "Scene::Update(): " << deltaTime << endl;
 
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());

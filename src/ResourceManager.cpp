@@ -4,7 +4,7 @@
 #include "../header/int/Model.h"
 
 
-ResourceManager::ResourceManager(int matCount, int textureCount, int meshCount ){
+ResourceManager::ResourceManager(int matCount, int textureCount, int meshCount){
 	materials = NULL;
 	textures  = NULL;
 	meshes    = NULL;
@@ -16,6 +16,8 @@ ResourceManager::ResourceManager(int matCount, int textureCount, int meshCount )
 	materialRefs = NULL;
 	textureRefs  = NULL;
 	meshRefs     = NULL;
+
+	cout << "matCount: " << matCount << endl;
 
 	ReserveMaterials(matCount);
 	ReserveTextures(textureCount);
@@ -135,17 +137,19 @@ Model* ResourceManager::GetMeshByName(string name){
 int GetMeshIdByName(string name);
 Model* GetMeshById(int id);
 
-Material* ResourceManager::LoadMaterial(string shaderName, string textureName){
-	Material* mat = GetMaterialByName(shaderName + textureName) ;
-	if(mat != NULL){
-		int index = (mat - materials)/sizeof(Material);
-		materialRefs[index]++;
-		return mat;
+Material* ResourceManager::LoadMaterial(string shaderName, string textureName, bool forceInstance, bool forceInstanceTexture){
+	if(!forceInstance){
+		Material* mat = GetMaterialByName(shaderName + textureName) ;
+		if(mat != NULL){
+			int index = ((size_t)mat - (size_t)materials)/sizeof(Material);
+			materialRefs[index]++;
+			return mat;
+		}
 	}
 
 	for(int i = 0; i < matAlloc; i++){
 		if(materialRefs[i] == 0){
-			materials[i] = Material(shaderName, this, textureName);
+			materials[i] = Material(shaderName, this, textureName, forceInstanceTexture);
 			materialRefs[i] = 1;
 			return &(materials[i]);
 		}
@@ -153,16 +157,20 @@ Material* ResourceManager::LoadMaterial(string shaderName, string textureName){
 
 	return NULL;
 }
-Texture* ResourceManager::LoadTexture(string textureName){
-	Texture* tex = GetTextureByName(textureName) ;
-	if(tex != NULL){
-		int index = (tex - textures)/sizeof(Texture);
-		textureRefs[index]++;
-		return tex;
+Texture* ResourceManager::LoadTexture(string textureName, bool forceInstance){
+	if(!forceInstance){
+		Texture* tex = GetTextureByName(textureName) ;
+		if(tex != NULL){
+			//cout << "copying texture: " << textureName << endl;
+			int index = ((size_t)tex - (size_t)textures)/sizeof(Texture);
+			textureRefs[index]++;
+			return tex;
+		}
 	}
 
 	for(int i = 0; i < texAlloc; i++){
 		if(textureRefs[i] == 0){
+			//cout << "instancing texture: " << textureName << endl;
 			textures[i] = Texture(GL_TEXTURE_2D, textureName);
 			textures[i].Load();
 			textureRefs[i] = 1;
@@ -172,12 +180,14 @@ Texture* ResourceManager::LoadTexture(string textureName){
 
 	return NULL;
 }
-Model* ResourceManager::LoadMesh(string modelName){
-	Model* mesh = GetMeshByName(modelName) ;
-	if(mesh != NULL){
-		int index = (mesh - meshes)/sizeof(Model);
-		meshRefs[index]++;
-		return mesh;
+Model* ResourceManager::LoadMesh(string modelName, bool forceInstance){
+	if(!forceInstance){
+		Model* mesh = GetMeshByName(modelName) ;
+		if(mesh != NULL){
+			int index = ((size_t)mesh - (size_t)meshes)/sizeof(Model);
+			meshRefs[index]++;
+			return mesh;
+		}
 	}
 
 	for(int i = 0; i < meshAlloc; i++){
@@ -192,7 +202,7 @@ Model* ResourceManager::LoadMesh(string modelName){
 }
 
 void ResourceManager::Release(Material* mat){
-	int index = (mat - materials)/sizeof(Material);
+	int index = ((size_t)mat - (size_t)materials)/sizeof(Material);
 	materialRefs[index]--;
 
 	if(materialRefs[index] == 0){
@@ -200,7 +210,7 @@ void ResourceManager::Release(Material* mat){
 	}
 }
 void ResourceManager::Release(Texture* tex){
-	int index = (tex - textures)/sizeof(Texture);
+	int index = ((size_t)tex - (size_t)textures)/sizeof(Texture);
 	textureRefs[index]--;
 
 	if(textureRefs[index] == 0){
@@ -208,7 +218,7 @@ void ResourceManager::Release(Texture* tex){
 	}
 }
 void ResourceManager::Release(Model* mesh){
-	int index = (mesh - meshes)/sizeof(Model);
+	int index = ((size_t)mesh - (size_t)meshes)/sizeof(Model);
 	meshRefs[index]--;
 
 	meshes[index].name = "";

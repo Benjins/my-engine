@@ -41,7 +41,7 @@ private:
 	void ReserveTextures(int newTexCount);
 	void ReserveMeshes(int newMeshCount);
 public:
-	ResourceManager(int matCount = 5, int textureCount = 10, int meshCount = 10);
+	ResourceManager(int matCount = 6, int textureCount = 10, int meshCount = 10);
 
 	Material* GetMaterialByName(string name);
 	int GetMaterialIdByName(string name);
@@ -55,9 +55,9 @@ public:
 	int GetMeshIdByName(string name);
 	Model* GetMeshById(int id);
 
-	Material* LoadMaterial(string shaderName, string textureName);
-	Texture* LoadTexture(string textureName);
-	Model* LoadMesh(string modelName);
+	Material* LoadMaterial(string shaderName, string textureName, bool forceInstance = true, bool forceInstanceTexture = false);
+	Texture* LoadTexture(string textureName, bool forceInstance = true);
+	Model* LoadMesh(string modelName, bool forceInstance = true);
 
 	void Release(Material* mat);
 	void Release(Texture* mat);

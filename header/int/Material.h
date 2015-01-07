@@ -36,7 +36,7 @@ struct Material{
 	
 	Material(void);
 
-	Material(string _shaderName, ResourceManager*, string textureName = "");
+	Material(string _shaderName, ResourceManager*, string textureName = "", bool instanceTexture = false);
 	
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
 	

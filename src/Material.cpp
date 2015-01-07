@@ -24,7 +24,7 @@ Material::Material(void){
 
 
 //Requires an OpenGL context
-Material::Material(string _shaderName, ResourceManager* manager, string textureName){
+Material::Material(string _shaderName, ResourceManager* manager, string textureName, bool instanceTexture){
 	shaderProgram = glCreateProgram();
 	shaderName = _shaderName;
 	matName = _shaderName + textureName;
@@ -33,7 +33,6 @@ Material::Material(string _shaderName, ResourceManager* manager, string textureN
 	
 	if(ReadFile(_shaderName + ".vs", vshaderText) 
 	&& ReadFile(_shaderName + ".fs", fshaderText)){
-		cout << "Added shader programs.\n";
 		AddShader(shaderProgram, vshaderText.c_str(), GL_VERTEX_SHADER);
 		AddShader(shaderProgram, fshaderText.c_str(), GL_FRAGMENT_SHADER);
 		
@@ -41,9 +40,7 @@ Material::Material(string _shaderName, ResourceManager* manager, string textureN
 		glValidateProgram(shaderProgram);
 		
 		if(textureName != ""){
-			cout << "mainTexture made.\n";
-			mainTexture = manager->LoadTexture(textureName);
-			//mainTexture->Load();
+			mainTexture = manager->LoadTexture(textureName, instanceTexture);
 
 			uniformNames = GetUniformNames(vshaderText + fshaderText);
 
@@ -53,7 +50,7 @@ Material::Material(string _shaderName, ResourceManager* manager, string textureN
 
 			textureUniform = GetUniformByName("_mainTex");
 			cameraUniform = GetUniformByName("_cameraMatrix");
-			objectMatrixUniform = GetUniformByName("objectMatrix");
+			objectMatrixUniform = GetUniformByName("_objectMatrix");
 		}
 		else{
 			mainTexture = NULL;
