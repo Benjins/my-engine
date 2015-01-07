@@ -33,11 +33,11 @@ void GameObject::AddMesh(string fileName){
 	mesh = scene->resources.LoadMesh(fileName);
 }
 
-void GameObject::AddMaterial(string matName, string textureName){
+void GameObject::AddMaterial(string matName, string textureName, bool instanceMaterial, bool instanceTexture){
 	if(material != NULL){
 		scene->resources.Release(material);
 	}
-	material = scene->resources.LoadMaterial(matName, textureName);
+	material = scene->resources.LoadMaterial(matName, textureName,instanceMaterial, instanceTexture);
 }
 
 void GameObject::OnUpdate(){

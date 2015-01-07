@@ -41,7 +41,7 @@ private:
 	void ReserveTextures(int newTexCount);
 	void ReserveMeshes(int newMeshCount);
 public:
-	ResourceManager(int matCount = 6, int textureCount = 10, int meshCount = 10);
+	ResourceManager(int matCount = 10, int textureCount = 10, int meshCount = 10);
 
 	Material* GetMaterialByName(string name);
 	int GetMaterialIdByName(string name);
