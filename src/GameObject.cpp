@@ -5,7 +5,6 @@
 #include "../header/int/Collider.h"
 #include "../header/int/Scene.h"
 
-
 #ifdef TESTING
 #if defined(_WIN32) || defined(_WIN64)
 #  define _CRTDBG_MAP_ALLOC

@@ -3,6 +3,8 @@ This code uses the EasyBMP library, Copyright (c) 2005, The EasyBMP Project (htt
 This code also uses the 3dbasics library, which I previously released under the GPL v3.  
 To simplify things, I am re-releasing my 3dbasics code under the same CC-BY 4.0 license as the engine code.
 
+This code also uses the simple-xml library, which I licensed under the MIT license.
+
 All other code is licensed under a Creative Commons Attribution 4.0 International License (http://creativecommons.org/licenses/by/4.0/)
 
 ------------CC-BY 4.0 LICENSE------------------------------------------------------------
@@ -19,4 +21,4 @@ Several parts of the code that deal with OpenGL were heavily influenced by the a
 You can find them at http://ogldev.atspace.co.uk/
 
 Finally, any 3D models or textures were made by me, or generated through Blender/GIMP/etc.  
-They are unlicensed, and can be assumed to be Public Domain.
+They are released to the Public Domain.
