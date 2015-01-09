@@ -2,7 +2,19 @@
 	<GameObject name='myObj'>
 		<Material shader='shader' texture='Texture.bmp'/>
 		<Mesh source='test.obj'/>
-		<Transform position='0,3,0' rotation='1,0,0,0' size='1,1,1'/>
+		<Transform position='0,3,0' rotation='1,0,0,0' scale='1,1,1'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
+	</GameObject>
+	<GameObject name='floor'>
+		<Material shader='shader' texture='Texture2.bmp'/>
+		<Mesh source='floor.obj'/>
+		<Transform position='0,0,0' rotation='1,0,0,0' scale='3,3,3'/>
+		<BoxCollider position='0,0,0' size='1,0.1,1'/>
+	</GameObject>
+	<GameObject name='myObj2'>
+		<Material shader='shader' texture='Texture.bmp'/>
+		<Mesh source='test.obj'/>
+		<Transform position='2,3,0' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 </Scene>

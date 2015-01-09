@@ -1,5 +1,6 @@
 #include "../header/int/Material.h"
 #include "../header/int/ResourceManager.h"
+#include "../header/int/Collider.h"
 #include "../header/int/Scene.h"
 #include "../header/ext/simple-xml.h"
 
@@ -44,6 +45,8 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 					trans.scale = ParseVector3(attr.data);
 				}
 			}
+
+			go->transform = trans;
 		}
 		else if(child.name == "Material"){
 			string shaderName="", textureName="";
@@ -68,7 +71,16 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 			}
 		}
 		else if(child.name == "BoxCollider"){
-			//stufff
+			BoxCollider* col = go->AddComponent<BoxCollider>();
+			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
+				XMLAttribute attr = *iter2;
+				if(attr.name == "position"){
+					col->position = ParseVector3(attr.data);
+				}
+				else if(attr.name == "size"){
+					col->size = ParseVector3(attr.data);
+				}
+			}
 		}
 	}
 
@@ -77,12 +89,7 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 
 void Scene::LoadScene(string fileName){
 	XMLDocument doc;
-
-	cout << "About to load doc.\n";
-
 	LoadXMLDoc(doc,fileName);
-
-	cout << "Loaded document" << endl;
 
 	for(auto iter = doc.contents.begin(); iter != doc.contents.end(); iter++){
 		XMLElement topElem = *iter;
