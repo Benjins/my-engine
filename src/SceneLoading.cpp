@@ -180,6 +180,7 @@ void Scene::SaveScene(string fileName){
 			boxCol.name = "BoxCollider";
 			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col->position)));
 			boxCol.attributes.push_back(XMLAttribute("size",EncodeVector3(col->size)));
+			elem.children.push_back(boxCol);
 		}
 
 		scene.children.push_back(elem);

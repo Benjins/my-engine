@@ -445,6 +445,9 @@ void Scene::RemoveAllObjects(){
 	}
 
 	objects.clear();
+	physicsSim->staticBoxBodies.clear();
+	physicsSim->staticSphereBodies.clear();
+	physicsSim->dynamicBodies.clear();
 
 	drawCalls.clear();
 }

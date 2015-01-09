@@ -31,15 +31,16 @@ void PhysicsSim::Advance(float dt){
 
 void PhysicsSim::StepForward(){
 	for(auto iter = dynamicBodies.begin(); iter != dynamicBodies.end(); iter++){
-		(*iter)->StepForward(timeStep);
+		RigidBody* rb = *iter;
+		rb->StepForward(timeStep);
 		for(auto iter2 = staticBoxBodies.begin(); iter2 != staticBoxBodies.end(); iter2++){
 
 			if((*iter)->col->CollisionWith(*iter2).collide){
-				GameObject* obj1 = (*iter)->col->gameObject;
+				GameObject* obj1 = rb->col->gameObject;
 				GameObject* obj2 = (*iter2)->gameObject;
 
 				obj1->OnCollision(*iter2);
-				obj2->OnCollision((*iter)->col);
+				obj2->OnCollision(rb->col);
 			}
 		}
 	}
