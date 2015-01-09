@@ -28,25 +28,38 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 	GameObject* go = new GameObject();
 	go->scene = scene;
 
+	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
+		XMLAttribute attr = *iter;
+		if(attr.name == "name"){
+			go->name = attr.data;
+		}
+	}
+
 	for(auto iter = elem.children.begin(); iter != elem.children.end(); iter++){
 		XMLElement child = *iter;
 		if(child.name == "Transform"){
-			SC_Transform trans;
 			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
 				XMLAttribute attr = *iter2;
 
 				if(attr.name == "position"){
-					trans.position = ParseVector3(attr.data);
+					go->transform.position = ParseVector3(attr.data);
 				}
 				else if(attr.name == "rotation"){
-					trans.rotation = ParseQuaternion(attr.data);
+					go->transform.rotation = ParseQuaternion(attr.data);
 				}
 				else if(attr.name == "scale"){
-					trans.scale = ParseVector3(attr.data);
+					go->transform.scale = ParseVector3(attr.data);
+				}
+				else if(attr.name == "parent"){
+					cout << "Finding parent " << attr.data << endl;
+					GameObject* parent = scene->FindGameObject(attr.data);
+
+					if(parent != NULL){
+						cout << "Setting parent" << endl;
+						go->transform.SetParent(&(parent->transform));
+					}
 				}
 			}
-
-			go->transform = trans;
 		}
 		else if(child.name == "Material"){
 			string shaderName="", textureName="";

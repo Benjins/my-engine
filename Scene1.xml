@@ -14,7 +14,7 @@
 	<GameObject name='myObj2'>
 		<Material shader='shader' texture='Texture.bmp'/>
 		<Mesh source='test.obj'/>
-		<Transform position='2,3,0' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
+		<Transform parent='myObj' position='2,3,0' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 </Scene>

@@ -66,6 +66,8 @@ public:
 	void Render();
 	void PhysicsUpdate();
 
+	GameObject* FindGameObject(string name);
+
 	void OnMouse(int button, int state, int x, int y);
 	void OnPassiveMouse(int x, int y);
 	void OnKey(unsigned char key, int x, int y);

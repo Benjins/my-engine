@@ -227,6 +227,17 @@ void Scene::Init(){
 	//camChild->AddComponent<ChangeColOnCollision>();
 }
 
+GameObject* Scene::FindGameObject(string name){
+	for(auto iter = objects.begin(); iter != objects.end(); iter++){
+		GameObject* obj = *iter;
+		if(obj->name == name){
+			return obj;
+		}
+	}
+
+	return NULL;
+}
+
 GameObject* Scene::AddObject(GameObject* obj){
 	objects.push_back(obj);
 	obj->scene = this;
