@@ -221,7 +221,9 @@ void ResourceManager::Release(Model* mesh){
 	int index = ((size_t)mesh - (size_t)meshes)/sizeof(Model);
 	meshRefs[index]--;
 
-	meshes[index].name = "";
+	if(index == 0){
+		meshes[index].name = "";
+	}
 }
 
 bool ResourceManager::IsReleased(Material* mat){
@@ -238,11 +240,6 @@ bool ResourceManager::IsReleased(Model* mesh){
 }
 
 ResourceManager::~ResourceManager(){
-	/*
-	for(int i = 0; i < meshAlloc; i++){
-		cout << "Mesh " << i << "  with " << meshRefs[i] << " refs.\n";
-	}
-	*/
 
 	if(materials != nullptr){
 		delete[] materials;

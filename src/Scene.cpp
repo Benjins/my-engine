@@ -114,15 +114,6 @@ Scene::Scene(int argc, char** argv){
 	physicsSim = new PhysicsSim();
 	input = Input();
 
-	cout << "sizeof(Material)" << sizeof(Material) << endl;
-	cout << "sizeof(Mesh)" << sizeof(Model) << endl;
-	cout << "sizeof(Texture)" << sizeof(Texture) << endl;
-	cout << "sizeof(GameObject)" << sizeof(GameObject) << endl;
-	cout << "sizeof(BoxCollider)" << sizeof(BoxCollider) << endl;
-	cout << "sizeof(PhysicsSim)" << sizeof(PhysicsSim) << endl;
-
-	cout << "PhysicsSim location: " << (size_t)physicsSim << endl;
-
 	myRandom = default_random_engine(time(NULL));
 
 	glutInit(&argc, argv);
@@ -352,7 +343,6 @@ void Scene::OnUpdate(){
 		//The rigidbody gets added to the physics sim, which manages its memory
 		BoxCollider* col = new BoxCollider(Vector3(0.0f,0.0f,0.0f), Vector3(0.5f,0.5f,0.5f));
 		rb = new RigidBody(&(y->transform), col);
-		
 	}
 
 	if(input.GetKey('x')){
@@ -452,13 +442,19 @@ void Scene::OnKeyUp(unsigned char key, int x, int y){
 }
 
 void Scene::RemoveAllObjects(){
+	int count = 0;
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		delete (*iter);
+		count++;
 	}
 
 	objects.clear();
+
 	physicsSim->staticBoxBodies.clear();
 	physicsSim->staticSphereBodies.clear();
+	for(auto iter = physicsSim->dynamicBodies.begin(); iter != physicsSim->dynamicBodies.end(); iter++){
+		delete *iter;
+	}
 	physicsSim->dynamicBodies.clear();
 
 	drawCalls.clear();

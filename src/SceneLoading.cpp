@@ -121,7 +121,6 @@ void Scene::LoadScene(string fileName){
 			continue;
 		}
 		else{
-			cout << "Parsing scene" << endl;
 			for(auto iter2 = topElem.children.begin(); iter2 != topElem.children.end(); iter2++){
 				XMLElement res = *iter2;
 

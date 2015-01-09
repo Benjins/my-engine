@@ -30,8 +30,6 @@ void GameObject::AddMesh(string fileName){
 		scene->resources.Release(mesh);
 	}
 	mesh = scene->resources.LoadMesh(fileName);
-
-	cout << "Added mesh at location: " << (size_t)mesh << endl;
 }
 
 void GameObject::AddMaterial(string matName, string textureName, bool instanceMaterial, bool instanceTexture){
