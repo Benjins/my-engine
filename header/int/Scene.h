@@ -54,6 +54,7 @@ public:
 	virtual void Init();
 
 	void LoadScene(string fileName);
+	void SaveScene(string fileName);
 
 	GameObject* AddObject(GameObject* obj);
 	
@@ -72,6 +73,8 @@ public:
 	void OnPassiveMouse(int x, int y);
 	void OnKey(unsigned char key, int x, int y);
 	void OnKeyUp(unsigned char key, int x, int y);
+
+	void RemoveAllObjects();
 
 	void Stop();
 

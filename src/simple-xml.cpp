@@ -5,6 +5,11 @@ Licensed under MIT License. See ../header/ext/simple-xml_LICENSE.txt for details
 
 #include "../header/ext/simple-xml.h"
 
+XMLAttribute::XMLAttribute(string _name, string _data){
+	name = _name;
+	data = _data;
+}
+
 void XMLElement::Print() const{
 	cout << name << " ";
 	for(auto iter = attributes.begin(); iter != attributes.end(); iter++){
@@ -178,7 +183,7 @@ XMLDocument ParseTokens(vector<string> tokens){
 
 void SaveXMLDoc(XMLDocument& doc, string fileName){
 	ofstream fileOut;
-	fileOut.open(fileName.c_str());
+	fileOut.open(fileName.c_str(), ofstream::out);
 
 	if(!fileOut.good()){
 		cout << "Failed to open file " << fileName << " for saving.\n";

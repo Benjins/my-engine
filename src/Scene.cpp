@@ -315,6 +315,13 @@ void Scene::OnUpdate(){
 		}
 	}
 
+	if(input.GetKeyUp('o')){
+		SaveScene("Quicksave.xml");
+	}
+	if(input.GetKeyUp('l')){
+		LoadScene("Quicksave.xml");
+	}
+
 	if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
 		float randY = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
 		float randZ = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
@@ -341,18 +348,6 @@ void Scene::OnUpdate(){
 	}
 	if(input.GetKey('w')){
 		camera.position = camera.position + (camera.Forward() * deltaTime * speed);
-	}
-	if(input.GetKey('k')){
-		child->transform.position = child->transform.position + (Vector3(1,0,0) * deltaTime);
-	}
-	if(input.GetKey('m')){
-		child->transform.position = child->transform.position - (Vector3(1,0,0) * deltaTime);
-	}
-	if(input.GetKey('l')){
-		parent->transform.position = parent->transform.position + (Vector3(1,1,0) * deltaTime);
-	}
-	if(input.GetKey(',')){
-		parent->transform.position = parent->transform.position - (Vector3(1,1,0) * deltaTime);
 	}
 	if(input.GetKey('s')){
 		camera.position = camera.position - (camera.Forward() * deltaTime * speed);
@@ -442,6 +437,16 @@ void Scene::OnKey(unsigned char key, int x, int y){
 
 void Scene::OnKeyUp(unsigned char key, int x, int y){
 	input.ReleaseKey(key);
+}
+
+void Scene::RemoveAllObjects(){
+	for(auto iter = objects.begin(); iter != objects.end(); iter++){
+		delete (*iter);
+	}
+
+	objects.clear();
+
+	drawCalls.clear();
 }
 
 void Scene::Stop(){

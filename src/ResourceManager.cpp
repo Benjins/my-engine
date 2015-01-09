@@ -224,6 +224,19 @@ void ResourceManager::Release(Model* mesh){
 	meshes[index].name = "";
 }
 
+bool ResourceManager::IsReleased(Material* mat){
+	int index = ((size_t)mat - (size_t)materials)/sizeof(Material);
+	return materialRefs[index] == 0;
+}
+bool ResourceManager::IsReleased(Texture* tex){
+	int index = ((size_t)tex - (size_t)textures)/sizeof(Texture);
+	return textureRefs[index] == 0;
+}
+bool ResourceManager::IsReleased(Model* mesh){
+	int index = ((size_t)mesh - (size_t)meshes)/sizeof(Model);
+	return meshRefs[index] == 0;
+}
+
 ResourceManager::~ResourceManager(){
 	if(materials != nullptr){
 		delete[] materials;

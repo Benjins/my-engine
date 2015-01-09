@@ -1,8 +1,17 @@
 #include "../header/int/Material.h"
+#include "../header/int/Texture.h"
 #include "../header/int/ResourceManager.h"
 #include "../header/int/Collider.h"
 #include "../header/int/Scene.h"
 #include "../header/ext/simple-xml.h"
+
+string EncodeVector3(Vector3 vec){
+	return to_string(vec.x) + "," + to_string(vec.y)+ "," + to_string(vec.z);
+}
+
+string EncodeQuaternion(Quaternion quat){
+	return to_string(quat.w) + "," + to_string(quat.x) + "," + to_string(quat.y)+ "," + to_string(quat.z);
+}
 
 Vector3 ParseVector3(string encoded){
 	vector<string> parts = SplitStringByDelimiter(encoded, ",");
@@ -51,11 +60,9 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 					go->transform.scale = ParseVector3(attr.data);
 				}
 				else if(attr.name == "parent"){
-					cout << "Finding parent " << attr.data << endl;
 					GameObject* parent = scene->FindGameObject(attr.data);
 
 					if(parent != NULL){
-						cout << "Setting parent" << endl;
 						go->transform.SetParent(&(parent->transform));
 					}
 				}
@@ -101,6 +108,9 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 }
 
 void Scene::LoadScene(string fileName){
+
+	RemoveAllObjects(); 
+
 	XMLDocument doc;
 	LoadXMLDoc(doc,fileName);
 
@@ -121,4 +131,62 @@ void Scene::LoadScene(string fileName){
 			}
 		}
 	}
+}
+
+
+void Scene::SaveScene(string fileName){
+	XMLDocument doc;
+
+	XMLElement scene;
+	scene.name = "Scene";
+	scene.attributes.push_back(XMLAttribute("name", "my-engine"));
+
+	for(auto iter = objects.begin(); iter != objects.end(); iter++){
+		GameObject* obj = *iter;
+		XMLElement elem;
+		elem.name = "GameObject";
+		elem.attributes.push_back(XMLAttribute("name", obj->name));
+
+		XMLElement trans;
+		trans.name = "Transform";
+		SC_Transform* parent = obj->transform.GetParent();
+		if(parent != NULL){
+			trans.attributes.push_back(XMLAttribute("parent", parent->gameObject->name));
+		}
+		trans.attributes.push_back(XMLAttribute("position", EncodeVector3(obj->transform.position)));
+		trans.attributes.push_back(XMLAttribute("rotation", EncodeQuaternion(obj->transform.rotation)));
+		trans.attributes.push_back(XMLAttribute("scale",    EncodeVector3(obj->transform.scale)));
+		elem.children.push_back(trans);
+
+		Material* mat = obj->material;
+		if(mat != NULL){
+			XMLElement material;
+			material.name = "Material";
+			material.attributes.push_back(XMLAttribute("shader",mat->shaderName));
+			string textureName = (mat->mainTexture != NULL? mat->mainTexture->fileName : "");
+			material.attributes.push_back(XMLAttribute("texture", textureName));
+			elem.children.push_back(material);
+		}
+		Model* model = obj->mesh;
+		if(model != NULL){
+			XMLElement mesh;
+			mesh.name = "Mesh";
+			mesh.attributes.push_back(XMLAttribute("source",model->name));
+			elem.children.push_back(mesh);
+		}
+		BoxCollider* col = obj->GetComponent<BoxCollider>();
+		if(col != NULL){
+			XMLElement boxCol;
+			boxCol.name = "BoxCollider";
+			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col->position)));
+			boxCol.attributes.push_back(XMLAttribute("size",EncodeVector3(col->size)));
+		}
+
+		scene.children.push_back(elem);
+	}
+
+	doc.contents.push_back(scene);
+
+	cout << "Saving to: " << fileName << endl;
+	SaveXMLDoc(doc, fileName);
 }

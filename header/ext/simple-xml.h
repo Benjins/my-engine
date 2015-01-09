@@ -41,6 +41,8 @@ struct XMLAttribute{
 	string name;
 	string data;
 
+	XMLAttribute(string _name="", string _data="");
+
 	void Print() const{
 		cout << name << ":" << data;
 	}

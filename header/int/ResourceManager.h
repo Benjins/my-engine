@@ -63,6 +63,9 @@ public:
 	void Release(Texture* mat);
 	void Release(Model* mat);
 
+	bool IsReleased(Material* mat);
+	bool IsReleased(Texture* mat);
+	bool IsReleased(Model* mat);
 
 	~ResourceManager();
 };
