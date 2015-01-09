@@ -55,5 +55,5 @@ RBDeriv Evaluate(const RBState& init, float dt, const RBDeriv& d){
 }
 
 RigidBody::~RigidBody(){
-	delete col;
+	//delete col;
 }
