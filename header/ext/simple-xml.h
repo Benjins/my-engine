@@ -11,7 +11,7 @@ Licensed under MIT License. See simple-xml_LICENSE.txt for details
 using std::string; using std::vector; using std::ifstream;
 using std::cout; using std::endl; using std::ofstream;
 
-#define MAX_STACK_SIZE 8192
+#define MAX_STACK_SIZE 1024
 
 template<typename T>
 struct Stack{

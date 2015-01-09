@@ -40,7 +40,8 @@ int main(int argc, char** argv){
 #else
 	Scene& x = Scene::getInstance(argc, argv);
 
-	x.Init();
+	//x.Init();
+	x.LoadScene("Scene1.xml");
 
 	x.Start();
 #endif

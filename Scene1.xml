@@ -1,0 +1,8 @@
+<Scene name='my-engine'>
+	<GameObject name='myObj'>
+		<Material shader='shader' texture='Texture.bmp'/>
+		<Mesh source='test.obj'/>
+		<Transform position='0,3,0' rotation='1,0,0,0' size='1,1,1'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
+	</GameObject>
+</Scene>

@@ -53,6 +53,8 @@ public:
 
 	virtual void Init();
 
+	void LoadScene(string fileName);
+
 	GameObject* AddObject(GameObject* obj);
 	
 	void Start();

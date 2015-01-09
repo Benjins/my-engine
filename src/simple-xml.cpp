@@ -3,7 +3,7 @@ Author: Benji Smith
 Licensed under MIT License. See ../header/ext/simple-xml_LICENSE.txt for details
 */
 
-#include "simple-xml.h"
+#include "../header/ext/simple-xml.h"
 
 void XMLElement::Print() const{
 	cout << name << " ";
