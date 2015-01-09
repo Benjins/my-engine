@@ -238,6 +238,12 @@ bool ResourceManager::IsReleased(Model* mesh){
 }
 
 ResourceManager::~ResourceManager(){
+	/*
+	for(int i = 0; i < meshAlloc; i++){
+		cout << "Mesh " << i << "  with " << meshRefs[i] << " refs.\n";
+	}
+	*/
+
 	if(materials != nullptr){
 		delete[] materials;
 	}

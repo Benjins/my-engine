@@ -150,7 +150,7 @@ void Scene::SaveScene(string fileName){
 		XMLElement trans;
 		trans.name = "Transform";
 		SC_Transform* parent = obj->transform.GetParent();
-		if(parent != NULL){
+		if(parent != NULL && parent->gameObject != NULL){
 			trans.attributes.push_back(XMLAttribute("parent", parent->gameObject->name));
 		}
 		trans.attributes.push_back(XMLAttribute("position", EncodeVector3(obj->transform.position)));

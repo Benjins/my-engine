@@ -41,6 +41,9 @@ struct GameObject{
 	
 	template<typename T>
 	T* AddComponent();
+
+	template<typename T>
+	T* AddComponent(T* comp);
 	
 	template<typename T>
 	T* GetComponent() const;
@@ -61,6 +64,18 @@ T* GameObject::AddComponent(){
 	else{
 		delete component;
 		return NULL;
+	}
+}
+
+template<typename T>
+T* GameObject::AddComponent(T* comp){
+	//Ensure that T is of type component
+	if(T::isComponent){
+		components.push_back(comp);
+		comp->gameObject = this;
+		comp->OnAwake();
+		
+		return comp;
 	}
 }
 

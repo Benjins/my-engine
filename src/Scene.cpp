@@ -114,6 +114,15 @@ Scene::Scene(int argc, char** argv){
 	physicsSim = new PhysicsSim();
 	input = Input();
 
+	cout << "sizeof(Material)" << sizeof(Material) << endl;
+	cout << "sizeof(Mesh)" << sizeof(Model) << endl;
+	cout << "sizeof(Texture)" << sizeof(Texture) << endl;
+	cout << "sizeof(GameObject)" << sizeof(GameObject) << endl;
+	cout << "sizeof(BoxCollider)" << sizeof(BoxCollider) << endl;
+	cout << "sizeof(PhysicsSim)" << sizeof(PhysicsSim) << endl;
+
+	cout << "PhysicsSim location: " << (size_t)physicsSim << endl;
+
 	myRandom = default_random_engine(time(NULL));
 
 	glutInit(&argc, argv);
@@ -155,6 +164,7 @@ Scene::Scene(int argc, char** argv){
 }
 
 void Scene::Init(){
+	/*
 	GameObject* y = new GameObject();
 	y->scene = this;
 	y->transform.position = Vector3(0, 2.0f, 0);
@@ -225,6 +235,7 @@ void Scene::Init(){
 	rb = new RigidBody(&(camChild->transform), new BoxCollider(Vector3(0,0,0), Vector3(1,1,1)));
 
 	//camChild->AddComponent<ChangeColOnCollision>();
+	*/
 }
 
 GameObject* Scene::FindGameObject(string name){
@@ -339,7 +350,8 @@ void Scene::OnUpdate(){
 		AddObject(y);
 
 		//The rigidbody gets added to the physics sim, which manages its memory
-		rb = new RigidBody(&(y->transform), new BoxCollider(Vector3(0.0f,0.0f,0.0f), Vector3(0.5f,0.5f,0.5f)));
+		BoxCollider* col = new BoxCollider(Vector3(0.0f,0.0f,0.0f), Vector3(0.5f,0.5f,0.5f));
+		rb = new RigidBody(&(y->transform), col);
 		
 	}
 

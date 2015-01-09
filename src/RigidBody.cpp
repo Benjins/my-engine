@@ -10,6 +10,7 @@ RigidBody::RigidBody(SC_Transform* _transform, Collider* _col, float _mass){
 	transform = _transform;
 	col = _col;
 	col->gameObject  = transform->gameObject;
+	transform->gameObject->AddComponent<Collider>(col);
 	transform->gameObject->scene->physicsSim->AddRigidBody(this);
 	state.position = transform->position;
 
