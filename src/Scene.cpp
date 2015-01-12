@@ -314,6 +314,15 @@ void Scene::OnUpdate(){
 			double x = rand();
 			double ratio = x/RAND_MAX;
 			hit.col->gameObject->material->SetVec4Uniform("_color", Vector4(ratio,1.0,ratio,1.0));
+			/*
+			GameObject* go = new GameObject();
+			go->scene = this;
+			go->AddMesh("test.obj");
+			go->AddMaterial("shader","Texture2.bmp",false,false);
+			go->transform.scale = Vector3(0.1f, 0.1f, 0.1f);
+			go->transform.position = hit.worldPos;
+			AddObject(go);
+			*/
 		}
 	}
 

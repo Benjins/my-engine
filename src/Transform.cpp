@@ -161,6 +161,15 @@ Vector3 SC_Transform::GlobalPosition() const{
 	}
 }
 
+Quaternion SC_Transform::TotalRotation() const{
+
+	if(parent == NULL){
+		return rotation;
+	}
+
+	return parent->TotalRotation() * rotation;
+}
+
 Vector3 SC_Transform::GlobalToLocal(const Vector3& global) const{
 	Vector3 localVec = global;
 	if(parent != NULL){

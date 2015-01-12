@@ -40,6 +40,7 @@ public:
 	SC_Transform GetInverse() const;
 
 	Vector3 GlobalPosition() const;
+	Quaternion TotalRotation() const; 
 	
     //Transform a vector into this transform's space
     Vector3 GlobalToLocal(const Vector3& original) const;
