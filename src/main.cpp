@@ -2,6 +2,8 @@
 #include "../header/int/GameObject.h"
 #include "../header/int/Component.h"
 #include "../header/int/Mat4.h"
+#include "../header/int/PhysicsSim.h"
+#include "../header/int/RaycastHit.h"
 #include "../header/int/Collider.h"
 #include "../test/testing.h"
 #include "../header/int/Vector4.h"
@@ -38,12 +40,29 @@ int main(int argc, char** argv){
 
 	int retVal = RunAllTests();
 #else
+	
 	Scene& x = Scene::getInstance(argc, argv);
 
-	//x.Init();
+	x.Init();
 	x.LoadScene("Scene1.xml");
 
 	x.Start();
+	
+
+	/*
+	BoxCollider y;
+	GameObject z;
+	y.gameObject = &z;
+	y.gameObject->transform.rotation = Quaternion(X_AXIS,3.141592653589*0.5);
+	y.size = Vector3(1, 0.1f, 1);
+	
+	RaycastHit hit = RaycastBox(&y, Vector3(0,0.2,-2), Vector3(0,0,1));
+
+	cout << (hit.hit ? "Hit" : "No Hit") << endl;
+	*/
+
+
+
 #endif
 
 #if (defined(_WIN32) || defined(_WIN64)) && (defined(MEM_CHECK) || defined(TESTING))

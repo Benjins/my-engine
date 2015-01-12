@@ -47,16 +47,18 @@ void PhysicsSim::StepForward(){
 }
 
 RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
+	RaycastHit finalHit;
+	finalHit.hit = false;
+	finalHit.depth = FLT_MAX;
+
 	for(auto iter = staticBoxBodies.begin(); iter != staticBoxBodies.end(); iter++){
 		RaycastHit hit = RaycastBox(*iter, origin, direction);
-		if(hit.hit){
-			return hit;
+		if(hit.hit && hit.depth < finalHit.depth){
+			finalHit = hit;
 		}
 	}
 
-	RaycastHit x;
-	x.hit = false;
-	return x;
+	return finalHit;
 }
 
 RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
@@ -65,10 +67,12 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 
 	SC_Transform trans = col->gameObject->transform;
 	Vector3 transformedOrigin = trans.GlobalToLocal(origin);
-	Vector3 transformedDirection = Rotate(direction, trans.rotation);
+	//TO-DO: Get global rotation instead of local
+	Vector3 transformedDirection = Rotate(direction, trans.rotation.Conjugate());
 
-	Vector3 corner1 = origin - colMin;
-	Vector3 corner2 = origin - colMax;
+	Vector3 gameObjectScale = col->gameObject->transform.scale;
+	Vector3 corner1 = colMin - transformedOrigin;
+	Vector3 corner2 = colMax - transformedOrigin;
 
 	Vector3 diffMin = Vector3(min(corner1.x, corner2.x),
 							  min(corner1.y, corner2.y),
@@ -77,16 +81,18 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 							  max(corner1.y, corner2.y),
 							  max(corner1.z, corner2.z));
 
-	Interval xInter = Interval(diffMin.x / direction.x, diffMax.x / direction.x, true);
-	Interval yInter = Interval(diffMin.y / direction.y, diffMax.y / direction.y, true);
-	Interval zInter = Interval(diffMin.z / direction.z, diffMax.z / direction.z, true);
+	Interval xInter = Interval(diffMin.x / transformedDirection.x, diffMax.x / transformedDirection.x, true);
+	Interval yInter = Interval(diffMin.y / transformedDirection.y, diffMax.y / transformedDirection.y, true);
+	Interval zInter = Interval(diffMin.z / transformedDirection.z, diffMax.z / transformedDirection.z, true);
 
 	Interval yzInter = yInter.Intersection(zInter);
 
 	Interval lineInterval = xInter.Intersection(yzInter);
 
-	if(lineInterval.IsValid() && lineInterval.max > 0){
+	if(lineInterval.IsValid() && lineInterval.min > 0){
 		RaycastHit x;
+		x.depth = lineInterval.min;
+		x.worldPos = origin + direction*x.depth;
 		x.hit = true;
 		x.col = col;
 		return x;
