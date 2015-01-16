@@ -1,6 +1,7 @@
 <Scene name='my-engine'>
+	<Material name='myMat' shader='shader' texture='Texture.bmp'/>
 	<GameObject name='myObj'>
-		<Material shader='shader' texture='Texture.bmp'/>
+		<Material name='myMat'/>
 		<Mesh source='test.obj'/>
 		<Transform position='0,3,0' rotation='1,0,0,0' scale='1,1,1'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
@@ -12,19 +13,19 @@
 		<BoxCollider position='0,0,0' size='4,0.1,4'/>
 	</GameObject>
 	<GameObject name='myObj2'>
-		<Material shader='shader' texture='Texture.bmp'/>
+		<Material name='myMat'/>
 		<Mesh source='test.obj'/>
 		<Transform parent='myObj' position='2,1,0' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 	<GameObject name='myObj2_1'>
-		<Material shader='shader' texture='Texture.bmp' instance='false'/>
+		<Material name='myMat'/>
 		<Mesh source='test.obj'/>
 		<Transform parent='myObj' position='-2,1,0' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 	<GameObject name='myObj2_2'>
-		<Material shader='shader' texture='Texture.bmp' instance='false'/>
+		<Material name='myMat'/>
 		<Mesh source='test.obj'/>
 		<Transform parent='myObj' position='2,1,-2' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
 		<SphereCollider position='0,0,0' radius='0.2'/>

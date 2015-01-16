@@ -31,7 +31,8 @@ struct GameObject{
 	~GameObject();
 	
 	void AddMesh(string fileName);
-	void AddMaterial(string matName, string textureName = "", bool instanceMaterial = true, bool instanceTexture = false);
+	void AddMaterial(string matName, string textureName = "");
+	void AddNamedMaterial(string matName);
 
 	void OnUpdate();
 	void OnCollision(Collider* col);

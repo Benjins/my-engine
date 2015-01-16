@@ -27,16 +27,17 @@ GameObject::GameObject(Scene& sceneRef){
 
 void GameObject::AddMesh(string fileName){
 	if(mesh != NULL){
-		scene->resources.Release(mesh);
+		delete[] mesh;
 	}
-	mesh = scene->resources.LoadMesh(fileName);
+	mesh = new Model(fileName);
 }
 
-void GameObject::AddMaterial(string matName, string textureName, bool instanceMaterial, bool instanceTexture){
-	if(material != NULL){
-		scene->resources.Release(material);
-	}
-	material = scene->resources.LoadMaterial(matName, textureName,instanceMaterial, instanceTexture);
+void GameObject::AddMaterial(string matName, string textureName){
+	material = scene->resources.LoadMaterial(matName + textureName, matName, textureName);
+}
+
+void GameObject::AddNamedMaterial(string matName){
+	material = scene->resources.GetMaterialByName(matName);
 }
 
 void GameObject::OnUpdate(){
@@ -74,10 +75,9 @@ GameObject::~GameObject(){
 	}
 
 	if(mesh != NULL){
-		scene->resources.Release(mesh);
+		delete mesh;
 	}
+	
+	//The material is managed by MaterialManager, so we don't delete it.
 
-	if(material != NULL){
-		scene->resources.Release(material);
-	}
 }

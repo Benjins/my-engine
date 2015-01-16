@@ -21,7 +21,7 @@ struct Scene{
 
 	PhysicsSim* physicsSim;
 	Input input;
-	ResourceManager resources;
+	MaterialManager resources;
 	
 protected:
 	list<GameObject*> objects;

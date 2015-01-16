@@ -23,6 +23,7 @@ namespace ResourceType{
 
 struct Texture; struct Material; struct Model; struct GameObject;
 
+/*
 struct ResourceManager{
 	Material* materials;
 	Texture* textures;
@@ -68,6 +69,23 @@ public:
 	bool IsReleased(Model* mat);
 
 	~ResourceManager();
+};
+*/
+
+struct MaterialManager{
+	Material* materials;
+private:
+	unsigned int matAlloc;
+
+public:
+	MaterialManager(int matCount = 25);
+
+	Material* GetMaterialByName(string name);
+	int GetMaterialIdByName(string name);
+	Material* GetMaterialById(int id);
+
+	Material* LoadMaterial(string matName, string shaderName, string textureName="");
+	~MaterialManager();
 };
 
 

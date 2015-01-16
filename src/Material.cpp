@@ -24,7 +24,25 @@ Material::Material(void){
 
 
 //Requires an OpenGL context
-Material::Material(string _shaderName, ResourceManager* manager, string textureName, bool instanceTexture){
+Material::Material(string _shaderName, string textureName){
+	mainTexture = NULL;
+	Switch(_shaderName, textureName);
+}
+
+void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType){
+    GLuint ShaderObj = glCreateShader(ShaderType);
+
+    const GLchar* p[1];
+    p[0] = pShaderText;
+    GLint Lengths[1];
+    Lengths[0]= strlen(pShaderText);
+    glShaderSource(ShaderObj, 1, p, Lengths);
+    glCompileShader(ShaderObj);
+	
+    glAttachShader(ShaderProgram, ShaderObj);
+}
+
+void Material::Switch(string _shaderName, string textureName){
 	shaderProgram = glCreateProgram();
 	shaderName = _shaderName;
 	matName = _shaderName + textureName;
@@ -39,8 +57,13 @@ Material::Material(string _shaderName, ResourceManager* manager, string textureN
 		glLinkProgram(shaderProgram);
 		glValidateProgram(shaderProgram);
 		
+		if(mainTexture != NULL){
+			delete mainTexture;
+		}
+
 		if(textureName != ""){
-			mainTexture = manager->LoadTexture(textureName, instanceTexture);
+			mainTexture = new Texture(GL_TEXTURE_2D,textureName);
+			mainTexture->Load();
 
 			uniformNames = GetUniformNames(vshaderText + fshaderText);
 
@@ -59,20 +82,6 @@ Material::Material(string _shaderName, ResourceManager* manager, string textureN
 	else{
 		//Probably should do something here...
 	}
-	
-}
-
-void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType){
-    GLuint ShaderObj = glCreateShader(ShaderType);
-
-    const GLchar* p[1];
-    p[0] = pShaderText;
-    GLint Lengths[1];
-    Lengths[0]= strlen(pShaderText);
-    glShaderSource(ShaderObj, 1, p, Lengths);
-    glCompileShader(ShaderObj);
-	
-    glAttachShader(ShaderProgram, ShaderObj);
 }
 
 void Material::SetFloatUniform(string name, float value){
@@ -247,17 +256,8 @@ GLuint Material::GetUniformByIndex(int index){
 	}
 }
 
-void Material::Release(ResourceManager* manager){
-	if(mainTexture != NULL){
-		manager->Release(mainTexture);
-		mainTexture = NULL;
-	}
-
-	matName = "";
-}
-
 Material::~Material(){
 	if(mainTexture != NULL){
-		//delete mainTexture;
+		delete mainTexture;
 	}
 }

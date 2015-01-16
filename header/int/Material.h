@@ -36,9 +36,11 @@ struct Material{
 	
 	Material(void);
 
-	Material(string _shaderName, ResourceManager*, string textureName = "", bool instanceTexture = false);
+	Material(string _shaderName, string textureName = "");
 	
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
+
+	void Switch(string _shaderName, string textureName = "");
 	
 	void SetFloatUniform(string name, float value);
 	void SetVec2Uniform(string name, Vector2 value);

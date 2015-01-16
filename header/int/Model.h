@@ -35,6 +35,7 @@ struct Model{
 	vector<Face> faces;
 
 	string name;
+	string fileName;
 	
 	Model(void);
 	Model(const Model& model);

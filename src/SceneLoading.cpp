@@ -33,6 +33,24 @@ Quaternion ParseQuaternion(string encoded){
 	return Quaternion(w,x,y,z);
 }
 
+void LoadMaterialXML(Scene* scene, XMLElement elem){
+	string matName="", shaderName="",textureName="";
+	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
+		if(iter->name == "name"){
+			matName = iter->data;
+		}
+		else if(iter->name == "shader"){
+			shaderName = iter->data;
+		}
+		else if(iter->name == "texture"){
+			textureName = iter->data;
+		}
+	}
+
+	scene->resources.LoadMaterial(matName, shaderName, textureName);
+
+}
+
 void LoadGameObjectXML(Scene* scene, XMLElement elem){
 	GameObject* go = new GameObject();
 	go->scene = scene;
@@ -71,9 +89,14 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 		else if(child.name == "Material"){
 			string shaderName="", textureName="";
 			bool instance=true;
+			bool newMaterial=true;
 			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
 				XMLAttribute attr = *iter2;
-				if(attr.name == "shader"){
+				if(attr.name == "name"){
+					go->AddNamedMaterial(attr.data);
+					newMaterial=false;
+				}
+				else if(attr.name == "shader"){
 					shaderName = attr.data;
 				}
 				else if(attr.name == "texture"){
@@ -86,7 +109,9 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 				}
 			}
 
-			go->AddMaterial(shaderName,textureName,instance,false);
+			if(newMaterial){
+				go->AddMaterial(shaderName,textureName);
+			}
 		}
 		else if(child.name == "Mesh"){
 			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
@@ -132,6 +157,9 @@ void Scene::LoadScene(string fileName){
 
 				if(res.name == "GameObject"){
 					LoadGameObjectXML(this, res);
+				}
+				else if(res.name == "Material"){
+					LoadMaterialXML(this, res);
 				}
 			}
 		}

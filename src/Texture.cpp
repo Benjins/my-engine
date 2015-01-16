@@ -3,7 +3,8 @@
 #include "../header/ext/EasyBMP.h"
 
 Texture::Texture(){
-
+	fileName = "";
+	this->pixelData = NULL;
 }
 
 
@@ -72,7 +73,8 @@ void Texture::Release(ResourceManager* manager){
 }
 
 Texture::~Texture(){
+	fileName="";
 	if(pixelData != NULL){
-		//delete[] pixelData;
+		delete[] pixelData;
 	}
 }

@@ -28,6 +28,10 @@ Vertex::Vertex(Vector3 _position){
 }
 
 Model::Model(){
+	name="";
+	fileName="";
+	vertices = vector<Vertex>();
+	faces = vector<Face>();
 }
 
 int Model::GLVertexCount() const{
@@ -35,6 +39,9 @@ int Model::GLVertexCount() const{
 }
 
 Model::Model(const Model& model){
+	name = model.name;
+	fileName = model.fileName;
+
 	//Copy the vertices
 	vertices.resize(model.vertices.size());
 	for(int i = 0; i < model.vertices.size(); i++){
@@ -49,6 +56,11 @@ Model::Model(const Model& model){
 }
 
 Model::Model(string fileName){
+	this->name="";
+	this->fileName="";
+	vertices = vector<Vertex>();
+	faces = vector<Face>();
+
 	ImportFromOBJ(fileName);
 }
 
@@ -57,11 +69,12 @@ void Model::ImportFromOBJ(string fileName){
 	ifstream importer;
 	importer.open(fileName);
 	if(!importer.good()){
-		cerr << "Error: Could not open OBJ file" << fileName << ": File does not exist.\n";
+		cerr << "Error: Could not open OBJ file: " << fileName << ". File does not exist.\n";
 		return;
 	}
 
-	name = fileName;
+	this->fileName = fileName;
+	this->name = fileName;
 	
 	string line = "";
 
