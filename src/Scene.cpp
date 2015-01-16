@@ -156,6 +156,16 @@ Scene::Scene(int argc, char** argv){
 
 void Scene::Init(){
 	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
+	resources.LoadMaterial("gui", "", true);
 }
 
 GameObject* Scene::FindGameObject(string name){

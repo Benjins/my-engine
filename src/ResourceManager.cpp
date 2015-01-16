@@ -28,7 +28,10 @@ void ResourceManager::ReserveMaterials(int newMatCount){
 	if(matAlloc < newMatCount){
 		Material* newMats = new Material[newMatCount];
 		if(materials != NULL){
-			memcpy(newMats, materials, matAlloc*sizeof(Material));
+			//memcpy(newMats, materials, matAlloc*sizeof(Material));
+			for(int i = 0; i < matAlloc; i++){
+				newMats[i] = materials[i];
+			}
 			delete[] materials;
 		}
 		materials = newMats;
@@ -157,9 +160,11 @@ Material* ResourceManager::LoadMaterial(string shaderName, string textureName, b
 
 	int originalMatAlloc = matAlloc;
 	ReserveMaterials(matAlloc+5);
-	materials[originalMatAlloc] = Material(shaderName, this, textureName, forceInstanceTexture);
-	materialRefs[originalMatAlloc] = 1;
-	return &(materials[originalMatAlloc]);
+	if(originalMatAlloc < matAlloc){
+		materials[originalMatAlloc] = Material(shaderName, this, textureName, forceInstanceTexture);
+		materialRefs[originalMatAlloc] = 1;
+		return &(materials[originalMatAlloc]);
+	}
 
 	return NULL;
 }
