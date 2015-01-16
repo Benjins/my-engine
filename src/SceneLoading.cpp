@@ -70,6 +70,7 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 		}
 		else if(child.name == "Material"){
 			string shaderName="", textureName="";
+			bool instance=true;
 			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
 				XMLAttribute attr = *iter2;
 				if(attr.name == "shader"){
@@ -78,9 +79,14 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 				else if(attr.name == "texture"){
 					textureName = attr.data;
 				}
+				else if(attr.name == "instance"){
+					if(attr.data == "false"){
+						instance=false;
+					}
+				}
 			}
 
-			go->AddMaterial(shaderName,textureName,true,false);
+			go->AddMaterial(shaderName,textureName,instance,false);
 		}
 		else if(child.name == "Mesh"){
 			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){

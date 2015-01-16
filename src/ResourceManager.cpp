@@ -146,6 +146,7 @@ Material* ResourceManager::LoadMaterial(string shaderName, string textureName, b
 		if(mat != NULL){
 			int index = ((size_t)mat - (size_t)materials)/sizeof(Material);
 			materialRefs[index]++;
+
 			return mat;
 		}
 	}

@@ -14,7 +14,19 @@
 	<GameObject name='myObj2'>
 		<Material shader='shader' texture='Texture.bmp'/>
 		<Mesh source='test.obj'/>
-		<Transform parent='myObj' position='2,3,0' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
+		<Transform parent='myObj' position='2,1,0' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
+	</GameObject>
+	<GameObject name='myObj2_1'>
+		<Material shader='shader' texture='Texture.bmp' instance='false'/>
+		<Mesh source='test.obj'/>
+		<Transform parent='myObj' position='-2,1,0' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
+	</GameObject>
+	<GameObject name='myObj2_2'>
+		<Material shader='shader' texture='Texture.bmp' instance='false'/>
+		<Mesh source='test.obj'/>
+		<Transform parent='myObj' position='2,1,-2' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
+		<SphereCollider position='0,0,0' radius='0.2'/>
 	</GameObject>
 </Scene>
