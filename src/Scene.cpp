@@ -155,78 +155,7 @@ Scene::Scene(int argc, char** argv){
 }
 
 void Scene::Init(){
-	/*
-	GameObject* y = new GameObject();
-	y->scene = this;
-	y->transform.position = Vector3(0, 2.0f, 0);
-	y->AddMaterial("shader", "Texture.bmp");
-	y->AddMesh("test.obj");
-	BoxCollider* yBox = y->AddComponent<BoxCollider>();
-	yBox->size = Vector3(1,1,1);
-
-	y->name = "Rotating_centre";
-
-	AddObject(y);
-
-	//rb = new RigidBody(&(y->transform), new SphereCollider(Vector3(0,0,0), 1.0f));
-
-	//rb->AddForce(Vector3(0,-5,0));
-
-	
-	GameObject* z = new GameObject();
-	z->scene = this;
-	z->transform.position = Vector3(0,-3,0);
-	z->AddMaterial("shader", "Texture2.bmp");
-	z->AddMesh("floor.obj");
-	z->name = "Floor";
-
-	BoxCollider* zBox = z->AddComponent<BoxCollider>();
-	zBox->position = Vector3(0,0,0);
-	zBox->size = Vector3(8, 0.1f, 8);
-
-	AddObject(z);
-	
-
-	GameObject* z2 = new GameObject();
-	z2->scene = this;
-	z2->transform.SetParent(&(y->transform));
-	z2->transform.position = Vector3(3, 0.0f, 0);
-	z2->transform.scale = Vector3(0.2f, 0.2f, 0.2f);
-	z2->AddMaterial("shader", "Texture.bmp");
-	z2->AddMesh("test.obj");
-	z2->AddComponent<BoxCollider>();
-	z2->name = "Child_ball_clone";
-
-	AddObject(z2);
-
-	GameObject* z3 = new GameObject();
-	z3->scene = this;
-	z3->transform.SetParent(&(y->transform));
-	z3->transform.position = Vector3(-3, 0.0f, 0);
-	z3->transform.scale = Vector3(0.2f, 0.2f, 0.2f);
-	z3->AddMaterial("shader", "Texture.bmp");
-	z3->AddMesh("test.obj");
-	z3->AddComponent<BoxCollider>();
-	z3->AddComponent<OscillateUp>();
-	z3->name = "Child_ball2";
-
-	AddObject(z3);
-
-	GameObject* camChild = new GameObject();
-	camChild->scene = this;
-	camChild->AddMaterial("shader", "Texture.bmp");
-	camChild->AddMesh("test.obj");
-	camChild->transform.position = Vector3(0,0,0);
-	camChild->transform.scale = Vector3(1,1,1);
-	camChild->name = "CamChild";
-	camChild->AddComponent<BoxCollider>();
-
-	AddObject(camChild);
-
-	rb = new RigidBody(&(camChild->transform), new BoxCollider(Vector3(0,0,0), Vector3(1,1,1)));
-
-	//camChild->AddComponent<ChangeColOnCollision>();
-	*/
+	resources.LoadMaterial("gui", "", true);
 }
 
 GameObject* Scene::FindGameObject(string name){
@@ -408,11 +337,33 @@ void Scene::Render(){
 
 	Mat4x4 camMatrix = camera.GetCameraMatrix();
 
+	glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+	glEnable(GL_DEPTH_TEST);
+
 	for(auto iter = drawCalls.rbegin(); iter != drawCalls.rend(); iter++){
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 
 		iter->Draw();	
+	}
+
+
+	//Gui stuff 
+	glDisable(GL_DEPTH_TEST);
+	Material* mat = resources.GetMaterialByName("gui");
+
+	if(mat != NULL){
+		GLint currProgram;
+		glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+		glUseProgram(mat->shaderProgram);
+		glBegin(GL_TRIANGLE_STRIP);
+			glVertex3f(0,0,0.5);
+			glVertex3f(0,0.2,0.5);
+			glVertex3f(0.2,0,0.5);
+			glVertex3f(0.2,0.2,0.5);
+		glEnd();
+
+		glUseProgram(currProgram);
 	}
 
 	glutSwapBuffers();

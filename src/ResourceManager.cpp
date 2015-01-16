@@ -155,6 +155,12 @@ Material* ResourceManager::LoadMaterial(string shaderName, string textureName, b
 		}
 	}
 
+	int originalMatAlloc = matAlloc;
+	ReserveMaterials(matAlloc+5);
+	materials[originalMatAlloc] = Material(shaderName, this, textureName, forceInstanceTexture);
+	materialRefs[originalMatAlloc] = 1;
+	return &(materials[originalMatAlloc]);
+
 	return NULL;
 }
 Texture* ResourceManager::LoadTexture(string textureName, bool forceInstance){
@@ -178,6 +184,12 @@ Texture* ResourceManager::LoadTexture(string textureName, bool forceInstance){
 		}
 	}
 
+	int originalTexAlloc = texAlloc;
+	ReserveTextures(texAlloc+5);
+	textures[originalTexAlloc] = Texture(GL_TEXTURE_2D, textureName);
+	materialRefs[originalTexAlloc] = 1;
+	return &(textures[originalTexAlloc]);
+
 	return NULL;
 }
 Model* ResourceManager::LoadMesh(string modelName, bool forceInstance){
@@ -197,6 +209,12 @@ Model* ResourceManager::LoadMesh(string modelName, bool forceInstance){
 			return &(meshes[i]);
 		}
 	}
+
+	int originalMeshAlloc = meshAlloc;
+	ReserveTextures(meshAlloc+5);
+	meshes[originalMeshAlloc] = Model(modelName);
+	materialRefs[originalMeshAlloc] = 1;
+	return &(meshes[originalMeshAlloc]);
 
 	return NULL;
 }
