@@ -421,6 +421,8 @@ void Scene::RemoveAllObjects(){
 	physicsSim->dynamicBodies.clear();
 
 	drawCalls.clear();
+
+	resources.Clear();
 }
 
 void Scene::Stop(){

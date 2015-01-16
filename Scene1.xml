@@ -1,13 +1,14 @@
 <Scene name='my-engine'>
 	<Material name='myMat' shader='shader' texture='Texture.bmp'/>
+	<Material name='floorMat' shader='shader' texture='Texture2.bmp'/>
 	<GameObject name='myObj'>
-		<Material name='myMat'/>
+		<Material shader='shader' texture='Texture.bmp'/>
 		<Mesh source='test.obj'/>
 		<Transform position='0,3,0' rotation='1,0,0,0' scale='1,1,1'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 	<GameObject name='floor'>
-		<Material shader='shader' texture='Texture2.bmp'/>
+		<Material name='floorMat'/>
 		<Mesh source='floor.obj'/>
 		<Transform position='0,0,0' rotation='1,0,0,0' scale='3,3,3'/>
 		<BoxCollider position='0,0,0' size='4,0.1,4'/>
