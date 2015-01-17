@@ -1,4 +1,5 @@
 <Scene name='my-engine'>
+	<Material name='gui' shader='gui'/>
 	<Material name='myMat' shader='shader' texture='Texture.bmp'/>
 	<Material name='floorMat' shader='shader' texture='Texture2.bmp'/>
 	<GameObject name='myObj'>

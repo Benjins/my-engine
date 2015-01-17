@@ -118,7 +118,7 @@ Scene::Scene(int argc, char** argv){
 
 	glutInit(&argc, argv);
 
-	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_ALPHA);
     glutInitWindowSize(1280, 720);
     glutInitWindowPosition(500, 100);
     glutCreateWindow("my-engine");
@@ -155,10 +155,6 @@ Scene::Scene(int argc, char** argv){
 }
 
 void Scene::Init(){
-	resources.LoadMaterial("gui", "gui");
-	resources.LoadMaterial("gui", "gui");
-	resources.LoadMaterial("gui", "gui");
-	resources.LoadMaterial("gui", "gui");
 }
 
 GameObject* Scene::FindGameObject(string name){
@@ -342,6 +338,7 @@ void Scene::Render(){
 
 	glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 
 	for(auto iter = drawCalls.rbegin(); iter != drawCalls.rend(); iter++){
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
@@ -353,6 +350,8 @@ void Scene::Render(){
 
 	//Gui stuff 
 	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	Material* mat = resources.GetMaterialByName("gui");
 
 	if(mat != NULL){
