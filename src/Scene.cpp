@@ -225,7 +225,7 @@ void Scene::OnUpdate(){
 #endif
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
-	//cout << "Scene::Update(): " << deltaTime << endl;
+	cout << "Scene::Update(): " << deltaTime << endl;
 
 	/*
 	float newX = guiElements[0]->position.x + 1.55*deltaTime;
