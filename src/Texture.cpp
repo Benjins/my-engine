@@ -7,6 +7,17 @@ Texture::Texture(){
 	this->pixelData = NULL;
 }
 
+Texture::Texture(int _width, int _height){
+	fileName = "";
+	width = _width;
+	height = _height;
+
+	textureTarget = GL_TEXTURE_2D;
+	pixelData = new RGBApixel[width*height];
+
+	glGenTextures(1, &textureObj);
+    Apply();
+}
 
 Texture::Texture(GLenum TextureTarget, const std::string& _fileName){
     textureTarget = TextureTarget;

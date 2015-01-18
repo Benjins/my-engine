@@ -27,7 +27,7 @@ struct Texture{
 	int height;
 	
 	Texture();
-
+	Texture(int _width, int _height);
 	Texture(GLenum TextureTarget, const string& FileName);
 
     void Load(void);

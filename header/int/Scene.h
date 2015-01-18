@@ -7,6 +7,7 @@
 #include "Drawcall.h"
 #include "Input.h"
 #include "ResourceManager.h"
+#include "GuiElement.h"
 #include <time.h>
 #include <random>
 
@@ -26,6 +27,8 @@ struct Scene{
 protected:
 	list<GameObject*> objects;
 	list<DrawCall> drawCalls;
+	vector<GuiElement*> guiElements;
+
 	int prevX;
 	int prevY;
 	int buttonDown;
@@ -41,7 +44,7 @@ public:
 	
 	//NEVER call this version before the parameterized version
 	static Scene& getInstance(){
-		return getInstance(-1,NULL);
+		return getInstance(0,NULL);
 	}
 	static Scene& getInstance(int argc, char** argv){
 		static Scene instance = Scene(argc, argv);
@@ -57,6 +60,7 @@ public:
 	void SaveScene(string fileName);
 
 	GameObject* AddObject(GameObject* obj);
+	GuiElement* AddGuiElement();
 	
 	void Start();
 

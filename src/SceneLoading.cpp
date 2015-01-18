@@ -3,6 +3,7 @@
 #include "../header/int/ResourceManager.h"
 #include "../header/int/Collider.h"
 #include "../header/int/Scene.h"
+#include "../header/int/GuiElement.h"
 #include "../header/ext/simple-xml.h"
 
 string EncodeVector3(Vector3 vec){
@@ -164,6 +165,10 @@ void Scene::LoadScene(string fileName){
 			}
 		}
 	}
+
+	GuiElement* elem = AddGuiElement();
+	elem->position = Vector2(0.1,0.1);
+	elem->scale = Vector2(0.2,0.1);
 }
 
 

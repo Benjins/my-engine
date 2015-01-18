@@ -3,8 +3,9 @@
 out vec4 FragColor;
 
 in vec2 uv_coord;
+uniform sampler2D _guiTex;
 
 void main()
 {
-    FragColor = vec4(0.8,0.2,0.8,0.5);
+    FragColor = vec4(1.0, uv_coord.x, uv_coord.y, 0.5);
 }

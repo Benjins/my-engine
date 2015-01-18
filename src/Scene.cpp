@@ -179,6 +179,13 @@ GameObject* Scene::AddObject(GameObject* obj){
 	return obj;
 }
 
+GuiElement* Scene::AddGuiElement(){
+	GuiElement* elem = new GuiElement(&resources);
+	guiElements.push_back(elem);
+
+	return elem;
+}
+
 void Scene::Start(){
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 	timeval start;
@@ -219,6 +226,14 @@ void Scene::OnUpdate(){
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
 	//cout << "Scene::Update(): " << deltaTime << endl;
+
+	float newX = guiElements[0]->position.x + 1.55*deltaTime;
+	newX = newX - (int)newX;
+	guiElements[0]->position.x = newX;
+
+	float newY = guiElements[0]->position.y + 0.9*deltaTime;
+	newY = newY - (int)newY;
+	guiElements[0]->position.y = newY;
 
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());
@@ -352,6 +367,12 @@ void Scene::Render(){
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
+		(*iter)->OnGui();
+	}
+
+	/*
 	Material* mat = resources.GetMaterialByName("gui");
 
 	if(mat != NULL){
@@ -366,7 +387,7 @@ void Scene::Render(){
 		glEnd();
 
 		glUseProgram(currProgram);
-	}
+	}*/
 
 	glutSwapBuffers();
 }
@@ -404,13 +425,17 @@ void Scene::OnKeyUp(unsigned char key, int x, int y){
 }
 
 void Scene::RemoveAllObjects(){
-	int count = 0;
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		delete (*iter);
-		count++;
 	}
 
 	objects.clear();
+
+	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
+		delete (*iter);
+	}
+
+	guiElements.clear();
 
 	physicsSim->staticBoxBodies.clear();
 	physicsSim->staticSphereBodies.clear();
@@ -430,6 +455,10 @@ void Scene::Stop(){
 
 Scene::~Scene(){
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
+		delete (*iter);
+	}
+
+	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
 		delete (*iter);
 	}
 
