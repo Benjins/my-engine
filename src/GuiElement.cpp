@@ -52,6 +52,23 @@ void GuiElement::OnGui() const{
 }
 
 
+void GuiSetSliderValue(GuiElement* elem, float value){
+	Texture* tex = elem->tex;
+	for(int i = 0; i < tex->width; i++){
+		for(int j = 0; j < tex->height; j++){
+			if(i < tex->width * value){
+				tex->SetPixel(i,j,1,0.2,0.2);
+			}
+			else{
+				tex->SetPixel(i,j,0.2,0.8,0.8);
+			}
+		}
+	}
+
+	tex->Apply();
+}
+
+
 GuiElement::~GuiElement(){
 	if(tex != NULL){
 		delete tex;

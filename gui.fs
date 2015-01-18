@@ -7,5 +7,5 @@ uniform sampler2D _guiTex;
 
 void main()
 {
-    FragColor = vec4(1.0, uv_coord.x, uv_coord.y, 0.5);
+    FragColor = texture2D(_guiTex, uv_coord.st);
 }
