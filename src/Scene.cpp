@@ -83,7 +83,7 @@ struct ChangeColOnCollision : Component{
 	}
 
 	virtual void OnCollision(Collider* col){
-		if(col->gameObject->transform.GetParent() == &(col->gameObject->scene->camera)){
+		if(col->gameObject->transform.GetParent() == col->gameObject->scene->camera){
 			if(gameObject->material != NULL){
 				double x = rand();
 				double ratio = x/RAND_MAX;
@@ -107,9 +107,7 @@ Scene::Scene(){
 
 Scene::Scene(int argc, char** argv){
 	drawCalls = list<DrawCall>();
-	camera = SC_Transform();
-	camera.position = Z_AXIS * -5 + Y_AXIS * 4;
-	camera.rotation = QUAT_IDENTITY;//Quaternion(Y_AXIS, 3.14159f);
+	camera = NULL;
 	rb = NULL;
 	physicsSim = new PhysicsSim();
 	input = Input();
@@ -247,7 +245,7 @@ void Scene::OnUpdate(){
 	double sliderTime = ((double)after - before)/CLOCKS_PER_SEC;
 	cout << "Time: " << sliderTime << endl;
 
-	if(child->transform.GetParent() == &camera){
+	if(child->transform.GetParent() == camera){
 		//child->transform.rotation = camera.rotation.Conjugate();
 	}
 
@@ -261,7 +259,7 @@ void Scene::OnUpdate(){
 	const float speed = 5;
 
 	if(input.GetKey('v')){
-		RaycastHit hit = physicsSim->Raycast(camera.GlobalPosition(), camera.Forward());
+		RaycastHit hit = physicsSim->Raycast(camera->GlobalPosition(), camera->Forward());
 		if(hit.hit){
 			double x = rand();
 			double ratio = x/RAND_MAX;
@@ -293,7 +291,7 @@ void Scene::OnUpdate(){
 		GameObject* y = new GameObject();
 		y->scene = this;
 		y->transform.scale = Vector3(0.005f,0.005f,22);
-		y->transform.SetParent(&camera);
+		y->transform.SetParent(camera);
 		y->AddMaterial("shader", "Texture.bmp");
 		y->AddMesh("test.obj");
 		y->AddComponent<ColorizerComp>();
@@ -310,32 +308,28 @@ void Scene::OnUpdate(){
 		Stop();
 	}
 	if(input.GetKey('w')){
-		camera.position = camera.position + (camera.Forward() * deltaTime * speed);
+		camera->position = camera->position + (camera->Forward() * deltaTime * speed);
 	}
 	if(input.GetKey('s')){
-		camera.position = camera.position - (camera.Forward() * deltaTime * speed);
+		camera->position = camera->position - (camera->Forward() * deltaTime * speed);
 	}
 	if(input.GetKey('a')){
-		camera.position = camera.position - (camera.Right() * deltaTime * speed);
+		camera->position = camera->position - (camera->Right() * deltaTime * speed);
 	}
 	if(input.GetKey('d')){
-		camera.position = camera.position + (camera.Right() * deltaTime * speed);
+		camera->position = camera->position + (camera->Right() * deltaTime * speed);
 	}
 	if(input.GetKey('q')){
-		camera.position = camera.position + (Y_AXIS * deltaTime * speed);
+		camera->position = camera->position + (Y_AXIS * deltaTime * speed);
 	}
 	if(input.GetKey('z')){
-		camera.position = camera.position - (Y_AXIS * deltaTime * speed);
+		camera->position = camera->position - (Y_AXIS * deltaTime * speed);
 	}
 	if(input.GetKey('e')){
-		camera.rotation = camera.rotation * (Quaternion(camera.Forward(), -0.012f));
+		camera->rotation = camera->rotation * (Quaternion(camera->Forward(), -0.012f));
 	}
 	if(input.GetKey('c')){
-		camera.rotation = camera.rotation * (Quaternion(camera.Forward(), 0.012f));
-	}
-	if(input.GetKeyUp('i')){
-		//camera.Right().Print();
-		camera.rotation.Print();
+		camera->rotation = camera->rotation * (Quaternion(camera->Forward(), 0.012f));
 	}
 }
 
@@ -358,7 +352,7 @@ void Scene::Render(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Mat4x4 perspMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
-	Mat4x4 camMatrix = camera.GetCameraMatrix();
+	Mat4x4 camMatrix = camera->GetCameraMatrix();
 
 	glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 	glEnable(GL_DEPTH_TEST);
@@ -417,7 +411,7 @@ void Scene::OnPassiveMouse(int x, int y){
 	xRot = xRot + deltaX;
 	yRot = yRot + deltaY;
 
-	camera.rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
+	camera->rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
 	
 	//camera.rotation = camera.rotation * (Quaternion(Y_AXIS, deltaX/80) * Quaternion(camera.Right(), deltaY/80));
 	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);

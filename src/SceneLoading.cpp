@@ -122,6 +122,9 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 				}
 			}
 		}
+		else if(child.name == "Camera"){
+			scene->camera = &(go->transform);
+		}
 		else if(child.name == "BoxCollider"){
 			BoxCollider* col = go->AddComponent<BoxCollider>();
 			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
@@ -196,6 +199,12 @@ void Scene::SaveScene(string fileName){
 		trans.attributes.push_back(XMLAttribute("rotation", EncodeQuaternion(obj->transform.rotation)));
 		trans.attributes.push_back(XMLAttribute("scale",    EncodeVector3(obj->transform.scale)));
 		elem.children.push_back(trans);
+
+		if(camera == &(obj->transform)){
+			XMLElement cam;
+			cam.name = "Camera";
+			elem.children.push_back(cam);
+		}
 
 		Material* mat = obj->material;
 		if(mat != NULL){

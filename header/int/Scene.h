@@ -17,7 +17,7 @@ struct RigidBody;
 struct PhysicsSim;
 
 struct Scene{
-	SC_Transform camera;
+	SC_Transform* camera;
 	float deltaTime;
 
 	PhysicsSim* physicsSim;
