@@ -34,4 +34,6 @@ public:
 
 RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction);
 
+RaycastHit RaycastSphere(SphereCollider* col, Vector3 origin, Vector3 direction);
+
 #endif

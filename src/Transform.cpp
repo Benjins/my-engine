@@ -170,6 +170,14 @@ Quaternion SC_Transform::TotalRotation() const{
 	return parent->TotalRotation() * rotation;
 }
 
+Vector3 SC_Transform::TotalScale() const{
+	if(parent == NULL){
+		return scale;
+	}
+
+	return scale.Scaled(parent->TotalScale());
+}
+
 Vector3 SC_Transform::GlobalToLocal(const Vector3& global) const{
 	Vector3 localVec = global;
 	if(parent != NULL){
@@ -186,9 +194,17 @@ Vector3 SC_Transform::GlobalToLocal(const Vector3& global) const{
 
 Vector3 SC_Transform::LocalToGlobal(const Vector3& local) const{
     Vector3 globalVec = local;
+
+	globalVec = globalVec.Scaled(Vector3(1/scale.x, 1/scale.y, 1/scale.z));
+	globalVec = Rotate(globalVec, rotation);
+	globalVec = globalVec + position;
+
 	if(parent != NULL){
-		globalVec = parent->LocalToGlobal(local);
+		return parent->LocalToGlobal(globalVec);
 	}
+
+	return globalVec; 
+
     globalVec = globalVec.Scaled(scale);
     globalVec = Rotate(globalVec, rotation);
     globalVec = globalVec + position;

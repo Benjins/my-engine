@@ -137,6 +137,18 @@ void LoadGameObjectXML(Scene* scene, XMLElement elem){
 				}
 			}
 		}
+		else if(child.name == "SphereCollider"){
+			SphereCollider* col = go->AddComponent<SphereCollider>();
+			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
+				XMLAttribute attr = *iter2;
+				if(attr.name == "position"){
+					col->position = ParseVector3(attr.data);
+				}
+				else if(attr.name == "radius"){
+					col->radius = atof(attr.data.c_str());
+				}
+			}
+		}
 	}
 
 	scene->AddObject(go);
@@ -239,9 +251,6 @@ void Scene::SaveScene(string fileName){
 			XMLElement material;
 			material.name = "Material";
 			material.attributes.push_back(XMLAttribute("name",mat->matName));
-			//material.attributes.push_back(XMLAttribute("shader",mat->shaderName));
-			//string textureName = (mat->mainTexture != NULL? mat->mainTexture->fileName : "");
-			//material.attributes.push_back(XMLAttribute("texture", textureName));
 			elem.children.push_back(material);
 		}
 		Model* model = obj->mesh;
@@ -257,6 +266,14 @@ void Scene::SaveScene(string fileName){
 			boxCol.name = "BoxCollider";
 			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col->position)));
 			boxCol.attributes.push_back(XMLAttribute("size",EncodeVector3(col->size)));
+			elem.children.push_back(boxCol);
+		}
+		SphereCollider* col2 = obj->GetComponent<SphereCollider>();
+		if(col != NULL){
+			XMLElement boxCol;
+			boxCol.name = "SphereCollider";
+			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col2->position)));
+			boxCol.attributes.push_back(XMLAttribute("radius",to_string(col2->radius)));
 			elem.children.push_back(boxCol);
 		}
 

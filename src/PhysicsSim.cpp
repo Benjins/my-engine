@@ -58,7 +58,47 @@ RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
 		}
 	}
 
+	for(auto iter = staticSphereBodies.begin(); iter != staticSphereBodies.end(); iter++){
+		RaycastHit hit = RaycastSphere(*iter, origin, direction);
+		if(hit.hit && hit.depth < finalHit.depth){
+			finalHit = hit;
+		}
+	}
+
 	return finalHit;
+}
+
+RaycastHit RaycastSphere(SphereCollider* col, Vector3 origin, Vector3 direction){
+
+
+	SC_Transform trans = col->gameObject->transform;
+	Vector3 transformedColPosition = trans.LocalToGlobal(col->position);
+	float transformedColRadius = trans.TotalScale().x * col->radius;
+
+	Vector3 originToCentre = transformedColPosition - origin;
+	Vector3 projection = VectorProject(originToCentre, direction);
+	float distance = (origin + projection - transformedColPosition).Magnitude();
+
+	/*
+	SC_Transform trans = col->gameObject->transform;
+	Vector3 transformedOrigin = trans.GlobalToLocal(origin);
+	Vector3 transformedDirection = Rotate(direction, trans.TotalRotation().Conjugate());
+
+	Vector3 originToCentre = col->position - transformedOrigin;
+	Vector3 projection = VectorProject(originToCentre,transformedDirection);
+	*/
+	//float distance = (projection - col->position).Magnitude();
+	if(distance > transformedColRadius){
+		RaycastHit hit;
+		hit.hit = false;
+		return hit;
+	}
+
+	RaycastHit hit;
+	hit.hit = true;
+	hit.depth = 0;
+	hit.col = col;
+	return hit;
 }
 
 RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
@@ -67,7 +107,6 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 
 	SC_Transform trans = col->gameObject->transform;
 	Vector3 transformedOrigin = trans.GlobalToLocal(origin);
-	//TO-DO: Get global rotation instead of local
 	Vector3 transformedDirection = Rotate(direction, trans.TotalRotation().Conjugate());
 
 	Vector3 gameObjectScale = col->gameObject->transform.scale;

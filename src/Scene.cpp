@@ -258,7 +258,7 @@ void Scene::OnUpdate(){
 
 	const float speed = 5;
 
-	if(input.GetKey('v')){
+	if(input.GetKeyUp('v')){
 		RaycastHit hit = physicsSim->Raycast(camera->GlobalPosition(), camera->Forward());
 		if(hit.hit){
 			double x = rand();

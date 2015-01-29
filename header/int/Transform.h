@@ -41,6 +41,7 @@ public:
 
 	Vector3 GlobalPosition() const;
 	Quaternion TotalRotation() const; 
+	Vector3 TotalScale() const; 
 	
     //Transform a vector into this transform's space
     Vector3 GlobalToLocal(const Vector3& original) const;

@@ -31,9 +31,9 @@
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 	<GameObject name='myObj2_2'>
-		<Material name='myMat'/>
+		<Material shader='shader' texture='Texture2.bmp'/>
 		<Mesh source='test.obj'/>
 		<Transform parent='myObj' position='2,1,-2' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
-		<SphereCollider position='0,0,0' radius='0.2'/>
+		<SphereCollider position='0,0,0' radius='1.0'/>
 	</GameObject>
 </Scene>
