@@ -225,7 +225,7 @@ void Scene::OnUpdate(){
 #endif
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
-	cout << "Scene::Update(): " << deltaTime << endl;
+	//cout << "Scene::Update(): " << deltaTime << endl;
 
 	/*
 	float newX = guiElements[0]->position.x + 1.55*deltaTime;
@@ -240,7 +240,12 @@ void Scene::OnUpdate(){
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());
 
+
+	clock_t before = clock();
 	GuiSetSliderValue(guiElements[0], (1+sin(float(currTime)/divisor))/2);
+	clock_t after = clock();
+	double sliderTime = ((double)after - before)/CLOCKS_PER_SEC;
+	cout << "Time: " << sliderTime << endl;
 
 	if(child->transform.GetParent() == &camera){
 		//child->transform.rotation = camera.rotation.Conjugate();

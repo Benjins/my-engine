@@ -167,7 +167,7 @@ void Scene::LoadScene(string fileName){
 	}
 
 	GuiElement* elem = AddGuiElement();
-	elem->tex = new Texture(80,1);
+	elem->tex = new Texture(300,1);
 	elem->position = Vector2(0.1,0.1);
 	elem->scale = Vector2(0.2,0.02);
 }

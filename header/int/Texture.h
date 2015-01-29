@@ -33,6 +33,7 @@ struct Texture{
     void Load(void);
 
 	void SetPixel(int x, int y, float r, float g, float b);
+	void SetPixel(int x, int y, RGBApixel col);
 	void GetPixel(int x, int y);
 	void Apply();
 

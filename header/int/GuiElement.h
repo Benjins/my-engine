@@ -8,7 +8,13 @@
 
 using std::string;
 
-struct Texture; struct MaterialManager;
+struct Texture; struct MaterialManager; struct Scene;
+
+enum struct GuiType{
+	RawTexture,
+	Text,
+	Slider
+};
 
 struct GuiElement{
 	
@@ -23,9 +29,19 @@ struct GuiElement{
 	GuiElement();
 	GuiElement(MaterialManager* resources);
 
+	//virtual void OnAddedToScene(Scene* scn);
+
 	void OnGui() const;
 
-	~GuiElement();
+	virtual ~GuiElement();
+};
+
+struct GuiSlider : GuiElement{
+
+};
+
+struct GuiText : GuiElement{
+	
 };
 
 void GuiSetSliderValue(GuiElement* elem, float value);

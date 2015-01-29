@@ -1,5 +1,6 @@
 #include "../header/int/GuiElement.h"
 #include "../header/int/Texture.h"
+#include "../header/ext/EasyBMP.h"
 #include "../header/int/ResourceManager.h"
 #include "../header/int/Material.h"
 
@@ -54,15 +55,15 @@ void GuiElement::OnGui() const{
 
 void GuiSetSliderValue(GuiElement* elem, float value){
 	Texture* tex = elem->tex;
-	for(int i = 0; i < tex->width; i++){
-		for(int j = 0; j < tex->height; j++){
-			if(i < tex->width * value){
-				tex->SetPixel(i,j,1,0.2,0.2);
-			}
-			else{
-				tex->SetPixel(i,j,0.2,0.8,0.8);
-			}
-		}
+	RGBApixel col1 = {255,50,50,255}, col2 = {50,200,200,255};
+	int width = tex->width, height = tex->height;
+	int size = width * height;
+	int border = value * width;
+
+	RGBApixel* data = tex->pixelData;
+	for(int i = 0; i < size; i++){
+		int horiz = i % width;
+		data[i] = (horiz > border ? col1 : col2);
 	}
 
 	tex->Apply();

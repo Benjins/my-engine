@@ -55,6 +55,11 @@ void Texture::SetPixel(int x, int y, float r, float g, float b){
 	pixelData[index] = pix;
 }
 
+void Texture::SetPixel(int x, int y, RGBApixel col){
+	int index = y * width + x;
+	pixelData[index] = col;
+}
+
 void Texture::GetPixel(int x, int y){
 	//Not implemented yet.
 }
