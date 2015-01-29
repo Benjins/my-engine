@@ -27,6 +27,9 @@ Material* MaterialManager::LoadMaterial(string matName, string shaderName, strin
 		if(materials[i].matName == ""){
 			materials[i].Switch(shaderName, textureName);
 			materials[i].matName = matName;
+			if(materials[i].mainTexture != NULL){
+				materials[i].mainTexture->fileName = textureName;
+			}
 			return &(materials[i]);
 		}
 	}

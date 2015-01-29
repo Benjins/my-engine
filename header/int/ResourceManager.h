@@ -11,7 +11,7 @@ struct Texture; struct Material; struct Model; struct GameObject;
 struct MaterialManager{
 	Material* materials;
 
-private:
+
 	unsigned int matAlloc;
 
 public:

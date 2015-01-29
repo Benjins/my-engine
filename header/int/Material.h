@@ -23,6 +23,8 @@ struct Material{
 	string vshaderText;
 	string fshaderText;
 	string matName;
+
+	bool sharedMaterial;
 	
 	GLuint shaderProgram;
 	Texture* mainTexture;

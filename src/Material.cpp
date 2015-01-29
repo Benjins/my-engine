@@ -19,7 +19,9 @@
 using std::ifstream; using std::cout; using std::cerr; using std::strlen;
 
 Material::Material(void){
+	matName = "";
 	mainTexture = NULL;
+	sharedMaterial = false;
 }
 
 
@@ -27,6 +29,7 @@ Material::Material(void){
 Material::Material(string _shaderName, string textureName){
 	mainTexture = NULL;
 	Switch(_shaderName, textureName);
+	sharedMaterial = false;
 }
 
 void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType){

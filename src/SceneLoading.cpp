@@ -170,9 +170,9 @@ void Scene::LoadScene(string fileName){
 	}
 
 	GuiElement* elem = AddGuiElement();
-	elem->tex = new Texture(300,1);
-	elem->position = Vector2(0.1,0.1);
-	elem->scale = Vector2(0.2,0.02);
+	elem->tex = new Texture(300, 1);
+	elem->position = Vector2(0.1, 0.1);
+	elem->scale = Vector2(0.2, 0.02);
 }
 
 
@@ -182,6 +182,34 @@ void Scene::SaveScene(string fileName){
 	XMLElement scene;
 	scene.name = "Scene";
 	scene.attributes.push_back(XMLAttribute("name", "my-engine"));
+
+	GameObject* bgn = *objects.begin();
+
+	for(int i = 0; i < resources.matAlloc; i++){
+		Material* mat = &(resources.materials[i]);
+		if(mat->matName != ""){
+			XMLElement matElem;
+			matElem.name = "Material";
+
+			XMLAttribute attr;
+
+			attr.name = "name";
+			attr.data = mat->matName;
+			matElem.attributes.push_back(attr);
+
+			attr.name = "shader";
+			attr.data = mat->shaderName;
+			matElem.attributes.push_back(attr);
+
+			if(mat->mainTexture != NULL){
+				attr.name = "texture";
+				attr.data = mat->mainTexture->fileName;
+				matElem.attributes.push_back(attr);
+			}
+
+			scene.children.push_back(matElem);
+		}
+	}
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		GameObject* obj = *iter;
