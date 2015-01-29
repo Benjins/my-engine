@@ -238,9 +238,10 @@ void Scene::SaveScene(string fileName){
 		if(mat != NULL){
 			XMLElement material;
 			material.name = "Material";
-			material.attributes.push_back(XMLAttribute("shader",mat->shaderName));
-			string textureName = (mat->mainTexture != NULL? mat->mainTexture->fileName : "");
-			material.attributes.push_back(XMLAttribute("texture", textureName));
+			material.attributes.push_back(XMLAttribute("name",mat->matName));
+			//material.attributes.push_back(XMLAttribute("shader",mat->shaderName));
+			//string textureName = (mat->mainTexture != NULL? mat->mainTexture->fileName : "");
+			//material.attributes.push_back(XMLAttribute("texture", textureName));
 			elem.children.push_back(material);
 		}
 		Model* model = obj->mesh;
