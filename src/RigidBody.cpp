@@ -14,6 +14,8 @@ RigidBody::RigidBody(SC_Transform* _transform, Collider* _col, float _mass){
 	transform->gameObject->scene->physicsSim->AddRigidBody(this);
 	state.position = transform->position;
 
+	isKinematic = false;
+
 	mass = _mass;
 	state.invMass = 1/_mass;
 }

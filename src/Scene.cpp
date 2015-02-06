@@ -223,7 +223,7 @@ void Scene::OnUpdate(){
 #endif
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
-	//cout << "Scene::Update(): " << deltaTime << endl;
+	cout << "Scene::Update(): " << deltaTime << endl;
 
 	/*
 	float newX = guiElements[0]->position.x + 1.55*deltaTime;
@@ -243,7 +243,7 @@ void Scene::OnUpdate(){
 	GuiSetSliderValue(guiElements[0], (1+sin(float(currTime)/divisor))/2);
 	clock_t after = clock();
 	double sliderTime = ((double)after - before)/CLOCKS_PER_SEC;
-	cout << "Time: " << sliderTime << endl;
+	//cout << "Time: " << sliderTime << endl;
 
 	if(child->transform.GetParent() == camera){
 		//child->transform.rotation = camera.rotation.Conjugate();
@@ -276,6 +276,11 @@ void Scene::OnUpdate(){
 		}
 	}
 
+	if(input.GetKeyUp('u')){
+		GameObject* mainCam = FindGameObject("mainCam");
+		rb = new RigidBody(&(mainCam->transform), new BoxCollider());
+	}
+
 	if(input.GetKeyUp('o')){
 		SaveScene("Quicksave.xml");
 	}
@@ -301,14 +306,20 @@ void Scene::OnUpdate(){
 
 		//The rigidbody gets added to the physics sim, which manages its memory
 		BoxCollider* col = new BoxCollider(Vector3(0.0f,0.0f,0.0f), Vector3(0.5f,0.5f,0.5f));
-		rb = new RigidBody(&(y->transform), col);
+		RigidBody* rbody = new RigidBody(&(y->transform), col);
+		rbody->isKinematic = true;
 	}
 
 	if(input.GetKey('x')){
 		Stop();
 	}
 	if(input.GetKey('w')){
-		camera->position = camera->position + (camera->Forward() * deltaTime * speed);
+		if(rb != NULL){
+			rb->AddForce(camera->Forward() * deltaTime * speed);
+		}
+		else{
+			camera->position = camera->position + (camera->Forward() * deltaTime * speed);
+		}
 	}
 	if(input.GetKey('s')){
 		camera->position = camera->position - (camera->Forward() * deltaTime * speed);

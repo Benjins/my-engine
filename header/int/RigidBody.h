@@ -23,6 +23,7 @@ struct RBDeriv{
 struct RigidBody{
 	float mass;
 	bool useGravity;
+	bool isKinematic;
 	float time;
 
 	SC_Transform* transform;

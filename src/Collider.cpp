@@ -221,6 +221,10 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Max.y, col2Min.z),
 								col2LocToCol1LocMatrix * Vector3(col2Max.x, col2Max.y, col2Max.z)};
 
+	Collision checkDepthCollision;
+	checkDepthCollision.collide = true;
+	checkDepthCollision.depth = FLT_MAX;
+
 	for(int i = 0; i < 15; i++){
 		Vector3 testAxis = testAxes[i];
 		Collision potentialCollision = SeparateAxisTheorem(testAxis, col1Corners, col2Corners);
@@ -231,13 +235,16 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 			return x;
 		}
 		else{
-			//Add it to potential cols, find actual col?
+			//Find the MVT by finding the axis with the smallest intersection
+			if(potentialCollision.depth < checkDepthCollision.depth){
+				checkDepthCollision.depth = potentialCollision.depth;
+				checkDepthCollision.normal = potentialCollision.normal;
+			}
 		}
 	}
 
-	Collision x;
-	x.collide = true;
-	return x;
+	checkDepthCollision.normal.Normalize();
+	return checkDepthCollision;
 }
 
 Collision SeparateAxisTheorem(Vector3 axis, Vector3* points1, Vector3* points2){
@@ -256,12 +263,19 @@ Collision SeparateAxisTheorem(Vector3 axis, Vector3* points1, Vector3* points2){
 		point2Max = max(point2Max,projection2);
 		point2Min = min(point2Min,projection2);
 
-		if(point2Min < point1Max && point2Max > point1Min){
-			//Handle collisions
-			Collision x;
-			x.collide = true;
-			return x;
-		}
+		int x = 2;
+		
+	}
+
+	if(point2Min < point1Max && point2Max > point1Min){
+		float maxMin = max(point1Min, point2Min);
+		float minMax = min(point1Max, point2Max);
+
+		Collision x;
+		x.collide = true;
+		x.normal = axis;
+		x.depth = minMax - maxMin;
+		return x;
 	}
 
 	Collision x;
