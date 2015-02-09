@@ -261,10 +261,7 @@ Collision SeparateAxisTheorem(Vector3 axis, Vector3* points1, Vector3* points2){
 		
 		float projection2 = DotProduct(axis, points2[i]);
 		point2Max = max(point2Max,projection2);
-		point2Min = min(point2Min,projection2);
-
-		int x = 2;
-		
+		point2Min = min(point2Min,projection2);	
 	}
 
 	if(point2Min < point1Max && point2Max > point1Min){
@@ -273,7 +270,7 @@ Collision SeparateAxisTheorem(Vector3 axis, Vector3* points1, Vector3* points2){
 
 		Collision x;
 		x.collide = true;
-		x.normal = axis;
+		x.normal = axis; //TODO: Convert to global coords
 		x.depth = minMax - maxMin;
 		return x;
 	}

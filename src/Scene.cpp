@@ -278,7 +278,7 @@ void Scene::OnUpdate(){
 
 	if(input.GetKeyUp('u')){
 		GameObject* mainCam = FindGameObject("mainCam");
-		rb = new RigidBody(&(mainCam->transform), new BoxCollider());
+		rb = new RigidBody(&(mainCam->transform), new BoxCollider(Vector3(0,0,0), Vector3(0.1f,0.1f,0.1f)));
 	}
 
 	if(input.GetKeyUp('o')){
@@ -318,23 +318,23 @@ void Scene::OnUpdate(){
 			rb->AddForce(camera->Forward() * deltaTime * speed);
 		}
 		else{
-			camera->position = camera->position + (camera->Forward() * deltaTime * speed);
+			camera->GetParent()->position = camera->GetParent()->position + (camera->Forward() * deltaTime * speed);
 		}
 	}
 	if(input.GetKey('s')){
-		camera->position = camera->position - (camera->Forward() * deltaTime * speed);
+		camera->GetParent()->position = camera->GetParent()->position - (camera->Forward() * deltaTime * speed);
 	}
 	if(input.GetKey('a')){
-		camera->position = camera->position - (camera->Right() * deltaTime * speed);
+		camera->GetParent()->position = camera->GetParent()->position - (camera->Right() * deltaTime * speed);
 	}
 	if(input.GetKey('d')){
-		camera->position = camera->position + (camera->Right() * deltaTime * speed);
+		camera->GetParent()->position = camera->GetParent()->position + (camera->Right() * deltaTime * speed);
 	}
 	if(input.GetKey('q')){
-		camera->position = camera->position + (Y_AXIS * deltaTime * speed);
+		camera->GetParent()->position = camera->GetParent()->position + (Y_AXIS * deltaTime * speed);
 	}
 	if(input.GetKey('z')){
-		camera->position = camera->position - (Y_AXIS * deltaTime * speed);
+		camera->GetParent()->position = camera->GetParent()->position - (Y_AXIS * deltaTime * speed);
 	}
 	if(input.GetKey('e')){
 		camera->rotation = camera->rotation * (Quaternion(camera->Forward(), -0.012f));
@@ -376,32 +376,53 @@ void Scene::Render(){
 		iter->Draw();	
 	}
 
-
-	//Gui stuff 
+	//Gui and gizmos stuff 
 	glDisable(GL_DEPTH_TEST);
+
+	Material* col = resources.GetMaterialByName("color");
+	glUseProgram(col->shaderProgram); 
+	col->SetMat4Uniform("_perspMatrix",  perspMatrix); 
+	col->SetMat4Uniform("_cameraMatrix", camMatrix); 
+	col->SetVec4Uniform("_color", Vector4(1,1,1,1));
+	for(auto iter = physicsSim->staticBoxBodies.begin(); iter != physicsSim->staticBoxBodies.end(); iter++){
+
+		Vector3 min = (*iter)->position - (*iter)->size;
+		Vector3 max = (*iter)->position + (*iter)->size;
+
+		//Vector3 minGlobal = (*iter)->gameObject->transform.LocalToGlobal(min);
+		//Vector3 maxGlobal = (*iter)->gameObject->transform.LocalToGlobal(max);
+
+		Vector3 corners[8] = {   Vector3(min.x, min.y, min.z),
+								 Vector3(min.x, max.y, min.z),
+							     Vector3(min.x, max.y, max.z),
+								 Vector3(min.x, min.y, max.z),
+								 Vector3(max.x, min.y, min.z),
+								 Vector3(max.x, max.y, min.z),
+								 Vector3(max.x, max.y, max.z),
+								 Vector3(max.x, min.y, max.z)};
+
+		for(int i = 0; i < 8; i++){
+			corners[i] = (*iter)->gameObject->transform.LocalToGlobal(corners[i]);
+		}
+
+		int indices[12] = {0,1,2,3, 7,6,5,4, 0,1,2,3};
+
+		glBegin(GL_LINE_STRIP);
+		{
+			for(int i = 0; i < 12; i++){
+				glVertex3f(corners[indices[i]].x, corners[indices[i]].y, corners[indices[i]].z);
+			}
+		}
+		glEnd();
+	}
+
+	//Gui stuff
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
 		(*iter)->OnGui();
 	}
-
-	/*
-	Material* mat = resources.GetMaterialByName("gui");
-
-	if(mat != NULL){
-		GLint currProgram;
-		glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-		glUseProgram(mat->shaderProgram);
-		glBegin(GL_TRIANGLE_STRIP);
-			glVertex3f(0,0,0.5);
-			glVertex3f(0,0.2,0.5);
-			glVertex3f(0.2,0,0.5);
-			glVertex3f(0.2,0.2,0.5);
-		glEnd();
-
-		glUseProgram(currProgram);
-	}*/
 
 	glutSwapBuffers();
 }

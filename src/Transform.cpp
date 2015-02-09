@@ -143,6 +143,10 @@ Mat4x4 SC_Transform::GetCameraMatrix() const{
 
 	transMat = linMat * affMat;
 
+	if(parent != NULL){
+		return transMat * parent->GetCameraMatrix();
+	}
+
 	return transMat;
 }
 

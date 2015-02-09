@@ -46,7 +46,7 @@ int main(int argc, char** argv){
 	x.Init();
 	x.LoadScene("Scene1.xml");
 	
-	x.FindGameObject("mainCam");
+	//x.FindGameObject("mainCam");
 
 	x.Start();
 	

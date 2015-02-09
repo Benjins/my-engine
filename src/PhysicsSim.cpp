@@ -45,8 +45,14 @@ void PhysicsSim::StepForward(){
 				GameObject* obj2 = (*iter2)->gameObject;
 
 				if(!rb->isKinematic){
-					cout << "Collision with non-kinematic and " << obj2->name << endl;
-					obj1->transform.position = obj1->transform.GlobalToLocal(obj1->transform.position + (collision.normal * collision.depth));
+					cout << "Collision with non-kinematic and " << obj2->name 
+						<< "  Normal: " << collision.normal.x << ", " << collision.normal.y << ", " << collision.normal.z 
+						<< "  depth: " << collision.depth << endl;
+					//obj1->transform.position = obj1->transform.GlobalToLocal(obj1->transform.position + (C * 10.01f));
+					rb->state.force = Vector3(0,0,0);
+					rb->deriv.instantAcceleration = Vector3(0,0,0);
+					rb->deriv.instantVelocity = Vector3(0,0,0);
+					rb->state.velocity = Vector3(0,0,0);
 				}
 
 				obj1->OnCollision(*iter2);
