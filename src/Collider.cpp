@@ -178,14 +178,14 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 	for(int i = 0; i < 3; i++){
 		Vector3 transformedAxis = transformedCol2Axes[i];
 		//Crossed with X, Y, and Z axes
-		testAxes[3*i]   = Vector3(0,                   transformedAxis.y, -transformedAxis.x);
-		testAxes[3*i+1] = Vector3(transformedAxis.x,  -transformedAxis.z,                  0);
-		testAxes[3*i+2] = Vector3(-transformedAxis.y, 0,                   transformedAxis.z);
+		testAxes[3*i]   = Vector3(0,                   transformedAxis.y, -transformedAxis.x).Normalized();
+		testAxes[3*i+1] = Vector3(transformedAxis.x,  -transformedAxis.z,                  0).Normalized();
+		testAxes[3*i+2] = Vector3(-transformedAxis.y, 0,                   transformedAxis.z).Normalized();
 	}
 
 	//9-11
 	for(int i = 0; i < 3; i++){
-		testAxes[9+i] = transformedCol2Axes[i];
+		testAxes[9+i] = transformedCol2Axes[i].Normalized();
 	}
 
 	//12-14
@@ -237,13 +237,13 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 		else{
 			//Find the MVT by finding the axis with the smallest intersection
 			if(potentialCollision.depth < checkDepthCollision.depth){
+				//cout << "Changed depth from: " << checkDepthCollision.depth << " to: " << potentialCollision.depth << endl;
 				checkDepthCollision.depth = potentialCollision.depth;
 				checkDepthCollision.normal = potentialCollision.normal;
 			}
 		}
 	}
 
-	checkDepthCollision.normal.Normalize();
 	return checkDepthCollision;
 }
 

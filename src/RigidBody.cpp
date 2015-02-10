@@ -24,6 +24,10 @@ void RigidBody::AddForce(Vector3 force){
 	state.force = state.force + force;
 }
 
+void RigidBody::Translate(const Vector3& move){
+	state.position = state.position + move;
+}
+
 void RigidBody::StepForward(float deltaTime){
 	RBDeriv a,b,c,d,initial;
 

@@ -45,14 +45,31 @@ void PhysicsSim::StepForward(){
 				GameObject* obj2 = (*iter2)->gameObject;
 
 				if(!rb->isKinematic){
+
+					Vector3 localTranslate = obj1->transform.GlobalToLocal(obj1->transform.GlobalPosition() + collision.normal * 4.1f * collision.depth);
+
+					/*
 					cout << "Collision with non-kinematic and " << obj2->name 
 						<< "  Normal: " << collision.normal.x << ", " << collision.normal.y << ", " << collision.normal.z 
-						<< "  depth: " << collision.depth << endl;
-					//obj1->transform.position = obj1->transform.GlobalToLocal(obj1->transform.position + (C * 10.01f));
+						<< "  depth: " << collision.depth 
+						<< "  moveBy: " << localTranslate.x << ", " << localTranslate.y << ", " << localTranslate.z << endl;
+						*/
+
+					rb->state.position = rb->state.position
+											 + localTranslate;
+
 					rb->state.force = Vector3(0,0,0);
 					rb->deriv.instantAcceleration = Vector3(0,0,0);
 					rb->deriv.instantVelocity = Vector3(0,0,0);
-					rb->state.velocity = Vector3(0,0,0);
+					rb->state.velocity = rb->state.velocity * -0.8f;
+
+					Vector3 currVelocity = rb->state.velocity;
+					Vector3 axis = Rotate(collision.normal, obj2->transform.TotalRotation());
+
+					Vector3 projVec = VectorProject(currVelocity, axis);
+					Vector3 reflectedVec = currVelocity - ((currVelocity - projVec) * 2);
+
+					//rb->state.velocity = reflectedVec * 0.9f;
 				}
 
 				obj1->OnCollision(*iter2);

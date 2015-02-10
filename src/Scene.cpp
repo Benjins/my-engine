@@ -223,7 +223,8 @@ void Scene::OnUpdate(){
 #endif
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
-	cout << "Scene::Update(): " << deltaTime << endl;
+	//cout << "Scene::Update(): " << deltaTime << endl;
+	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 
 	/*
 	float newX = guiElements[0]->position.x + 1.55*deltaTime;
@@ -278,7 +279,11 @@ void Scene::OnUpdate(){
 
 	if(input.GetKeyUp('u')){
 		GameObject* mainCam = FindGameObject("mainCam");
-		rb = new RigidBody(&(mainCam->transform), new BoxCollider(Vector3(0,0,0), Vector3(0.1f,0.1f,0.1f)));
+		rb = new RigidBody(&(mainCam->transform), new BoxCollider(Vector3(0,0,0), Vector3(0.01f,0.01f,0.01f)));
+	}
+
+	if(input.GetKeyUp('p')){
+		Vector3 colPos = ((BoxCollider*)rb->col)->position;
 	}
 
 	if(input.GetKeyUp('o')){
@@ -315,14 +320,21 @@ void Scene::OnUpdate(){
 	}
 	if(input.GetKey('w')){
 		if(rb != NULL){
-			rb->AddForce(camera->Forward() * deltaTime * speed);
+			//rb->AddForce(camera->Forward() * deltaTime * speed);
+			rb->Translate(camera->Forward() * deltaTime * speed);
 		}
 		else{
 			camera->GetParent()->position = camera->GetParent()->position + (camera->Forward() * deltaTime * speed);
 		}
 	}
 	if(input.GetKey('s')){
-		camera->GetParent()->position = camera->GetParent()->position - (camera->Forward() * deltaTime * speed);
+		if(rb != NULL){
+			//rb->AddForce(camera->Forward() * deltaTime * -speed);
+			rb->Translate(camera->Forward() * deltaTime * -speed);
+		}
+		else{
+			camera->GetParent()->position = camera->GetParent()->position - (camera->Forward() * deltaTime * speed);
+		}
 	}
 	if(input.GetKey('a')){
 		camera->GetParent()->position = camera->GetParent()->position - (camera->Right() * deltaTime * speed);
@@ -406,14 +418,17 @@ void Scene::Render(){
 		}
 
 		int indices[12] = {0,1,2,3, 7,6,5,4, 0,1,2,3};
+		break;
 
-		glBegin(GL_LINE_STRIP);
-		{
-			for(int i = 0; i < 12; i++){
-				glVertex3f(corners[indices[i]].x, corners[indices[i]].y, corners[indices[i]].z);
+		if((*iter)->gameObject->name == "floor"){
+			glBegin(GL_LINE_STRIP);
+			{
+				for(int i = 0; i < 12; i++){
+					glVertex3f(corners[indices[i]].x, corners[indices[i]].y, corners[indices[i]].z);
+				}
 			}
+			glEnd();
 		}
-		glEnd();
 	}
 
 	//Gui stuff

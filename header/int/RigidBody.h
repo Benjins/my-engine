@@ -37,6 +37,8 @@ struct RigidBody{
 
 	void AddForce(Vector3 force);
 
+	void Translate(const Vector3& move);
+
 	void StepForward(float deltaTime);
 
 	~RigidBody();
