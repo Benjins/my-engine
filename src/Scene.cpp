@@ -112,6 +112,8 @@ Scene::Scene(int argc, char** argv){
 	physicsSim = new PhysicsSim();
 	input = Input();
 
+	lightDir = Z_AXIS;
+
 	myRandom = default_random_engine(time(NULL));
 
 	glutInit(&argc, argv);
@@ -223,6 +225,9 @@ void Scene::OnUpdate(){
 #endif
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
+
+	lightDir = Rotate(lightDir, Quaternion(Y_AXIS,deltaTime));
+
 	//cout << "Scene::Update(): " << deltaTime << endl;
 	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 

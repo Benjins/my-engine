@@ -23,6 +23,8 @@ struct Scene{
 	PhysicsSim* physicsSim;
 	Input input;
 	MaterialManager resources;
+
+	Vector3 lightDir;
 	
 protected:
 	list<GameObject*> objects;
