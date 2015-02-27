@@ -13,6 +13,7 @@ struct Material; struct GameObject;
 struct DrawCall{
 	//Data for OpenGL
 	GLuint vertices;
+	GLuint normals;
 	GLuint colors;
 	GLuint uvs;
 	

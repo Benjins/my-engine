@@ -24,6 +24,7 @@ struct Face{
 struct Vertex{
 	Vector3 position;
 	Vector3 color;
+	Vector3 normal;
 	//Vector3 uv;
 	
 	Vertex(void);
@@ -44,6 +45,8 @@ struct Model{
 	int GLVertexCount() const;
 	
 	void ImportFromOBJ(string fileName);
+
+	void CalculateNormals();
 };
 
 Vertex ParseVertexLine(string line);

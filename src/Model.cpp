@@ -64,6 +64,31 @@ Model::Model(string fileName){
 	ImportFromOBJ(fileName);
 }
 
+void Model::CalculateNormals(){
+	for(int i = 0; i < vertices.size(); i++){
+		Vector3 totalNormal = Vector3(0,0,0);
+		int totalNormalCount = 0;
+		for(int j = 0; j < faces.size(); j++){
+			Face face = faces[j];
+			if(face.v0 == i || face.v1 == i || face.v2 == i){
+				Vector3 v0 = vertices[face.v0].position;
+				Vector3 v1 = vertices[face.v1].position;
+				Vector3 v2 = vertices[face.v2].position;
+
+				Vector3 edge1 = v1 - v0;
+				Vector3 edge2 = v2 - v0;
+
+				Vector3 normal = CrossProduct(edge1, edge2).Normalized();
+				totalNormal = totalNormal + normal;
+				totalNormalCount++;
+			}
+		}
+
+		Vector3 finalNormal = totalNormal / totalNormalCount;
+		vertices[i].normal = finalNormal;
+	}
+}
+
 void Model::ImportFromOBJ(string fileName){
 	srand(time(NULL));
 	ifstream importer;
@@ -98,6 +123,8 @@ void Model::ImportFromOBJ(string fileName){
 			faces.push_back(ParseFaceLine(line, uvs));
 		}
 	}
+
+	CalculateNormals();
 }
 
 Vertex ParseVertexLine(string line){
