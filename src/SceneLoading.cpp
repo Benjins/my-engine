@@ -6,6 +6,8 @@
 #include "../header/int/GuiElement.h"
 #include "../header/ext/simple-xml.h"
 
+struct FireGun;
+
 string EncodeVector3(Vector3 vec){
 	return to_string(vec.x) + "," + to_string(vec.y)+ "," + to_string(vec.z);
 }
@@ -181,10 +183,7 @@ void Scene::LoadScene(string fileName){
 		}
 	}
 
-	GuiElement* elem = AddGuiElement();
-	elem->tex = new Texture(300, 1);
-	elem->position = Vector2(0.1, 0.1);
-	elem->scale = Vector2(0.2, 0.02);
+	OnPostLoad();
 }
 
 

@@ -28,6 +28,124 @@ struct TestComp : Component{
 	}
 };
 
+struct HitComponent : Component{
+
+	virtual void OnHit(RaycastHit hitInfo, GameObject* sender) = 0;
+
+	virtual ~HitComponent(){}
+};
+
+struct FireGun : Component{
+	Input* input;
+	PhysicsSim* physicsSim;
+	SC_Transform* camera;
+
+	FireGun(){
+		
+	}
+
+	virtual void OnAwake(){
+		input = &gameObject->scene->input;
+		physicsSim = gameObject->scene->physicsSim;
+		camera = gameObject->scene->camera;
+	}
+
+	virtual void OnUpdate(){
+		if(input->GetMouseUp(GLUT_LEFT_BUTTON)){
+			RaycastHit hit = physicsSim->Raycast(camera->GlobalPosition(), camera->Forward());
+			if(hit.hit){
+				HitComponent* hitComp = hit.col->gameObject->GetComponent<HitComponent>();
+				if(hitComp != NULL){
+					hitComp->OnHit(hit, gameObject);
+				}
+			}
+		}
+	}
+
+	virtual ~FireGun(){}
+};
+
+struct MatChangeOnHit : HitComponent{
+	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
+		double x = rand();
+		double ratio = x/RAND_MAX;
+		gameObject->material->SetVec4Uniform("_color", Vector4(ratio,1.0,ratio,1.0));
+	}
+
+	virtual ~MatChangeOnHit(){}
+};
+
+struct CameraControl : Component{
+	Input* input;
+	SC_Transform* camera;
+	float speed;
+	float velocity;
+
+	int prevX;
+	int prevY;
+	float xRot;
+	float yRot;
+
+	CameraControl(){
+		speed = 3;
+		prevX = 0;
+		prevY = 0;
+		xRot = 0;
+		yRot = 0;
+		velocity = 0;
+	}
+
+	virtual void OnAwake(){
+		input = &gameObject->scene->input;
+		camera = gameObject->scene->camera;
+	}
+
+	virtual void OnUpdate(){
+		float deltaX = input->GetMouseX() - prevX;
+		float deltaY = input->GetMouseY() - prevY;
+	
+		xRot = xRot + deltaX;
+		yRot = yRot + deltaY;
+
+		camera->rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
+
+		prevX = input->GetMouseX();
+		prevY = input->GetMouseY();
+		Vector3 moveVec(0,0,0);
+		if(input->GetKey('w')){
+			moveVec = moveVec + (camera->Forward() * gameObject->scene->deltaTime * speed);
+		}
+		if(input->GetKey('s')){
+			moveVec = moveVec + (camera->Forward() * gameObject->scene->deltaTime * speed) * -1; 
+		}
+		if(input->GetKey('a')){
+			moveVec = moveVec + (camera->Right() * gameObject->scene->deltaTime * speed) * -1;
+		}
+		if(input->GetKey('d')){
+			moveVec = moveVec + (camera->Right() * gameObject->scene->deltaTime * speed);
+		}
+		if(input->GetKeyDown(' ')){
+			velocity = 4;
+		}
+
+		moveVec.y = 0;
+		if(moveVec.MagnitudeSquared() > 0){
+			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+		}
+
+		camera->GetParent()->position = camera->GetParent()->position + moveVec;
+
+		velocity -= gameObject->scene->deltaTime * 5;
+		camera->position.y += velocity * gameObject->scene->deltaTime;
+		if(camera->position.y <= -2){
+			camera->position.y = -2;
+			velocity = 0;
+		}
+	}
+
+	virtual ~CameraControl(){}
+};
+
 struct OscillateUp : Component{
 	float time;
 	int frameCount;
@@ -133,6 +251,7 @@ Scene::Scene(int argc, char** argv){
 	glutMouseFunc(OnMouseFunc);
 	//glutMotionFunc(OnPassiveMouseFunc);
 	glutPassiveMotionFunc(OnPassiveMouseFunc);
+	glutMotionFunc(OnPassiveMouseFunc);
 	glutKeyboardFunc(OnKeyFunc);
 	glutKeyboardUpFunc(OnKeyUpFunc);
 	
@@ -259,33 +378,6 @@ void Scene::OnUpdate(){
 
 	const float speed = 5;
 
-	if(input.GetKeyUp('v')){
-		RaycastHit hit = physicsSim->Raycast(camera->GlobalPosition(), camera->Forward());
-		if(hit.hit){
-			double x = rand();
-			double ratio = x/RAND_MAX;
-			hit.col->gameObject->material->SetVec4Uniform("_color", Vector4(ratio,1.0,ratio,1.0));
-			/*
-			GameObject* go = new GameObject();
-			go->scene = this;
-			go->AddMesh("test.obj");
-			go->AddMaterial("shader","Texture2.bmp",false,false);
-			go->transform.scale = Vector3(0.1f, 0.1f, 0.1f);
-			go->transform.position = hit.worldPos;
-			AddObject(go);
-			*/
-		}
-	}
-
-	if(input.GetKeyUp('u')){
-		GameObject* mainCam = FindGameObject("mainCam");
-		rb = new RigidBody(&(mainCam->transform), new BoxCollider(Vector3(0,0,0), Vector3(0.01f,0.01f,0.01f)));
-	}
-
-	if(input.GetKeyUp('p')){
-		Vector3 colPos = ((BoxCollider*)rb->col)->position;
-	}
-
 	if(input.GetKeyUp('o')){
 		SaveScene("Quicksave.xml");
 	}
@@ -293,7 +385,7 @@ void Scene::OnUpdate(){
 		LoadScene("Quicksave.xml");
 	}
 
-	if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
+	if(input.GetKeyUp('v')){
 		float randY = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
 		float randZ = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
 
@@ -318,46 +410,22 @@ void Scene::OnUpdate(){
 	if(input.GetKey('x')){
 		Stop();
 	}
-	if(input.GetKey('w')){
-		if(rb != NULL){
-			//rb->AddForce(camera->Forward() * deltaTime * speed);
-			rb->Translate(camera->Forward() * deltaTime * speed);
-		}
-		else{
-			camera->GetParent()->position = camera->GetParent()->position + (camera->Forward() * deltaTime * speed);
-		}
-	}
-	if(input.GetKey('s')){
-		if(rb != NULL){
-			//rb->AddForce(camera->Forward() * deltaTime * -speed);
-			rb->Translate(camera->Forward() * deltaTime * -speed);
-		}
-		else{
-			camera->GetParent()->position = camera->GetParent()->position - (camera->Forward() * deltaTime * speed);
-		}
-	}
-	if(input.GetKey('a')){
-		camera->GetParent()->position = camera->GetParent()->position - (camera->Right() * deltaTime * speed);
-	}
-	if(input.GetKey('d')){
-		camera->GetParent()->position = camera->GetParent()->position + (camera->Right() * deltaTime * speed);
-	}
-	if(input.GetKey('q')){
-		camera->GetParent()->position = camera->GetParent()->position + (Y_AXIS * deltaTime * speed);
-	}
-	if(input.GetKey('z')){
-		camera->GetParent()->position = camera->GetParent()->position - (Y_AXIS * deltaTime * speed);
-	}
-	if(input.GetKey('e')){
-		camera->rotation = camera->rotation * (Quaternion(camera->Forward(), -0.012f));
-	}
-	if(input.GetKey('c')){
-		camera->rotation = camera->rotation * (Quaternion(camera->Forward(), 0.012f));
-	}
 }
 
 void PhysicsUpdate(){
 	
+}
+
+void Scene::OnPostLoad(){
+	GuiElement* elem = AddGuiElement();
+	elem->tex = new Texture(300, 1);
+	elem->position = Vector2(0.1, 0.1);
+	elem->scale = Vector2(0.2, 0.02);
+
+	camera->gameObject->AddComponent<FireGun>();
+	camera->gameObject->AddComponent<CameraControl>();
+
+	FindGameObject("myObj2_2")->AddComponent<MatChangeOnHit>();
 }
 
 void Scene::Render(){
@@ -452,18 +520,8 @@ void Scene::OnMouse(int button, int state, int x, int y){
 }
 
 void Scene::OnPassiveMouse(int x, int y){
-	float deltaX = x - prevX;
-	float deltaY = y - prevY;
-	
-	xRot = xRot + deltaX;
-	yRot = yRot + deltaY;
-
-	camera->rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
-	
-	//camera.rotation = camera.rotation * (Quaternion(Y_AXIS, deltaX/80) * Quaternion(camera.Right(), deltaY/80));
-	//camera.rotation = camera.rotation * Quaternion(X_AXIS, deltaY/200) * Quaternion(Y_AXIS, deltaX/200);
-	prevX = x;
-	prevY = y;
+	input.mouseX = x;
+	input.mouseY = y;
 }
 
 void Scene::OnKey(unsigned char key, int x, int y){
