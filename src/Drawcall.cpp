@@ -75,6 +75,7 @@ void DrawCall::Draw() const{
 	glBindBuffer(GL_ARRAY_BUFFER, normals);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	
+
 	material->mainTexture->Bind(GL_TEXTURE0);
 	
 	glDrawArrays(GL_TRIANGLES, 0, vertCount);

@@ -14,6 +14,6 @@ uniform mat4 _objectMatrix;
 void main()
 {
     gl_Position =  _perspMatrix * _cameraMatrix * _objectMatrix * vec4(Position, 1.0);
-	normal = _normal;
 	uv_coord = UV;
+	normal = (_objectMatrix * vec4(_normal, 0.0)).xyz;
 }
