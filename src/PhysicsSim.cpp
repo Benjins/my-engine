@@ -52,6 +52,7 @@ void PhysicsSim::StepForward(){
 }
 
 RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
+	direction.Normalize();
 	RaycastHit finalHit;
 	finalHit.hit = false;
 	finalHit.depth = FLT_MAX;
@@ -74,8 +75,6 @@ RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
 }
 
 RaycastHit RaycastSphere(SphereCollider* col, Vector3 origin, Vector3 direction){
-
-
 	SC_Transform trans = col->gameObject->transform;
 	Vector3 transformedColPosition = trans.LocalToGlobal(col->position);
 	float transformedColRadius = trans.TotalScale().x * col->radius;
@@ -84,15 +83,6 @@ RaycastHit RaycastSphere(SphereCollider* col, Vector3 origin, Vector3 direction)
 	Vector3 projection = VectorProject(originToCentre, direction);
 	float distance = (origin + projection - transformedColPosition).Magnitude();
 
-	/*
-	SC_Transform trans = col->gameObject->transform;
-	Vector3 transformedOrigin = trans.GlobalToLocal(origin);
-	Vector3 transformedDirection = Rotate(direction, trans.TotalRotation().Conjugate());
-
-	Vector3 originToCentre = col->position - transformedOrigin;
-	Vector3 projection = VectorProject(originToCentre,transformedDirection);
-	*/
-	//float distance = (projection - col->position).Magnitude();
 	if(distance > transformedColRadius){
 		RaycastHit hit;
 		hit.hit = false;
@@ -139,6 +129,16 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 		x.worldPos = origin + direction*x.depth;
 		x.hit = true;
 		x.col = col;
+
+		Vector3 transformedHit = (transformedOrigin + transformedDirection * x.depth) - col->position;
+		transformedHit = transformedHit.Scaled(Vector3(1 / col->size.x, 1 / col->size.y, 1 / col->size.z));
+
+		Vector3 normalLocal = transformedHit;
+		normalLocal.x = (abs(abs(normalLocal.x) - 1) < 0.0000001f ? 1 : 0) * (normalLocal.x < 0 ? -1 : 1);
+		normalLocal.y = (abs(abs(normalLocal.y) - 1) < 0.0000001f ? 1 : 0) * (normalLocal.y < 0 ? -1 : 1);
+		normalLocal.z = (abs(abs(normalLocal.z) - 1) < 0.0000001f ? 1 : 0) * (normalLocal.z < 0 ? -1 : 1);
+
+		x.normal = Rotate(normalLocal, trans.TotalRotation()).Normalized();
 		return x;
 	}
 

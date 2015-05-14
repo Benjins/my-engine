@@ -75,9 +75,22 @@ struct MatChangeOnHit : HitComponent{
 	virtual ~MatChangeOnHit(){}
 };
 
+struct RotateConstantly : Component{
+	float rotationSpeed;
+
+	RotateConstantly(){
+		rotationSpeed = 30;
+	}
+
+	virtual void OnUpdate(){
+		gameObject->transform.rotation = gameObject->transform.rotation * Quaternion(Y_AXIS, rotationSpeed * gameObject->scene->deltaTime);
+	}
+};
+
 struct CameraControl : Component{
 	Input* input;
 	SC_Transform* camera;
+	PhysicsSim* physics;
 	float speed;
 	float velocity;
 
@@ -98,6 +111,7 @@ struct CameraControl : Component{
 	virtual void OnAwake(){
 		input = &gameObject->scene->input;
 		camera = gameObject->scene->camera;
+		physics = gameObject->scene->physicsSim;
 	}
 
 	virtual void OnUpdate(){
@@ -113,16 +127,16 @@ struct CameraControl : Component{
 		prevY = input->GetMouseY();
 		Vector3 moveVec(0,0,0);
 		if(input->GetKey('w')){
-			moveVec = moveVec + (camera->Forward() * gameObject->scene->deltaTime * speed);
+			moveVec = moveVec + camera->Forward();
 		}
 		if(input->GetKey('s')){
-			moveVec = moveVec + (camera->Forward() * gameObject->scene->deltaTime * speed) * -1; 
+			moveVec = moveVec + camera->Forward() * -1; 
 		}
 		if(input->GetKey('a')){
-			moveVec = moveVec + (camera->Right() * gameObject->scene->deltaTime * speed) * -1;
+			moveVec = moveVec + camera->Right() * -1;
 		}
 		if(input->GetKey('d')){
-			moveVec = moveVec + (camera->Right() * gameObject->scene->deltaTime * speed);
+			moveVec = moveVec + camera->Right();
 		}
 		if(input->GetKeyDown(' ')){
 			velocity = 4;
@@ -131,14 +145,28 @@ struct CameraControl : Component{
 		moveVec.y = 0;
 		if(moveVec.MagnitudeSquared() > 0){
 			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+
+			RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), moveVec);
+			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
+				camera->GetParent()->position = camera->GetParent()->position + moveVec;
+			}
+			else if (testHit.hit){
+				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+				Vector3 goodVec = moveVec - badVec;
+				camera->GetParent()->position = camera->GetParent()->position + goodVec;
+			}
 		}
 
-		camera->GetParent()->position = camera->GetParent()->position + moveVec;
+		float floorHeight = -10;
+		RaycastHit lookDown = physics->Raycast(camera->GetParent()->position, Y_AXIS*-1);
+		if(lookDown.hit){
+			floorHeight = lookDown.worldPos.y;
+		}
 
 		velocity -= gameObject->scene->deltaTime * 5;
-		camera->position.y += velocity * gameObject->scene->deltaTime;
-		if(camera->position.y <= -2){
-			camera->position.y = -2;
+		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
+		if(camera->GetParent()->position.y <= floorHeight + 1){
+			camera->GetParent()->position.y = floorHeight + 1;
 			velocity = 0;
 		}
 	}
@@ -342,7 +370,7 @@ void Scene::OnUpdate(){
 #endif
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
-	//cout << "Scene::Update(): " << deltaTime << endl;
+	cout << "Scene::Update(): " << deltaTime * 1000 << " ms.\n";
 	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 
 	/*
@@ -426,6 +454,7 @@ void Scene::OnPostLoad(){
 	camera->gameObject->AddComponent<CameraControl>();
 
 	FindGameObject("myObj2_2")->AddComponent<MatChangeOnHit>();
+	FindGameObject("wall1")->AddComponent<MatChangeOnHit>();
 }
 
 void Scene::Render(){
