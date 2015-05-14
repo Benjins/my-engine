@@ -8,6 +8,7 @@ struct Collider;
 
 struct RaycastHit{
 	Vector3 worldPos;
+	Vector3 normal;
 	bool hit;
 	Vector2 texCoords;
 	float depth;

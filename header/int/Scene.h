@@ -70,6 +70,8 @@ public:
 	
 	void OnUpdate();
 
+	void OnPostLoad();
+
 	void Render();
 	void PhysicsUpdate();
 

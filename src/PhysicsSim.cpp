@@ -44,34 +44,6 @@ void PhysicsSim::StepForward(){
 				GameObject* obj1 = rb->col->gameObject;
 				GameObject* obj2 = (*iter2)->gameObject;
 
-				if(!rb->isKinematic){
-
-					Vector3 localTranslate = obj1->transform.GlobalToLocal(obj1->transform.GlobalPosition() + collision.normal * 4.1f * collision.depth);
-
-					/*
-					cout << "Collision with non-kinematic and " << obj2->name 
-						<< "  Normal: " << collision.normal.x << ", " << collision.normal.y << ", " << collision.normal.z 
-						<< "  depth: " << collision.depth 
-						<< "  moveBy: " << localTranslate.x << ", " << localTranslate.y << ", " << localTranslate.z << endl;
-						*/
-
-					rb->state.position = rb->state.position
-											 + localTranslate;
-
-					rb->state.force = Vector3(0,0,0);
-					rb->deriv.instantAcceleration = Vector3(0,0,0);
-					rb->deriv.instantVelocity = Vector3(0,0,0);
-					rb->state.velocity = rb->state.velocity * -0.8f;
-
-					Vector3 currVelocity = rb->state.velocity;
-					Vector3 axis = Rotate(collision.normal, obj2->transform.TotalRotation());
-
-					Vector3 projVec = VectorProject(currVelocity, axis);
-					Vector3 reflectedVec = currVelocity - ((currVelocity - projVec) * 2);
-
-					//rb->state.velocity = reflectedVec * 0.9f;
-				}
-
 				obj1->OnCollision(*iter2);
 				obj2->OnCollision(rb->col);
 			}
@@ -80,6 +52,7 @@ void PhysicsSim::StepForward(){
 }
 
 RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
+	direction.Normalize();
 	RaycastHit finalHit;
 	finalHit.hit = false;
 	finalHit.depth = FLT_MAX;
@@ -102,8 +75,6 @@ RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
 }
 
 RaycastHit RaycastSphere(SphereCollider* col, Vector3 origin, Vector3 direction){
-
-
 	SC_Transform trans = col->gameObject->transform;
 	Vector3 transformedColPosition = trans.LocalToGlobal(col->position);
 	float transformedColRadius = trans.TotalScale().x * col->radius;
@@ -112,15 +83,6 @@ RaycastHit RaycastSphere(SphereCollider* col, Vector3 origin, Vector3 direction)
 	Vector3 projection = VectorProject(originToCentre, direction);
 	float distance = (origin + projection - transformedColPosition).Magnitude();
 
-	/*
-	SC_Transform trans = col->gameObject->transform;
-	Vector3 transformedOrigin = trans.GlobalToLocal(origin);
-	Vector3 transformedDirection = Rotate(direction, trans.TotalRotation().Conjugate());
-
-	Vector3 originToCentre = col->position - transformedOrigin;
-	Vector3 projection = VectorProject(originToCentre,transformedDirection);
-	*/
-	//float distance = (projection - col->position).Magnitude();
 	if(distance > transformedColRadius){
 		RaycastHit hit;
 		hit.hit = false;
@@ -167,6 +129,16 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 		x.worldPos = origin + direction*x.depth;
 		x.hit = true;
 		x.col = col;
+
+		Vector3 transformedHit = (transformedOrigin + transformedDirection * x.depth) - col->position;
+		transformedHit = transformedHit.Scaled(Vector3(1 / col->size.x, 1 / col->size.y, 1 / col->size.z));
+
+		Vector3 normalLocal = transformedHit;
+		normalLocal.x = (abs(abs(normalLocal.x) - 1) < 0.0000001f ? 1 : 0) * (normalLocal.x < 0 ? -1 : 1);
+		normalLocal.y = (abs(abs(normalLocal.y) - 1) < 0.0000001f ? 1 : 0) * (normalLocal.y < 0 ? -1 : 1);
+		normalLocal.z = (abs(abs(normalLocal.z) - 1) < 0.0000001f ? 1 : 0) * (normalLocal.z < 0 ? -1 : 1);
+
+		x.normal = Rotate(normalLocal, trans.TotalRotation()).Normalized();
 		return x;
 	}
 

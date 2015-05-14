@@ -18,6 +18,9 @@ protected:
 	KeyState mouseMiddle;
 	KeyState mouseRight;
 
+	int mouseX;
+	int mouseY;
+
 	void PushKey(unsigned char key);
 	void ReleaseKey(unsigned char key);
 
@@ -37,6 +40,8 @@ public:
 	bool GetMouseUp(int button) const;
 	bool GetMouseDown(int button) const;
 
+	int inline GetMouseX() const{ return mouseX; }
+	int inline GetMouseY() const{ return mouseY; }
 };
 
 #endif
