@@ -7,6 +7,7 @@
 		<Material name='floorMat'/>
 		<Mesh source='test.obj'/>
 		<Transform position='0,3,0' rotation='1,0,0,0' scale='1,1,1'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 	<GameObject name='mainCam'>
 		<Transform position='0,3,-2' rotation='1,0,0,0' scale='1,1,1'/>

@@ -94,6 +94,8 @@ struct CameraControl : Component{
 	float speed;
 	float velocity;
 
+	bool isGrounded;
+
 	int prevX;
 	int prevY;
 	float xRot;
@@ -106,6 +108,7 @@ struct CameraControl : Component{
 		xRot = 0;
 		yRot = 0;
 		velocity = 0;
+		isGrounded = false;
 	}
 
 	virtual void OnAwake(){
@@ -138,7 +141,7 @@ struct CameraControl : Component{
 		if(input->GetKey('d')){
 			moveVec = moveVec + camera->Right();
 		}
-		if(input->GetKeyDown(' ')){
+		if(input->GetKeyDown(' ') && isGrounded){
 			velocity = 4;
 		}
 
@@ -168,6 +171,10 @@ struct CameraControl : Component{
 		if(camera->GetParent()->position.y <= floorHeight + 1){
 			camera->GetParent()->position.y = floorHeight + 1;
 			velocity = 0;
+			isGrounded = true;
+		}
+		else{
+			isGrounded = false;
 		}
 	}
 

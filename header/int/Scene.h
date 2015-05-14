@@ -54,6 +54,12 @@ public:
 	Scene();
 	Scene(int argc, char** argv);
 
+private:
+	//Hide this, because it'll break things
+	Scene(const Scene& orig){}
+
+public:
+
 	virtual void Init();
 
 	void LoadScene(string fileName);
