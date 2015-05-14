@@ -168,8 +168,8 @@ struct CameraControl : Component{
 
 		velocity -= gameObject->scene->deltaTime * 5;
 		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
-		if(camera->GetParent()->position.y <= floorHeight + 1){
-			camera->GetParent()->position.y = floorHeight + 1;
+		if(camera->GetParent()->position.y <= floorHeight + 0.4f){
+			camera->GetParent()->position.y = floorHeight + 0.4f;
 			velocity = 0;
 			isGrounded = true;
 		}
@@ -473,7 +473,7 @@ void Scene::Render(){
 
 	float aspectRatio = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
 	float fieldOfView = 80;
-	float nearZ = 0.1;
+	float nearZ = 0.01;
 	float farZ = 1000;
 	                                                                    
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
