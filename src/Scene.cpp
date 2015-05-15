@@ -87,14 +87,85 @@ struct RotateConstantly : Component{
 	}
 };
 
+struct EnemyComp : Component{
+	Vector3 currentTarget;
+	float speed;
+	PhysicsSim* physics;
+	GameObject* player;
+
+	EnemyComp(){
+		speed = 2;
+	}
+
+	void ResetTarget(){
+		float x = ((float)(rand() % 500 - 250)) / 25;
+		float z = ((float)(rand() % 500 - 250)) / 25;
+		currentTarget = Vector3(x, 0, z);
+	}
+
+	virtual void OnAwake(){
+		ResetTarget();
+		physics = gameObject->scene->physicsSim;
+		player = gameObject->scene->FindGameObject("mainCam");
+	}
+
+	virtual void OnUpdate(){
+		Vector3 toPlayer = player->transform.position - gameObject->transform.position;
+		RaycastHit hitPlayer = physics->Raycast(gameObject->transform.position, toPlayer);
+		
+		Vector3 moveVec;
+
+		if(hitPlayer.hit && hitPlayer.col->gameObject == player){
+			moveVec = toPlayer;
+		}
+		else{
+			moveVec = currentTarget - gameObject->transform.position;
+		}
+		
+		moveVec.y = 0;
+
+		if(moveVec.MagnitudeSquared() < 0.1f){
+			ResetTarget();
+		}
+		else{
+			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+
+			RaycastHit testHit = physics->Raycast(gameObject->transform.GlobalPosition(), moveVec);
+			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
+				gameObject->transform.position = gameObject->transform.position + moveVec;
+			}
+			else if (testHit.hit){
+				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+				Vector3 goodVec = moveVec - badVec;
+				gameObject->transform.position = gameObject->transform.position + goodVec;
+			}
+		}
+
+		float floorHeight = -10;
+		RaycastHit lookDown = physics->Raycast(gameObject->transform.position, Y_AXIS*-1);
+		if(lookDown.hit){
+			floorHeight = lookDown.worldPos.y;
+		}
+
+		if(gameObject->transform.position.y <= floorHeight + 0.6f){
+			gameObject->transform.position.y = floorHeight + 0.6f;
+		}
+		else{
+			gameObject->transform.position.y -= 3 * gameObject->scene->deltaTime;
+		}
+	}
+};
+
 struct CameraControl : Component{
 	Input* input;
 	SC_Transform* camera;
 	PhysicsSim* physics;
+	GuiElement* slider;
 	float speed;
 	float velocity;
 
 	bool isGrounded;
+	float health;
 
 	int prevX;
 	int prevY;
@@ -109,12 +180,14 @@ struct CameraControl : Component{
 		yRot = 0;
 		velocity = 0;
 		isGrounded = false;
+		health = 1;
 	}
 
 	virtual void OnAwake(){
 		input = &gameObject->scene->input;
 		camera = gameObject->scene->camera;
 		physics = gameObject->scene->physicsSim;
+		slider = gameObject->scene->guiElements[0];
 	}
 
 	virtual void OnUpdate(){
@@ -144,6 +217,10 @@ struct CameraControl : Component{
 		if(input->GetKeyDown(' ') && isGrounded){
 			velocity = 4;
 		}
+
+		health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
+		health = max(0.0f, min(1.0f, health));
+		GuiSetSliderValue(slider, health);
 
 		moveVec.y = 0;
 		if(moveVec.MagnitudeSquared() > 0){
@@ -462,6 +539,7 @@ void Scene::OnPostLoad(){
 
 	FindGameObject("myObj2_2")->AddComponent<MatChangeOnHit>();
 	FindGameObject("wall1")->AddComponent<MatChangeOnHit>();
+	FindGameObject("enemy1")->AddComponent<EnemyComp>();
 }
 
 void Scene::Render(){

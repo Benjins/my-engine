@@ -11,6 +11,7 @@
 	</GameObject>
 	<GameObject name='mainCam'>
 		<Transform position='0,3,-2' rotation='1,0,0,0' scale='1,1,1'/>
+		<BoxCollider position='0,0,0' size='0.2,0.2,0.2'/>
 	</GameObject>
 	<GameObject name='mainCamSub'>
 		<Camera />
@@ -54,6 +55,12 @@
 		<Material name='floorMat'/>
 		<Mesh source='test.obj'/>
 		<Transform position='4,0,4' rotation='0.9063077870366499,0,0,0.42261826174069944' scale='2,1,1'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
+	</GameObject>
+	<GameObject name='enemy1'>
+		<Material name='floorMat'/>
+		<Mesh source='test.obj'/>
+		<Transform position='-3,0.7,2' rotation='1,0,0,0' scale='0.3,1,0.3'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 </Scene>

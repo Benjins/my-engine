@@ -23,11 +23,12 @@ struct Scene{
 	PhysicsSim* physicsSim;
 	Input input;
 	MaterialManager resources;
+
+	vector<GuiElement*> guiElements;
 	
 protected:
 	list<GameObject*> objects;
 	list<DrawCall> drawCalls;
-	vector<GuiElement*> guiElements;
 
 	int prevX;
 	int prevY;
