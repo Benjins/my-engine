@@ -518,6 +518,9 @@ void Scene::OnPostLoad(){
 	FindGameObject("enemy1")->AddComponent<EnemyComp>();
 	FindGameObject("enemy2")->AddComponent<EnemyComp>();
 	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+
+	pathfinding.scene = this;
+	//pathfinding.HookUpNodes();
 }
 
 void Scene::Render(){

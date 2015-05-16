@@ -8,6 +8,7 @@
 #include "Input.h"
 #include "ResourceManager.h"
 #include "GuiElement.h"
+#include "Pathfinding.h"
 #include <time.h>
 #include <random>
 
@@ -23,6 +24,7 @@ struct Scene{
 	PhysicsSim* physicsSim;
 	Input input;
 	MaterialManager resources;
+	Pathfinding pathfinding;
 
 	vector<GuiElement*> guiElements;
 	
