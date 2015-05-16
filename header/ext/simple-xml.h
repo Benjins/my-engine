@@ -2,6 +2,8 @@
 Author: Benji Smith
 Licensed under MIT License. See simple-xml_LICENSE.txt for details
 */
+#ifndef SIMPLEXML_H
+#define SIMPLEXML_H
 
 #include <vector>
 #include <string>
@@ -76,3 +78,6 @@ XMLDocument ParseTokens(vector<string> tokens);
 void SaveXMLDoc(XMLDocument& doc, string fileName);
 
 void LoadXMLDoc(XMLDocument& doc, string fileName);
+
+
+#endif

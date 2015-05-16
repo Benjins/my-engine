@@ -7,6 +7,8 @@
 	<Material name='enemyMat' shader='shader' texture='Texture.bmp'/>
 	<Material name='enemyMat2' shader='shader' texture='Texture.bmp'/>
 	<Material name='gui-txt' shader='guitext'/>
+	<GuiElement width='300' height='1' position='0.1,0.1' scale='0.2,0.02'/>
+	<GuiText name='healthText' fuv='CODE_Bold64.fuv' text='Health: 100' position='-0.6,0.9' scale='0.4,0.4'/>
 	<GameObject name='myObj'>
 		<Material name='floorMat'/>
 		<Mesh source='test.obj'/>

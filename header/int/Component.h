@@ -3,6 +3,7 @@
 
 struct GameObject;
 struct Collider;
+struct XMLElement;
 
 struct Component{
 	const static bool isComponent = true;
@@ -15,6 +16,9 @@ struct Component{
 	virtual void OnUpdate();
 
 	virtual void OnCollision(Collider* col);
+
+	virtual XMLElement Serialize();
+	virtual void Deserialize(const XMLElement& data);
 	
 	virtual ~Component();
 };

@@ -15,6 +15,7 @@ using std::list;
 
 struct RigidBody;
 struct PhysicsSim;
+struct XMLElement;
 
 struct Scene{
 	SC_Transform* camera;
@@ -94,6 +95,11 @@ public:
 	void RemoveAllObjects();
 
 	void Stop();
+
+	void LoadGuiElement(const XMLElement& elem);
+	void LoadGuiText(const XMLElement& elem);
+
+	void LoadGameObjectXML(const XMLElement& elem);
 
 	virtual ~Scene();
 };
