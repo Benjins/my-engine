@@ -230,6 +230,19 @@ struct CameraControl : Component{
 			velocity = 4;
 		}
 
+		if(input->GetKeyUp('b')){
+			GameObject* newEnemy = new GameObject();
+			newEnemy->name = "enemyClone";
+			newEnemy->scene = gameObject->scene;
+			newEnemy->AddMesh("test.obj");
+			newEnemy->AddMaterial("shader","Texture.bmp");
+			newEnemy->AddComponent<BoxCollider>();
+			newEnemy->AddComponent<EnemyComp>();
+			newEnemy->transform.position = Vector3(-2, 1, 5);
+			newEnemy->transform.scale = Vector3(0.3f, 1, 0.3f);
+			gameObject->scene->AddObject(newEnemy);
+		}
+
 		health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
 		health = max(0.0f, min(1.0f, health));
 		GuiSetSliderValue(slider, health);
@@ -296,49 +309,6 @@ struct OscillateUp : Component{
 			z2->name = "Child_ball_clone";
 
 			gameObject->scene->AddObject(z2);
-		}
-	}
-};
-
-struct ColorizerComp : Component{
-	virtual void OnCollision(Collider* col){
-		Material* mat = col->gameObject->material;
-		if(mat != NULL){
-			double x = rand();
-			double ratio = x/RAND_MAX;
-			mat->SetVec4Uniform("_color",Vector4(0.6,0.6,ratio,1.0));
-			for(auto iter = col->gameObject->transform.children.begin(); iter != col->gameObject->transform.children.end(); iter++){
-				Material* childMat = (*iter)->gameObject->material;
-				childMat->SetVec4Uniform("_color",Vector4(1.0,0,0,1.0));
-			}
-		}
-	}
-};
-
-struct ChangeColOnCollision : Component{
-	bool collided;
-	Texture* tex;
-
-	virtual void OnAwake(){
-		collided = false;
-		tex = gameObject->material->mainTexture;
-	}
-
-	virtual void OnCollision(Collider* col){
-		if(col->gameObject->transform.GetParent() == col->gameObject->scene->camera){
-			if(gameObject->material != NULL){
-				double x = rand();
-				double ratio = x/RAND_MAX;
-
-				for(int i = 0; i < 256; i++){
-					for(int j = 0; j < 256; j++){
-						tex->SetPixel(i,j,ratio,ratio,ratio);
-					}
-				}
-
-				tex->Apply();
-				//gameObject->material->SetVec4Uniform("_color",Vector4(1.0f, (float)ratio,1.0f,1.0f));
-			}
 		}
 	}
 };
@@ -524,28 +494,6 @@ void Scene::OnUpdate(){
 	}
 	if(input.GetKeyUp('l')){
 		LoadScene("Quicksave.xml");
-	}
-
-	if(input.GetKeyUp('v')){
-		float randY = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
-		float randZ = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
-
-		
-		GameObject* y = new GameObject();
-		y->scene = this;
-		y->transform.scale = Vector3(0.005f,0.005f,22);
-		y->transform.SetParent(camera);
-		y->AddMaterial("shader", "Texture.bmp");
-		y->AddMesh("test.obj");
-		y->AddComponent<ColorizerComp>();
-		y->name = "cameraSpawn";
-
-		AddObject(y);
-
-		//The rigidbody gets added to the physics sim, which manages its memory
-		BoxCollider* col = new BoxCollider(Vector3(0.0f,0.0f,0.0f), Vector3(0.5f,0.5f,0.5f));
-		RigidBody* rbody = new RigidBody(&(y->transform), col);
-		rbody->isKinematic = true;
 	}
 
 	if(input.GetKey('x')){
