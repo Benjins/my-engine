@@ -82,7 +82,9 @@ public:
 	void Render();
 	void PhysicsUpdate();
 
-	GameObject* FindGameObject(string name);
+	GameObject* FindGameObject(const string& name);
+
+	GuiElement* FindGUIElement(const string& name);
 
 	void OnMouse(int button, int state, int x, int y);
 	void OnPassiveMouse(int x, int y);
