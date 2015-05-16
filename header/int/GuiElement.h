@@ -9,7 +9,7 @@
 
 using std::string;
 
-struct Texture; struct MaterialManager; struct Scene; struct FUV;
+struct Texture; struct MaterialManager; struct Scene; struct FUV; struct XMLElement;
 
 enum struct GuiType{
 	RawTexture,
@@ -34,6 +34,8 @@ struct GuiElement{
 
 	virtual void OnGui() const;
 
+	virtual XMLElement Serialize();
+
 	virtual ~GuiElement();
 };
 
@@ -45,10 +47,13 @@ struct GuiText : GuiElement{
 	string text;
 	FUV fuv;
 	GLuint texObj;
+	string fuvFileName;
 
-	GuiText(MaterialManager* resources, FUV& _fuv);
+	GuiText(MaterialManager* resources, string& _fuvFileName);
 
 	virtual void OnGui() const;
+
+	virtual XMLElement Serialize();
 
 	virtual ~GuiText();
 };

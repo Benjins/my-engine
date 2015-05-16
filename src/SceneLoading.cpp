@@ -257,6 +257,10 @@ void Scene::SaveScene(string fileName){
 			scene.children.push_back(matElem);
 		}
 	}
+	
+	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
+		scene.children.push_back((*iter)->Serialize());
+	}
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		GameObject* obj = *iter;
@@ -304,12 +308,19 @@ void Scene::SaveScene(string fileName){
 			elem.children.push_back(boxCol);
 		}
 		SphereCollider* col2 = obj->GetComponent<SphereCollider>();
-		if(col != NULL){
+		if(col2 != NULL){
 			XMLElement boxCol;
 			boxCol.name = "SphereCollider";
 			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col2->position)));
 			boxCol.attributes.push_back(XMLAttribute("radius",to_string(col2->radius)));
 			elem.children.push_back(boxCol);
+		}
+
+		for(auto iter = obj->components.begin(); iter != obj->components.end(); iter++){
+			XMLElement newElem = (*iter)->Serialize();
+			if(newElem.name != ""){
+				elem.children.push_back(newElem);
+			}
 		}
 
 		scene.children.push_back(elem);
@@ -346,7 +357,7 @@ void Scene::LoadGuiElement(const XMLElement& elem){
 }
 
 void Scene::LoadGuiText(const XMLElement& elem){
-	FUV fuv;
+	string fuv;
 	Vector2 position;
 	Vector2 scale;
 	string name;
@@ -354,7 +365,7 @@ void Scene::LoadGuiText(const XMLElement& elem){
 
 	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
 		if(iter->name == "fuv"){
-			ImportFUV(iter->data, fuv);
+			fuv = iter->data;
 		}
 		else if(iter->name == "position"){
 			position = ParseVector2(iter->data);

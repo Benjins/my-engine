@@ -4,6 +4,8 @@
 #include "../header/int/ResourceManager.h"
 #include "../header/int/Material.h"
 #include "../header/int/FontBMPMaker.h"
+#include "../header/ext/simple-xml.h"
+#include "../header/int/LoadingUtilities.h"
 
 
 GuiElement::GuiElement(){
@@ -53,6 +55,18 @@ void GuiElement::OnGui() const{
 	glUseProgram(currProgram);
 }
 
+XMLElement GuiElement::Serialize(){
+	XMLElement elem;
+	elem.name = "GuiElement";
+
+	elem.attributes.push_back(XMLAttribute("name", name));
+	elem.attributes.push_back(XMLAttribute("width", to_string(tex->width)));
+	elem.attributes.push_back(XMLAttribute("height", to_string(tex->height)));
+	elem.attributes.push_back(XMLAttribute("position", EncodeVector2(position)));
+	elem.attributes.push_back(XMLAttribute("scale", EncodeVector2(scale)));
+
+	return elem;
+}
 
 void GuiSetSliderValue(GuiElement* elem, float value){
 	Texture* tex = elem->tex;
@@ -84,9 +98,12 @@ GuiText::~GuiText(){
 	}
 }
 
-GuiText::GuiText(MaterialManager* resources, FUV& _fuv) : GuiElement(), fuv(_fuv)
+GuiText::GuiText(MaterialManager* resources, string& _fuvFileName) 
+	: GuiElement()
+	, fuvFileName(_fuvFileName)
 {
 	text = "";
+	ImportFUV(fuvFileName, fuv);
 
 	Material* textMat = resources->GetMaterialByName("gui-txt");
 	guiProgram = textMat->shaderProgram;
@@ -94,7 +111,7 @@ GuiText::GuiText(MaterialManager* resources, FUV& _fuv) : GuiElement(), fuv(_fuv
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &texObj);
 	glBindTexture(GL_TEXTURE_2D, texObj);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _fuv.imageSize, _fuv.imageSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, _fuv.pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fuv.imageSize, fuv.imageSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, fuv.pixels);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
  
@@ -102,6 +119,19 @@ GuiText::GuiText(MaterialManager* resources, FUV& _fuv) : GuiElement(), fuv(_fuv
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glUniform1i(glGetUniformLocation(guiProgram, "_mainTex"), 0);
+}
+
+XMLElement GuiText::Serialize(){
+	XMLElement elem;
+	elem.name = "GuiText";
+
+	elem.attributes.push_back(XMLAttribute("name", name));
+	elem.attributes.push_back(XMLAttribute("fuv", fuvFileName));
+	elem.attributes.push_back(XMLAttribute("text", text));
+	elem.attributes.push_back(XMLAttribute("position", EncodeVector2(position)));
+	elem.attributes.push_back(XMLAttribute("scale", EncodeVector2(scale)));
+
+	return elem;
 }
 
 void GuiText::OnGui() const{
