@@ -21,6 +21,8 @@
 	</GameObject>
 	<GameObject name='mainCamSub'>
 		<Camera />
+		<FireGun />
+		<CameraControl speed='6' velocity='0' health='1' isGrounded='F'/>
 		<Transform parent='mainCam' position='0,0,0' rotation='1,0,0,0' scale='1,1,1'/>
 	</GameObject>
 	<GameObject name='reticle'>
@@ -47,6 +49,7 @@
 	<GameObject name='myObj2_2'>
 		<Material shader='shader' texture='Texture2.bmp'/>
 		<Mesh source='test.obj'/>
+		<MatChangeOnHit />
 		<Transform parent='myObj' position='2,1,-2' rotation='1,0,0,0' scale='0.2,0.2,0.2'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
@@ -71,13 +74,15 @@
 	<GameObject name='enemy1'>
 		<Material name='enemyMat'/>
 		<Mesh source='test.obj'/>
-		<Transform position='-3,0.7,2' rotation='1,0,0,0' scale='0.3,1,0.3'/>
+		<Transform position='-3,0.8,2' rotation='1,0,0,0' scale='0.3,1,0.3'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
+		<EnemyComp speed="3" health="5"/>
 	</GameObject>
 	<GameObject name='enemy2'>
 		<Material name='enemyMat2'/>
 		<Mesh source='test.obj'/>
-		<Transform position='-1,0.7,4' rotation='1,0,0,0' scale='0.3,1,0.3'/>
+		<Transform position='-1,0.8,4' rotation='1,0,0,0' scale='0.3,1,0.3'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
+		<EnemyComp speed="1.5" health="12"/>
 	</GameObject>
 </Scene>

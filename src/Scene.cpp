@@ -229,13 +229,9 @@ void PhysicsUpdate(){
 }
 
 void Scene::OnPostLoad(){
-	
-	camera->gameObject->AddComponent<FireGun>();
-	camera->gameObject->AddComponent<CameraControl>();
-
-	FindGameObject("myObj2_2")->AddComponent<MatChangeOnHit>();
-	FindGameObject("enemy1")->AddComponent<EnemyComp>();
-	FindGameObject("enemy2")->AddComponent<EnemyComp>();
+	//FindGameObject("myObj2_2")->AddComponent<MatChangeOnHit>();
+	//FindGameObject("enemy1")->AddComponent<EnemyComp>();
+	//FindGameObject("enemy2")->AddComponent<EnemyComp>();
 	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 }
 
