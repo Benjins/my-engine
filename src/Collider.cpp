@@ -43,6 +43,13 @@ void BoxCollider::OnAwake(){
 }
 
 BoxCollider::~BoxCollider(){
+	vector<BoxCollider*>& boxBodies = gameObject->scene->physicsSim->staticBoxBodies;
+	for(auto iter = boxBodies.begin(); iter != boxBodies.end(); iter++){
+		if(*iter == this){
+			boxBodies.erase(iter);
+			break;
+		}
+	}
 }
 
 SphereCollider::SphereCollider(Vector3 _position, float _radius){
@@ -72,7 +79,13 @@ void SphereCollider::OnAwake(){
 }
 
 SphereCollider::~SphereCollider(){
-
+	vector<SphereCollider*>& sphereBodies = gameObject->scene->physicsSim->staticSphereBodies;
+	for(auto iter = sphereBodies.begin(); iter != sphereBodies.end(); iter++){
+		if(*iter == this){
+			sphereBodies.erase(iter);
+			break;
+		}
+	}
 }
 
 Collision DetectCollision(const SphereCollider* col1, const SphereCollider* col2){

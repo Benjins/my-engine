@@ -2,19 +2,29 @@
 	<Material name='gui' shader='gui'/>
 	<Material name='color' shader='col'/>
 	<Material name='myMat' shader='shader' texture='Texture.bmp'/>
+	<Material name='myMat2' shader='shader' texture='Texture.bmp'/>
 	<Material name='floorMat' shader='shader' texture='Texture2.bmp'/>
 	<Material name='monkey' shader='shader' texture='Monkey.bmp'/>
+	<Material name='enemyMat' shader='shader' texture='Texture.bmp'/>
+	<Material name='enemyMat2' shader='shader' texture='Texture.bmp'/>
 	<GameObject name='myObj'>
 		<Material name='floorMat'/>
 		<Mesh source='test.obj'/>
 		<Transform position='0,3,0' rotation='1,0,0,0' scale='1,1,1'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 	<GameObject name='mainCam'>
 		<Transform position='0,3,-2' rotation='1,0,0,0' scale='1,1,1'/>
+		<BoxCollider position='0,0,0' size='0.2,0.2,0.2'/>
 	</GameObject>
 	<GameObject name='mainCamSub'>
 		<Camera />
 		<Transform parent='mainCam' position='0,0,0' rotation='1,0,0,0' scale='1,1,1'/>
+	</GameObject>
+	<GameObject name='reticle'>
+		<Transform parent='mainCamSub' position='0,0,0.1' rotation='1,0,0,0' scale='0.001,0.001,0.001'/>
+		<Material name='myMat2'/>
+		<Mesh source='test.obj'/>
 	</GameObject>
 	<GameObject name='floor'>
 		<Material name='floorMat'/>
@@ -47,6 +57,30 @@
 		<Material name='floorMat'/>
 		<Mesh source='test.obj'/>
 		<Transform position='-2,1.01,1' rotation='0.9063077870366499,0,0.42261826174069944,0' scale='1,1,1'/>
+		<BoxCollider position='0,0,0' size='1,1.1,1'/>
+	</GameObject>
+	<GameObject name='stairs1'>
+		<Material name='floorMat'/>
+		<Mesh source='test.obj'/>
+		<Transform position='2,0,-2' rotation='0.9063077870366499,0.42261826174069944,0,0' scale='4,1,1'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
+	</GameObject>
+	<GameObject name='stairs2'>
+		<Material name='floorMat'/>
+		<Mesh source='test.obj'/>
+		<Transform position='4,0,4' rotation='0.9063077870366499,0,0,0.42261826174069944' scale='2,1,1'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
+	</GameObject>
+	<GameObject name='enemy1'>
+		<Material name='enemyMat'/>
+		<Mesh source='test.obj'/>
+		<Transform position='-3,0.7,2' rotation='1,0,0,0' scale='0.3,1,0.3'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
+	</GameObject>
+	<GameObject name='enemy2'>
+		<Material name='enemyMat2'/>
+		<Mesh source='test.obj'/>
+		<Transform position='-1,0.7,4' rotation='1,0,0,0' scale='0.3,1,0.3'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 </Scene>

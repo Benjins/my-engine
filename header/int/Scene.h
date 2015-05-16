@@ -25,11 +25,11 @@ struct Scene{
 	MaterialManager resources;
 
 	Vector3 lightDir;
+	vector<GuiElement*> guiElements;
 	
 protected:
 	list<GameObject*> objects;
 	list<DrawCall> drawCalls;
-	vector<GuiElement*> guiElements;
 
 	int prevX;
 	int prevY;
@@ -56,6 +56,12 @@ public:
 	Scene();
 	Scene(int argc, char** argv);
 
+private:
+	//Hide this, because it'll break things
+	Scene(const Scene& orig){}
+
+public:
+
 	virtual void Init();
 
 	void LoadScene(string fileName);
@@ -63,6 +69,8 @@ public:
 
 	GameObject* AddObject(GameObject* obj);
 	GuiElement* AddGuiElement();
+
+	void RemoveObject(GameObject* obj);
 	
 	void Start();
 

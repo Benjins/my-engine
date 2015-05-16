@@ -87,12 +87,97 @@ struct RotateConstantly : Component{
 	}
 };
 
+struct EnemyComp : HitComponent{
+	Vector3 currentTarget;
+	float speed;
+	PhysicsSim* physics;
+	GameObject* player;
+
+	int health;
+
+	EnemyComp(){
+		speed = 2;
+		health = 5;
+	}
+
+	void ResetTarget(){
+		float x = ((float)(rand() % 500 - 250)) / 25;
+		float z = ((float)(rand() % 500 - 250)) / 25;
+		currentTarget = Vector3(x, 0, z);
+	}
+
+	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
+		health--;
+		float ratio = ((float)health)/5;
+		gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
+		if(health <= 0){
+			gameObject->scene->RemoveObject(gameObject);	
+		}
+	}
+
+	virtual void OnAwake(){
+		ResetTarget();
+		physics = gameObject->scene->physicsSim;
+		player = gameObject->scene->FindGameObject("mainCam");
+	}
+
+	virtual void OnUpdate(){
+		Vector3 toPlayer = player->transform.position - gameObject->transform.position;
+		RaycastHit hitPlayer = physics->Raycast(gameObject->transform.position, toPlayer);
+		
+		Vector3 moveVec;
+
+		if(hitPlayer.hit && hitPlayer.col->gameObject == player){
+			moveVec = toPlayer;
+		}
+		else{
+			moveVec = currentTarget - gameObject->transform.position;
+		}
+		
+		moveVec.y = 0;
+
+		if(moveVec.MagnitudeSquared() < 0.1f){
+			ResetTarget();
+		}
+		else{
+			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+
+			RaycastHit testHit = physics->Raycast(gameObject->transform.GlobalPosition(), moveVec);
+			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
+				gameObject->transform.position = gameObject->transform.position + moveVec;
+			}
+			else if (testHit.hit){
+				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+				Vector3 goodVec = moveVec - badVec;
+				gameObject->transform.position = gameObject->transform.position + goodVec;
+			}
+		}
+
+		float floorHeight = -10;
+		RaycastHit lookDown = physics->Raycast(gameObject->transform.position, Y_AXIS*-1);
+		if(lookDown.hit){
+			floorHeight = lookDown.worldPos.y;
+		}
+
+		if(gameObject->transform.position.y <= floorHeight + 0.6f){
+			gameObject->transform.position.y = floorHeight + 0.6f;
+		}
+		else{
+			gameObject->transform.position.y -= 3 * gameObject->scene->deltaTime;
+		}
+	}
+};
+
 struct CameraControl : Component{
 	Input* input;
 	SC_Transform* camera;
 	PhysicsSim* physics;
+	GuiElement* slider;
 	float speed;
 	float velocity;
+
+	bool isGrounded;
+	float health;
 
 	int prevX;
 	int prevY;
@@ -100,18 +185,21 @@ struct CameraControl : Component{
 	float yRot;
 
 	CameraControl(){
-		speed = 3;
+		speed = 5;
 		prevX = 0;
 		prevY = 0;
 		xRot = 0;
 		yRot = 0;
 		velocity = 0;
+		isGrounded = false;
+		health = 1;
 	}
 
 	virtual void OnAwake(){
 		input = &gameObject->scene->input;
 		camera = gameObject->scene->camera;
 		physics = gameObject->scene->physicsSim;
+		slider = gameObject->scene->guiElements[0];
 	}
 
 	virtual void OnUpdate(){
@@ -138,9 +226,26 @@ struct CameraControl : Component{
 		if(input->GetKey('d')){
 			moveVec = moveVec + camera->Right();
 		}
-		if(input->GetKeyDown(' ')){
+		if(input->GetKeyDown(' ') && isGrounded){
 			velocity = 4;
 		}
+
+		if(input->GetKeyUp('b')){
+			GameObject* newEnemy = new GameObject();
+			newEnemy->name = "enemyClone";
+			newEnemy->scene = gameObject->scene;
+			newEnemy->AddMesh("test.obj");
+			newEnemy->AddMaterial("shader","Texture.bmp");
+			newEnemy->AddComponent<BoxCollider>();
+			newEnemy->AddComponent<EnemyComp>();
+			newEnemy->transform.position = Vector3(-2, 1, 5);
+			newEnemy->transform.scale = Vector3(0.3f, 1, 0.3f);
+			gameObject->scene->AddObject(newEnemy);
+		}
+
+		health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
+		health = max(0.0f, min(1.0f, health));
+		GuiSetSliderValue(slider, health);
 
 		moveVec.y = 0;
 		if(moveVec.MagnitudeSquared() > 0){
@@ -165,9 +270,13 @@ struct CameraControl : Component{
 
 		velocity -= gameObject->scene->deltaTime * 5;
 		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
-		if(camera->GetParent()->position.y <= floorHeight + 1){
-			camera->GetParent()->position.y = floorHeight + 1;
+		if(camera->GetParent()->position.y <= floorHeight + 0.4f){
+			camera->GetParent()->position.y = floorHeight + 0.4f;
 			velocity = 0;
+			isGrounded = true;
+		}
+		else{
+			isGrounded = false;
 		}
 	}
 
@@ -200,49 +309,6 @@ struct OscillateUp : Component{
 			z2->name = "Child_ball_clone";
 
 			gameObject->scene->AddObject(z2);
-		}
-	}
-};
-
-struct ColorizerComp : Component{
-	virtual void OnCollision(Collider* col){
-		Material* mat = col->gameObject->material;
-		if(mat != NULL){
-			double x = rand();
-			double ratio = x/RAND_MAX;
-			mat->SetVec4Uniform("_color",Vector4(0.6,0.6,ratio,1.0));
-			for(auto iter = col->gameObject->transform.children.begin(); iter != col->gameObject->transform.children.end(); iter++){
-				Material* childMat = (*iter)->gameObject->material;
-				childMat->SetVec4Uniform("_color",Vector4(1.0,0,0,1.0));
-			}
-		}
-	}
-};
-
-struct ChangeColOnCollision : Component{
-	bool collided;
-	Texture* tex;
-
-	virtual void OnAwake(){
-		collided = false;
-		tex = gameObject->material->mainTexture;
-	}
-
-	virtual void OnCollision(Collider* col){
-		if(col->gameObject->transform.GetParent() == col->gameObject->scene->camera){
-			if(gameObject->material != NULL){
-				double x = rand();
-				double ratio = x/RAND_MAX;
-
-				for(int i = 0; i < 256; i++){
-					for(int j = 0; j < 256; j++){
-						tex->SetPixel(i,j,ratio,ratio,ratio);
-					}
-				}
-
-				tex->Apply();
-				//gameObject->material->SetVec4Uniform("_color",Vector4(1.0f, (float)ratio,1.0f,1.0f));
-			}
 		}
 	}
 };
@@ -333,6 +399,23 @@ GuiElement* Scene::AddGuiElement(){
 	return elem;
 }
 
+void Scene::RemoveObject(GameObject* obj){
+	for(auto iter = objects.begin(); iter != objects.end(); iter++){
+		if(*iter == obj){
+			objects.erase(iter);
+			delete obj;
+			break;
+		}
+	}
+
+	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
+		if((*iter).obj == obj){
+			drawCalls.erase(iter);
+			break;
+		}
+	}
+}
+
 void Scene::Start(){
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 	timeval start;
@@ -417,28 +500,6 @@ void Scene::OnUpdate(){
 		LoadScene("Quicksave.xml");
 	}
 
-	if(input.GetKeyUp('v')){
-		float randY = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
-		float randZ = (((double)(myRandom() % RAND_MAX))/RAND_MAX);
-
-		
-		GameObject* y = new GameObject();
-		y->scene = this;
-		y->transform.scale = Vector3(0.005f,0.005f,22);
-		y->transform.SetParent(camera);
-		y->AddMaterial("shader", "Texture.bmp");
-		y->AddMesh("test.obj");
-		y->AddComponent<ColorizerComp>();
-		y->name = "cameraSpawn";
-
-		AddObject(y);
-
-		//The rigidbody gets added to the physics sim, which manages its memory
-		BoxCollider* col = new BoxCollider(Vector3(0.0f,0.0f,0.0f), Vector3(0.5f,0.5f,0.5f));
-		RigidBody* rbody = new RigidBody(&(y->transform), col);
-		rbody->isKinematic = true;
-	}
-
 	if(input.GetKey('x')){
 		Stop();
 	}
@@ -458,7 +519,9 @@ void Scene::OnPostLoad(){
 	camera->gameObject->AddComponent<CameraControl>();
 
 	FindGameObject("myObj2_2")->AddComponent<MatChangeOnHit>();
-	FindGameObject("wall1")->AddComponent<MatChangeOnHit>();
+	FindGameObject("enemy1")->AddComponent<EnemyComp>();
+	FindGameObject("enemy2")->AddComponent<EnemyComp>();
+	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 }
 
 void Scene::Render(){
@@ -470,7 +533,7 @@ void Scene::Render(){
 
 	float aspectRatio = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
 	float fieldOfView = 80;
-	float nearZ = 0.1;
+	float nearZ = 0.01;
 	float farZ = 1000;
 	                                                                    
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
