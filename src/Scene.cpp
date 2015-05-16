@@ -87,20 +87,32 @@ struct RotateConstantly : Component{
 	}
 };
 
-struct EnemyComp : Component{
+struct EnemyComp : HitComponent{
 	Vector3 currentTarget;
 	float speed;
 	PhysicsSim* physics;
 	GameObject* player;
 
+	int health;
+
 	EnemyComp(){
 		speed = 2;
+		health = 5;
 	}
 
 	void ResetTarget(){
 		float x = ((float)(rand() % 500 - 250)) / 25;
 		float z = ((float)(rand() % 500 - 250)) / 25;
 		currentTarget = Vector3(x, 0, z);
+	}
+
+	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
+		health--;
+		float ratio = ((float)health)/5;
+		gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
+		if(health <= 0){
+			gameObject->scene->RemoveObject(gameObject);	
+		}
 	}
 
 	virtual void OnAwake(){
@@ -173,7 +185,7 @@ struct CameraControl : Component{
 	float yRot;
 
 	CameraControl(){
-		speed = 3;
+		speed = 5;
 		prevX = 0;
 		prevY = 0;
 		xRot = 0;
@@ -415,6 +427,23 @@ GuiElement* Scene::AddGuiElement(){
 	return elem;
 }
 
+void Scene::RemoveObject(GameObject* obj){
+	for(auto iter = objects.begin(); iter != objects.end(); iter++){
+		if(*iter == obj){
+			objects.erase(iter);
+			delete obj;
+			break;
+		}
+	}
+
+	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
+		if((*iter).obj == obj){
+			drawCalls.erase(iter);
+			break;
+		}
+	}
+}
+
 void Scene::Start(){
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 	timeval start;
@@ -538,8 +567,9 @@ void Scene::OnPostLoad(){
 	camera->gameObject->AddComponent<CameraControl>();
 
 	FindGameObject("myObj2_2")->AddComponent<MatChangeOnHit>();
-	FindGameObject("wall1")->AddComponent<MatChangeOnHit>();
 	FindGameObject("enemy1")->AddComponent<EnemyComp>();
+	FindGameObject("enemy2")->AddComponent<EnemyComp>();
+	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 }
 
 void Scene::Render(){

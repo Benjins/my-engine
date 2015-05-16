@@ -68,6 +68,8 @@ public:
 
 	GameObject* AddObject(GameObject* obj);
 	GuiElement* AddGuiElement();
+
+	void RemoveObject(GameObject* obj);
 	
 	void Start();
 
