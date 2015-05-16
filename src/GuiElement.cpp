@@ -3,6 +3,7 @@
 #include "../header/ext/EasyBMP.h"
 #include "../header/int/ResourceManager.h"
 #include "../header/int/Material.h"
+#include "../header/int/FontBMPMaker.h"
 
 
 GuiElement::GuiElement(){
@@ -74,4 +75,75 @@ GuiElement::~GuiElement(){
 	if(tex != NULL){
 		delete tex;
 	}
+}
+
+GuiText::~GuiText(){
+	if(fuv.pixels != NULL){
+		delete[] fuv.pixels;
+		fuv.pixels = NULL;
+	}
+}
+
+GuiText::GuiText(MaterialManager* resources, FUV& _fuv) : GuiElement(), fuv(_fuv)
+{
+	text = "";
+
+	Material* textMat = resources->GetMaterialByName("gui-txt");
+	guiProgram = textMat->shaderProgram;
+
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &texObj);
+	glBindTexture(GL_TEXTURE_2D, texObj);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _fuv.imageSize, _fuv.imageSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, _fuv.pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+ 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glUniform1i(glGetUniformLocation(guiProgram, "_mainTex"), 0);
+}
+
+void GuiText::OnGui() const{
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+
+	glUseProgram(guiProgram);
+	glBindTexture(GL_TEXTURE_2D, texObj);
+
+	float sx = 2.0f / glutGet(GLUT_WINDOW_WIDTH) * scale.x;
+	float sy = 2.0f / glutGet(GLUT_WINDOW_HEIGHT) * scale.y; 
+
+	//Left alignement by default
+	float x = position.x - scale.x;
+	float y = position.y;
+
+	for(int i = 0; i < text.size(); i++){
+		char letter = text[i];
+		if(letter == '\n' || letter == '\r'){
+			x = position.x;
+			y += sy * fuv.fontSize; 
+			continue;
+		}
+
+		LetterUV uv = fuv.uvs[letter];
+		float xSize = (uv.xMax - uv.xMin) * fuv.imageSize * sx;
+		float ySize = (uv.yMax - uv.yMin) * fuv.imageSize * sy;
+
+		float x2 = x + uv.left * sx;
+		float y2 = y - uv.top * sy;
+		
+		glBegin(GL_TRIANGLE_STRIP);
+		{
+			glVertex4f(x2, -y2,                 uv.xMin, uv.yMin);
+			glVertex4f(x2, -y2 - ySize,         uv.xMin, uv.yMax);
+			glVertex4f(x2 + xSize, -y2,         uv.xMax, uv.yMin);
+			glVertex4f(x2 + xSize, -y2 - ySize, uv.xMax, uv.yMax);
+		}
+		glEnd();
+
+		x += uv.xAdvance * sx;
+		y += uv.yAdvance * sy;
+	}
+	glUseProgram(currProgram);
 }

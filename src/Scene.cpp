@@ -7,6 +7,7 @@
 #include "../header/int/RigidBody.h"
 #include "../header/int/Collider.h"
 #include "../header/int/PhysicsSim.h"
+#include "../header/int/FontBMPMaker.h"
 #include <time.h>
 #include <cstdlib>
 
@@ -173,6 +174,7 @@ struct CameraControl : Component{
 	SC_Transform* camera;
 	PhysicsSim* physics;
 	GuiElement* slider;
+	GuiText* healthBar;
 	float speed;
 	float velocity;
 
@@ -200,6 +202,7 @@ struct CameraControl : Component{
 		camera = gameObject->scene->camera;
 		physics = gameObject->scene->physicsSim;
 		slider = gameObject->scene->guiElements[0];
+		healthBar = static_cast<GuiText*>(gameObject->scene->FindGUIElement("healthText"));
 	}
 
 	virtual void OnUpdate(){
@@ -246,6 +249,9 @@ struct CameraControl : Component{
 		health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
 		health = max(0.0f, min(1.0f, health));
 		GuiSetSliderValue(slider, health);
+		if(healthBar != nullptr){
+			healthBar->text = "Health: " + to_string((int)(health*100));
+		}
 
 		moveVec.y = 0;
 		if(moveVec.MagnitudeSquared() > 0){
@@ -368,11 +374,22 @@ Scene::Scene(int argc, char** argv){
 void Scene::Init(){
 }
 
-GameObject* Scene::FindGameObject(string name){
+GameObject* Scene::FindGameObject(const string& name){
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		GameObject* obj = *iter;
 		if(obj->name == name){
 			return obj;
+		}
+	}
+
+	return NULL;
+}
+
+GuiElement* Scene::FindGUIElement(const string& name){
+	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
+		GuiElement* elem = *iter;
+		if(elem->name == name){
+			return elem;
 		}
 	}
 
@@ -511,6 +528,17 @@ void Scene::OnPostLoad(){
 	elem->position = Vector2(0.1, 0.1);
 	elem->scale = Vector2(0.2, 0.02);
 
+	FUV fuv;
+	ImportFUV("CODE_Bold64.fuv", fuv);
+	//ConvertTrueTypeToFUV("arial.ttf", 64, fuv);
+
+	GuiText* guiTxt = new GuiText(&resources, fuv);
+	guiElements.push_back(guiTxt);
+	guiTxt->text = "Health: 100";
+	guiTxt->position = Vector2(-0.6f, 0.9f);
+	guiTxt->scale = Vector2(0.4f,0.4f);
+	guiTxt->name = "healthText";
+	
 	camera->gameObject->AddComponent<FireGun>();
 	camera->gameObject->AddComponent<CameraControl>();
 
@@ -550,46 +578,6 @@ void Scene::Render(){
 
 	//Gui and gizmos stuff 
 	glDisable(GL_DEPTH_TEST);
-
-	Material* col = resources.GetMaterialByName("color");
-	glUseProgram(col->shaderProgram); 
-	col->SetMat4Uniform("_perspMatrix",  perspMatrix); 
-	col->SetMat4Uniform("_cameraMatrix", camMatrix); 
-	col->SetVec4Uniform("_color", Vector4(1,1,1,1));
-	for(auto iter = physicsSim->staticBoxBodies.begin(); iter != physicsSim->staticBoxBodies.end(); iter++){
-
-		Vector3 min = (*iter)->position - (*iter)->size;
-		Vector3 max = (*iter)->position + (*iter)->size;
-
-		//Vector3 minGlobal = (*iter)->gameObject->transform.LocalToGlobal(min);
-		//Vector3 maxGlobal = (*iter)->gameObject->transform.LocalToGlobal(max);
-
-		Vector3 corners[8] = {   Vector3(min.x, min.y, min.z),
-								 Vector3(min.x, max.y, min.z),
-							     Vector3(min.x, max.y, max.z),
-								 Vector3(min.x, min.y, max.z),
-								 Vector3(max.x, min.y, min.z),
-								 Vector3(max.x, max.y, min.z),
-								 Vector3(max.x, max.y, max.z),
-								 Vector3(max.x, min.y, max.z)};
-
-		for(int i = 0; i < 8; i++){
-			corners[i] = (*iter)->gameObject->transform.LocalToGlobal(corners[i]);
-		}
-
-		int indices[12] = {0,1,2,3, 7,6,5,4, 0,1,2,3};
-		break;
-
-		if((*iter)->gameObject->name == "floor"){
-			glBegin(GL_LINE_STRIP);
-			{
-				for(int i = 0; i < 12; i++){
-					glVertex3f(corners[indices[i]].x, corners[indices[i]].y, corners[indices[i]].z);
-				}
-			}
-			glEnd();
-		}
-	}
 
 	//Gui stuff
 	glEnable(GL_BLEND);
