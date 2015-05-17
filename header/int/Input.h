@@ -10,6 +10,7 @@ enum KeyState{
 
 struct Input{
 	friend struct Scene;
+	friend struct EditorScene;
 
 protected:
 	KeyState keys[255];

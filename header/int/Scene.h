@@ -56,7 +56,7 @@ public:
 	Scene();
 	Scene(int argc, char** argv);
 
-private:
+protected:
 	//Hide this, because it'll break things
 	Scene(const Scene& orig){}
 
@@ -72,7 +72,7 @@ public:
 
 	void RemoveObject(GameObject* obj);
 	
-	void Start();
+	virtual void Start();
 
 	void UpdateVertexBuffer();
 	
