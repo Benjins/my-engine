@@ -26,7 +26,7 @@
 		<Transform parent='mainCam' position='0,0,0' rotation='1,0,0,0' scale='1,1,1'/>
 	</GameObject>
 	<GameObject name='reticle'>
-		<Transform parent='mainCamSub' position='0,0,0.1' rotation='1,0,0,0' scale='0.001,0.001,0.001'/>
+		<Transform parent='mainCamSub' position='0,0,0.1' rotation='1,0,0,0' scale='0.1,0.1,0.1'/>
 		<Material name='myMat2'/>
 		<Mesh source='test.obj'/>
 	</GameObject>
@@ -62,7 +62,7 @@
 	<GameObject name='stairs1'>
 		<Material name='floorMat'/>
 		<Mesh source='test.obj'/>
-		<Transform position='2,0,-2' rotation='0.9063077870366499,0.42261826174069944,0,0' scale='4,1,1'/>
+		<Transform position='2,0,-2' rotation='1,0,0,0' scale='4,1,1'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 	<GameObject name='stairs2'>

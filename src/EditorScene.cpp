@@ -1,6 +1,11 @@
 #include "../header/int/EditorScene.h"
 #include "../header/int/Input.h"
+#include "../header/int/RaycastHit.h"
 #include "../header/int/PhysicsSim.h"
+#include "../header/int/Collider.h"
+#include "../header/int/Material.h"
+#include "../header/int/Vector4.h"
+#include "../header/int/Mat4.h"
 
 EditorScene::EditorScene(int argc, char** argv) : Scene(argc, argv){
 	glutMouseFunc(OnEditorMouseFunc);
@@ -54,6 +59,12 @@ void EditorScene::EditorUpdate(){
 	
 	//cout << "EditorScene::EditorUpdate(): " << (deltaTime * 1000) << "  ms.\n";
 
+	float windowWidth  = glutGet(GLUT_WINDOW_WIDTH);
+	float windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
+	float mouseXNormalized = (input.mouseX -  windowWidth/2) / windowWidth  * 2;
+	float mouseYNormalized = (input.mouseY - windowHeight/2) / windowHeight * 2;
+
 	if(input.GetKeyUp('x')){
 		Stop();
 	}
@@ -87,6 +98,26 @@ void EditorScene::EditorUpdate(){
 		yRot += deltaX/90;
 
 		editorCamera.rotation =  Quaternion(Y_AXIS, yRot) * Quaternion(X_AXIS, xRot);
+	}
+	else if(input.GetMouse(GLUT_LEFT_BUTTON)){
+
+		Vector3 mouseWorldPos = editorCamera.position;
+		mouseWorldPos = mouseWorldPos - (editorCamera.Up()    * mouseYNormalized * sinf(80 * DEG2RAD));
+		mouseWorldPos = mouseWorldPos + (editorCamera.Right() * mouseXNormalized * (windowWidth/windowHeight) * sinf(80 * DEG2RAD));
+		mouseWorldPos = mouseWorldPos + (editorCamera.Forward() * 1.0f);
+
+		Vector3 rayDirection = mouseWorldPos - editorCamera.position;
+
+		RaycastHit testHit = physicsSim->Raycast(editorCamera.position, rayDirection);
+		if(testHit.hit){
+			if(testHit.col->gameObject->material != nullptr){
+				double randVal = ((double)(rand() % 1000))/1000;
+				//cout << "Depth: " << testHit.depth << endl;
+				//testHit.col->gameObject->transform.position.y += (randVal < 0.5f ? 0.02f : -0.02f);
+				FindGameObject("reticle")->transform.SetParent(nullptr);
+				FindGameObject("reticle")->transform.position = testHit.worldPos;
+			}
+		}
 	}
 
 	prevX = input.mouseX;
