@@ -2,6 +2,7 @@
 #define EDITORSCENE_H
 
 #include "Scene.h"
+#include "PhysicsSim.h"
 
 struct EditorScene : Scene{
 
@@ -10,6 +11,8 @@ struct EditorScene : Scene{
 	EditorScene(int argc, char** argv);
 
 	SC_Transform editorCamera;
+
+	PhysicsSim selectionSim;
 
 	static EditorScene& getInstance(){
 		return getInstance(0,NULL);
@@ -22,6 +25,10 @@ struct EditorScene : Scene{
 	virtual void Start();
 
 	void EditorUpdate();
+
+	void EditorGUI();
+
+	virtual ~EditorScene();
 };
 
 

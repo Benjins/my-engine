@@ -62,7 +62,7 @@
 	<GameObject name='stairs1'>
 		<Material name='floorMat'/>
 		<Mesh source='test.obj'/>
-		<Transform position='2,0,-2' rotation='1,0,0,0' scale='4,1,1'/>
+		<Transform position='2,0,-2' rotation='0.9063077870366499,0.42261826174069944,0,0' scale='4,1,1'/>
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 	</GameObject>
 	<GameObject name='stairs2'>
