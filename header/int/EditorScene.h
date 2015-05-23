@@ -11,8 +11,11 @@ struct EditorScene : Scene{
 	EditorScene(int argc, char** argv);
 
 	SC_Transform editorCamera;
+	SC_Transform* sceneCamera;
 
 	PhysicsSim selectionSim;
+
+	vector<GuiElement*> editorGui;
 
 	GameObject* selectedObj;
 	int selectedAxis;

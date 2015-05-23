@@ -42,14 +42,14 @@ int main(int argc, char** argv){
 	int retVal = RunAllTests();
 #else
 	
-#if 0
+#if 1
 	Scene& x = Scene::getInstance(argc, argv);
 #else
 	Scene& x = EditorScene::getInstance(argc, argv);
 #endif
 
 	x.Init();
-	x.LoadScene("Scene1.xml");
+	x.LoadScene("Editor_Scene.xml");
 
 	x.Start();
 

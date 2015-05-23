@@ -11,7 +11,7 @@
 <GuiElement name='' width='300' height='1' position='0.100000,0.100000' scale='0.200000,0.020000'/>
 <GuiText name='healthText' fuv='CODE_Bold64.fuv' text='Health: 100' position='-0.600000,0.900000' scale='0.400000,0.400000'/>
 <GameObject name='myObj'>
-<Transform position='0.000000,3.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Transform position='0.000000,3.001412,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
 <Material name='floorMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
@@ -22,11 +22,12 @@
 </GameObject>
 <GameObject name='mainCamSub'>
 <Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Camera/>
 <FireGun/>
 <CameraControl speed='6.000000' velocity='0.000000' isGrounded='F' health='1.000000'/>
 </GameObject>
 <GameObject name='reticle'>
-<Transform parent='mainCamSub' position='0.000000,0.000000,0.100000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
+<Transform parent='mainCamSub' position='0.000000,0.000000,0.100000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.001000,0.001000,0.001000'/>
 <Material name='myMat2'/>
 <Mesh source='test.obj'/>
 </GameObject>
@@ -60,7 +61,7 @@
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.100000,1.000000'/>
 </GameObject>
 <GameObject name='stairs1'>
-<Transform position='-0.028073,0.000000,-3.916512' rotation='0.906308,0.422618,0.000000,0.000000' scale='4.000000,1.000000,1.000000'/>
+<Transform position='2.162069,4.987144,3.038745' rotation='0.906308,0.422618,0.000000,0.000000' scale='4.000000,1.000000,1.000000'/>
 <Material name='floorMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
@@ -79,7 +80,7 @@
 <EnemyComp speed='3.000000' health='5'/>
 </GameObject>
 <GameObject name='enemy2'>
-<Transform position='0.872865,0.800000,4.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
+<Transform position='-2.079239,0.800000,4.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
 <Material name='enemyMat2'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>

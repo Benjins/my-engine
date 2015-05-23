@@ -98,7 +98,7 @@ GuiText::~GuiText(){
 	}
 }
 
-GuiText::GuiText(MaterialManager* resources, string& _fuvFileName) 
+GuiText::GuiText(MaterialManager* resources, const string& _fuvFileName) 
 	: GuiElement()
 	, fuvFileName(_fuvFileName)
 {

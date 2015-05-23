@@ -2,6 +2,8 @@
 #include "../header/int/Input.h"
 #include "../header/int/RaycastHit.h"
 #include "../header/int/Collider.h"
+#include "../header/int/Texture.h"
+#include "../header/ext/EasyBMP.h"
 #include "../header/int/Material.h"
 #include "../header/int/Vector4.h"
 #include "../header/int/Mat4.h"
@@ -30,9 +32,30 @@ void EditorScene::Start(){
 
 	RecalculateSelectionSim();
 
+	sceneCamera = camera;
+
 	editorCamera.position = Vector3(3,3,-3);
 	editorCamera.rotation = Quaternion(Y_AXIS, -45) * Quaternion(X_AXIS, 45);
 	camera = &editorCamera;
+
+	
+	GuiElement* panel = new GuiElement(&resources);
+	panel->position = Vector2(0.9f,0.9f);
+	panel->scale = Vector2(0.25f, 0.2f);
+	panel->tex = new Texture(1,1);
+	RGBApixel pix = {50,50,50,220};
+	panel->tex->SetPixel(0,0,pix);
+	panel->tex->Apply();
+
+	editorGui.push_back(panel);
+	
+
+	GuiText* guiTxt = new GuiText(&resources, "arial_16.fuv");
+	guiTxt->position = Vector2(1.55f,-0.8f);
+	guiTxt->scale = Vector2(1,1);
+	guiTxt->text = "Position: ";
+
+	editorGui.push_back(guiTxt);
 
 	running = true;
 	while(running){
@@ -129,7 +152,9 @@ void EditorScene::EditorUpdate(){
 	}
 
 	if(input.GetKeyUp('o')){
+		camera = sceneCamera;
 		SaveScene("Editor_Scene.xml");
+		camera = &editorCamera;
 	}
 	if(input.GetKeyUp('l')){
 		selectedObj=nullptr;
@@ -139,6 +164,7 @@ void EditorScene::EditorUpdate(){
 		selectionSim.staticBoxBodies.clear();
 		LoadScene("Editor_Scene.xml");
 		RecalculateSelectionSim();
+		camera = &editorCamera;
 	}
 
 	Vector3 mouseWorldPos = editorCamera.position;
@@ -220,6 +246,13 @@ void EditorScene::EditorUpdate(){
 		selectedAxis = -1;
 	}
 	
+	if(selectedObj){
+		Vector3 position = selectedObj->transform.position;
+		static_cast<GuiText*>(editorGui[1])->text = "Position: " + to_string(position.x) + ", " + to_string(position.y) + ", " + to_string(position.z);
+	}
+	else{
+		static_cast<GuiText*>(editorGui[1])->text = "Position:";
+	}
 
 	prevX = input.mouseX;
 	prevY = input.mouseY;
@@ -278,9 +311,13 @@ void EditorScene::EditorGUI(){
 			glVertex3f(to.x, to.y, to.z);
 		}
 		glEnd();
-
-		glEnable(GL_DEPTH);
 	}
+
+	for(GuiElement* elem : editorGui){
+		elem->OnGui();
+	}
+
+	glEnable(GL_DEPTH);
 }
 
 static void OnEditorMouseFunc(int button, int state, int x, int y){
@@ -302,5 +339,9 @@ static void OnEditorKeyUpFunc(unsigned char key, int x, int y){
 EditorScene::~EditorScene(){
 	for(auto iter = selectionSim.staticBoxBodies.begin(); iter != selectionSim.staticBoxBodies.end(); iter++){
 		delete (*iter);
+	}
+
+	for(GuiElement* elem : editorGui){
+		delete elem;
 	}
 }
