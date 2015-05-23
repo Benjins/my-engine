@@ -28,6 +28,8 @@ struct EditorScene : Scene{
 
 	virtual void Start();
 
+	void RecalculateSelectionSim();
+
 	void EditorUpdate();
 
 	void EditorGUI();

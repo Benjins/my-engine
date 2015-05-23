@@ -28,6 +28,28 @@ void EditorScene::Start(){
 	prevTime = clock();
 #endif
 
+	RecalculateSelectionSim();
+
+	editorCamera.position = Vector3(3,3,-3);
+	editorCamera.rotation = Quaternion(Y_AXIS, -45) * Quaternion(X_AXIS, 45);
+	camera = &editorCamera;
+
+	running = true;
+	while(running){
+		glutMainLoopEvent();
+
+		EditorUpdate();
+
+		Render();
+		EditorGUI();
+		glutSwapBuffers();
+		glutPostRedisplay();
+
+		input.EndFrame();
+	}
+}
+
+void EditorScene::RecalculateSelectionSim(){
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		Vector3 maxVert = Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX), minVert = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
 		GameObject* obj = *iter;
@@ -52,24 +74,6 @@ void EditorScene::Start(){
 			boundingBox->gameObject = obj;
 			selectionSim.staticBoxBodies.push_back(boundingBox);
 		}
-	}
-
-	editorCamera.position = Vector3(3,3,-3);
-	editorCamera.rotation = Quaternion(Y_AXIS, -45) * Quaternion(X_AXIS, 45);
-	camera = &editorCamera;
-
-	running = true;
-	while(running){
-		glutMainLoopEvent();
-
-		EditorUpdate();
-
-		Render();
-		EditorGUI();
-		glutSwapBuffers();
-		glutPostRedisplay();
-
-		input.EndFrame();
 	}
 }
 
@@ -120,8 +124,21 @@ void EditorScene::EditorUpdate(){
 		editorCamera.position = editorCamera.position - Y_AXIS * speed * deltaTime;
 	}
 
-	if(input.GetKey('g')){
+	if(input.GetKeyDown('g')){
 		globalManipulator = !globalManipulator;
+	}
+
+	if(input.GetKeyUp('o')){
+		SaveScene("Editor_Scene.xml");
+	}
+	if(input.GetKeyUp('l')){
+		selectedObj=nullptr;
+		for(BoxCollider* col : selectionSim.staticBoxBodies){
+			delete col;
+		}
+		selectionSim.staticBoxBodies.clear();
+		LoadScene("Editor_Scene.xml");
+		RecalculateSelectionSim();
 	}
 
 	Vector3 mouseWorldPos = editorCamera.position;
@@ -138,7 +155,7 @@ void EditorScene::EditorUpdate(){
 			Vector3 projectedCenter = rayDirection * projectionAmount;
 
 			Vector3 orthoPart = projectedCenter - cameraToObj;
-			if(orthoPart.MagnitudeSquared() < 3){
+			if(orthoPart.MagnitudeSquared() < 1){
 				Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
 				Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
 				Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
