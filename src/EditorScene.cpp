@@ -14,6 +14,8 @@ EditorScene::EditorScene(int argc, char** argv) : Scene(argc, argv){
 	glutKeyboardUpFunc(OnEditorKeyUpFunc);
 
 	selectedObj = nullptr;
+	selectedAxis = -1;
+	globalManipulator = false;
 }
 
 void EditorScene::Start(){
@@ -118,6 +120,68 @@ void EditorScene::EditorUpdate(){
 		editorCamera.position = editorCamera.position - Y_AXIS * speed * deltaTime;
 	}
 
+	if(input.GetKey('g')){
+		globalManipulator = !globalManipulator;
+	}
+
+	Vector3 mouseWorldPos = editorCamera.position;
+	mouseWorldPos = mouseWorldPos - (editorCamera.Up()    * mouseYNormalized);
+	mouseWorldPos = mouseWorldPos + (editorCamera.Right() * mouseXNormalized * (windowWidth/windowHeight));
+	mouseWorldPos = mouseWorldPos + (editorCamera.Forward() * 1.2f);
+
+	Vector3 rayDirection = mouseWorldPos - editorCamera.position;
+
+	if(input.GetMouseDown(GLUT_LEFT_BUTTON)){
+		if(selectedObj != nullptr){
+			Vector3 cameraToObj = selectedObj->transform.GlobalPosition() - editorCamera.position;
+			float projectionAmount = DotProduct(cameraToObj, rayDirection)/DotProduct(rayDirection, rayDirection);
+			Vector3 projectedCenter = rayDirection * projectionAmount;
+
+			Vector3 orthoPart = projectedCenter - cameraToObj;
+			if(orthoPart.MagnitudeSquared() < 3){
+				Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
+				Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
+				Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
+
+				float xBit = DotProduct(orthoPart, rightVector);
+				float yBit = DotProduct(orthoPart, upVector);
+				float zBit = DotProduct(orthoPart, forwardVector);
+
+				if(xBit > yBit && xBit > zBit){
+					selectedAxis = 0;
+				}
+				else if(yBit > xBit && yBit > zBit){
+					selectedAxis = 1;
+				}
+				else if(zBit > yBit && zBit > xBit){
+					selectedAxis = 2;
+				}
+			}
+		}
+	}
+
+	if(input.GetMouse(GLUT_LEFT_BUTTON) && selectedObj != nullptr && selectedAxis >= 0){
+		float deltaX = prevX - input.mouseX;
+		float deltaY = prevY - input.mouseY;
+
+		Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
+		Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
+		Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
+
+		const Vector3 axes[3] = {rightVector, upVector, forwardVector};
+		Vector3 axis = axes[selectedAxis];
+
+		Vector3 cameraToObj = selectedObj->transform.GlobalPosition() - editorCamera.position;
+		float projectionAmount = DotProduct(cameraToObj, rayDirection)/DotProduct(rayDirection, rayDirection);
+		Vector3 projectedCenter = rayDirection * projectionAmount;
+		Vector3 orthoPart = projectedCenter - cameraToObj;
+
+		float amount = DotProduct(orthoPart, axis);
+
+		selectedObj->transform.position = selectedObj->transform.position + axis * amount;
+
+	}
+
 	if(input.GetMouse(GLUT_RIGHT_BUTTON)){
 		float deltaX = prevX - input.mouseX;
 		float deltaY = prevY - input.mouseY;
@@ -128,14 +192,6 @@ void EditorScene::EditorUpdate(){
 		editorCamera.rotation =  Quaternion(Y_AXIS, yRot) * Quaternion(X_AXIS, xRot);
 	}
 	else if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
-
-		Vector3 mouseWorldPos = editorCamera.position;
-		mouseWorldPos = mouseWorldPos - (editorCamera.Up()    * mouseYNormalized);
-		mouseWorldPos = mouseWorldPos + (editorCamera.Right() * mouseXNormalized * (windowWidth/windowHeight));
-		mouseWorldPos = mouseWorldPos + (editorCamera.Forward() * 1.2);
-
-		Vector3 rayDirection = mouseWorldPos - editorCamera.position;
-
 		RaycastHit testHit = selectionSim.Raycast(editorCamera.position, rayDirection);
 		if(testHit.hit){
 			selectedObj = testHit.col->gameObject;
@@ -143,7 +199,10 @@ void EditorScene::EditorUpdate(){
 		else{
 			selectedObj = nullptr;
 		}
+
+		selectedAxis = -1;
 	}
+	
 
 	prevX = input.mouseX;
 	prevY = input.mouseY;
@@ -169,31 +228,35 @@ void EditorScene::EditorGUI(){
 		vertColMat->SetMat4Uniform("_perspMatrix", GetPerspectiveMatrix(aspectRatio,fov,nearClip,farClip));
 		vertColMat->SetMat4Uniform("_cameraMatrix", editorCamera.GetCameraMatrix());
 
-		vertColMat->SetVec4Uniform("_color", Vector4(1,0,0,1));
+		Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
+		Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
+		Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
+
+		glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 0, 0, 1);
 		glBegin(GL_LINES);
 		{
 			Vector3 origin = selectedObj->transform.GlobalPosition();
-			Vector3 to = origin + selectedObj->transform.Right();
+			Vector3 to = origin + rightVector/2;
 			glVertex3f(origin.x, origin.y, origin.z);
 			glVertex3f(to.x, to.y, to.z);
 		}
 		glEnd();
 
-		vertColMat->SetVec4Uniform("_color", Vector4(0,1,0,1));
+		glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 1, 0, 1);
 		glBegin(GL_LINES);
 		{
 			Vector3 origin = selectedObj->transform.GlobalPosition();
-			Vector3 to = origin + selectedObj->transform.Up();
+			Vector3 to = origin + upVector/2;
 			glVertex3f(origin.x, origin.y, origin.z);
 			glVertex3f(to.x, to.y, to.z);
 		}
 		glEnd();
 
-		vertColMat->SetVec4Uniform("_color", Vector4(0,0,1,1));
+		glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 0, 1, 1);
 		glBegin(GL_LINES);
 		{
 			Vector3 origin = selectedObj->transform.GlobalPosition();
-			Vector3 to = origin + selectedObj->transform.Forward();
+			Vector3 to = origin + forwardVector/2;
 			glVertex3f(origin.x, origin.y, origin.z);
 			glVertex3f(to.x, to.y, to.z);
 		}

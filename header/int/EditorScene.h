@@ -15,6 +15,8 @@ struct EditorScene : Scene{
 	PhysicsSim selectionSim;
 
 	GameObject* selectedObj;
+	int selectedAxis;
+	bool globalManipulator;
 
 	static EditorScene& getInstance(){
 		return getInstance(0,NULL);
