@@ -3,6 +3,9 @@
 #include "../header/ext/EasyBMP.h"
 #include "../header/int/ResourceManager.h"
 #include "../header/int/Material.h"
+#include "../header/int/FontBMPMaker.h"
+#include "../header/ext/simple-xml.h"
+#include "../header/int/LoadingUtilities.h"
 
 
 GuiElement::GuiElement(){
@@ -52,6 +55,18 @@ void GuiElement::OnGui() const{
 	glUseProgram(currProgram);
 }
 
+XMLElement GuiElement::Serialize(){
+	XMLElement elem;
+	elem.name = "GuiElement";
+
+	elem.attributes.push_back(XMLAttribute("name", name));
+	elem.attributes.push_back(XMLAttribute("width", to_string(tex->width)));
+	elem.attributes.push_back(XMLAttribute("height", to_string(tex->height)));
+	elem.attributes.push_back(XMLAttribute("position", EncodeVector2(position)));
+	elem.attributes.push_back(XMLAttribute("scale", EncodeVector2(scale)));
+
+	return elem;
+}
 
 void GuiSetSliderValue(GuiElement* elem, float value){
 	Texture* tex = elem->tex;
@@ -74,4 +89,91 @@ GuiElement::~GuiElement(){
 	if(tex != NULL){
 		delete tex;
 	}
+}
+
+GuiText::~GuiText(){
+	if(fuv.pixels != NULL){
+		delete[] fuv.pixels;
+		fuv.pixels = NULL;
+	}
+}
+
+GuiText::GuiText(MaterialManager* resources, string& _fuvFileName) 
+	: GuiElement()
+	, fuvFileName(_fuvFileName)
+{
+	text = "";
+	ImportFUV(fuvFileName, fuv);
+
+	Material* textMat = resources->GetMaterialByName("gui-txt");
+	guiProgram = textMat->shaderProgram;
+
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &texObj);
+	glBindTexture(GL_TEXTURE_2D, texObj);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fuv.imageSize, fuv.imageSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, fuv.pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+ 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glUniform1i(glGetUniformLocation(guiProgram, "_mainTex"), 0);
+}
+
+XMLElement GuiText::Serialize(){
+	XMLElement elem;
+	elem.name = "GuiText";
+
+	elem.attributes.push_back(XMLAttribute("name", name));
+	elem.attributes.push_back(XMLAttribute("fuv", fuvFileName));
+	elem.attributes.push_back(XMLAttribute("text", text));
+	elem.attributes.push_back(XMLAttribute("position", EncodeVector2(position)));
+	elem.attributes.push_back(XMLAttribute("scale", EncodeVector2(scale)));
+
+	return elem;
+}
+
+void GuiText::OnGui() const{
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+
+	glUseProgram(guiProgram);
+	glBindTexture(GL_TEXTURE_2D, texObj);
+
+	float sx = 2.0f / glutGet(GLUT_WINDOW_WIDTH) * scale.x;
+	float sy = 2.0f / glutGet(GLUT_WINDOW_HEIGHT) * scale.y; 
+
+	//Left alignement by default
+	float x = position.x - scale.x;
+	float y = position.y;
+
+	for(int i = 0; i < text.size(); i++){
+		char letter = text[i];
+		if(letter == '\n' || letter == '\r'){
+			x = position.x;
+			y += sy * fuv.fontSize; 
+			continue;
+		}
+
+		LetterUV uv = fuv.uvs[letter];
+		float xSize = (uv.xMax - uv.xMin) * fuv.imageSize * sx;
+		float ySize = (uv.yMax - uv.yMin) * fuv.imageSize * sy;
+
+		float x2 = x + uv.left * sx;
+		float y2 = y - uv.top * sy;
+		
+		glBegin(GL_TRIANGLE_STRIP);
+		{
+			glVertex4f(x2, -y2,                 uv.xMin, uv.yMin);
+			glVertex4f(x2, -y2 - ySize,         uv.xMin, uv.yMax);
+			glVertex4f(x2 + xSize, -y2,         uv.xMax, uv.yMin);
+			glVertex4f(x2 + xSize, -y2 - ySize, uv.xMax, uv.yMax);
+		}
+		glEnd();
+
+		x += uv.xAdvance * sx;
+		y += uv.yAdvance * sy;
+	}
+	glUseProgram(currProgram);
 }

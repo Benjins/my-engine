@@ -1,4 +1,5 @@
 #include "../header/int/Scene.h"
+#include "../header/int/EditorScene.h"
 #include "../header/int/GameObject.h"
 #include "../header/int/Component.h"
 #include "../header/int/Mat4.h"
@@ -41,29 +42,16 @@ int main(int argc, char** argv){
 	int retVal = RunAllTests();
 #else
 	
+#if 0
 	Scene& x = Scene::getInstance(argc, argv);
+#else
+	Scene& x = EditorScene::getInstance(argc, argv);
+#endif
 
 	x.Init();
 	x.LoadScene("Scene1.xml");
-	
-	//x.FindGameObject("mainCam");
 
 	x.Start();
-	
-
-	/*
-	BoxCollider y;
-	GameObject z;
-	y.gameObject = &z;
-	y.gameObject->transform.rotation = Quaternion(X_AXIS,3.141592653589*0.5);
-	y.size = Vector3(1, 0.1f, 1);
-	
-	RaycastHit hit = RaycastBox(&y, Vector3(0,0.2,-2), Vector3(0,0,1));
-
-	cout << (hit.hit ? "Hit" : "No Hit") << endl;
-	*/
-
-
 
 #endif
 
