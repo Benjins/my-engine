@@ -14,6 +14,8 @@ struct EditorScene : Scene{
 
 	PhysicsSim selectionSim;
 
+	GameObject* selectedObj;
+
 	static EditorScene& getInstance(){
 		return getInstance(0,NULL);
 	}

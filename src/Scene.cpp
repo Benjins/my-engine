@@ -153,6 +153,7 @@ void Scene::Start(){
 		physicsSim->Advance(deltaTime);
 
 		Render();
+		glutSwapBuffers();
 		glutPostRedisplay();
 
 		input.EndFrame();
@@ -273,8 +274,6 @@ void Scene::Render(){
 	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
 		(*iter)->OnGui();
 	}
-
-	glutSwapBuffers();
 }
 
 void Scene::OnMouse(int button, int state, int x, int y){

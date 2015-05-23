@@ -12,6 +12,8 @@ EditorScene::EditorScene(int argc, char** argv) : Scene(argc, argv){
 	glutMotionFunc(OnEditorPassiveMouseFunc);
 	glutKeyboardFunc(OnEditorKeyFunc);
 	glutKeyboardUpFunc(OnEditorKeyUpFunc);
+
+	selectedObj = nullptr;
 }
 
 void EditorScene::Start(){
@@ -62,6 +64,7 @@ void EditorScene::Start(){
 
 		Render();
 		EditorGUI();
+		glutSwapBuffers();
 		glutPostRedisplay();
 
 		input.EndFrame();
@@ -124,7 +127,7 @@ void EditorScene::EditorUpdate(){
 
 		editorCamera.rotation =  Quaternion(Y_AXIS, yRot) * Quaternion(X_AXIS, xRot);
 	}
-	else if(input.GetMouse(GLUT_LEFT_BUTTON)){
+	else if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
 
 		Vector3 mouseWorldPos = editorCamera.position;
 		mouseWorldPos = mouseWorldPos - (editorCamera.Up()    * mouseYNormalized);
@@ -135,13 +138,10 @@ void EditorScene::EditorUpdate(){
 
 		RaycastHit testHit = selectionSim.Raycast(editorCamera.position, rayDirection);
 		if(testHit.hit){
-			if(testHit.col->gameObject->material != nullptr){
-				double randVal = ((double)(rand() % 1000))/1000;
-				//cout << "Depth: " << testHit.depth << endl;
-				testHit.col->gameObject->transform.position.y += (randVal < 0.5f ? 0.002f : -0.002f);
-				//FindGameObject("reticle")->transform.SetParent(nullptr);
-				//FindGameObject("reticle")->transform.position = testHit.worldPos;
-			}
+			selectedObj = testHit.col->gameObject;
+		}
+		else{
+			selectedObj = nullptr;
 		}
 	}
 
@@ -150,7 +150,57 @@ void EditorScene::EditorUpdate(){
 }
 
 void EditorScene::EditorGUI(){
-	
+
+	Material* guiMat = resources.GetMaterialByName("gui");
+	Material* vertColMat = resources.GetMaterialByName("color");
+
+	if(selectedObj != nullptr){
+		glDisable(GL_DEPTH_TEST);
+		glLineWidth(5);
+		glUseProgram(vertColMat->shaderProgram);
+
+		float width = glutGet(GLUT_WINDOW_WIDTH);
+		float height = glutGet(GLUT_WINDOW_HEIGHT);
+		float aspectRatio = width/height;
+		float fov = 80;
+		float nearClip = 0.01f;
+		float farClip = 1000;
+
+		vertColMat->SetMat4Uniform("_perspMatrix", GetPerspectiveMatrix(aspectRatio,fov,nearClip,farClip));
+		vertColMat->SetMat4Uniform("_cameraMatrix", editorCamera.GetCameraMatrix());
+
+		vertColMat->SetVec4Uniform("_color", Vector4(1,0,0,1));
+		glBegin(GL_LINES);
+		{
+			Vector3 origin = selectedObj->transform.GlobalPosition();
+			Vector3 to = origin + selectedObj->transform.Right();
+			glVertex3f(origin.x, origin.y, origin.z);
+			glVertex3f(to.x, to.y, to.z);
+		}
+		glEnd();
+
+		vertColMat->SetVec4Uniform("_color", Vector4(0,1,0,1));
+		glBegin(GL_LINES);
+		{
+			Vector3 origin = selectedObj->transform.GlobalPosition();
+			Vector3 to = origin + selectedObj->transform.Up();
+			glVertex3f(origin.x, origin.y, origin.z);
+			glVertex3f(to.x, to.y, to.z);
+		}
+		glEnd();
+
+		vertColMat->SetVec4Uniform("_color", Vector4(0,0,1,1));
+		glBegin(GL_LINES);
+		{
+			Vector3 origin = selectedObj->transform.GlobalPosition();
+			Vector3 to = origin + selectedObj->transform.Forward();
+			glVertex3f(origin.x, origin.y, origin.z);
+			glVertex3f(to.x, to.y, to.z);
+		}
+		glEnd();
+
+		glEnable(GL_DEPTH);
+	}
 }
 
 static void OnEditorMouseFunc(int button, int state, int x, int y){
