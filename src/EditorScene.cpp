@@ -49,13 +49,19 @@ void EditorScene::Start(){
 
 	editorGui.push_back(panel);
 	
+	GuiText* posTxt = new GuiText(&resources, "arial_16.fuv");
+	posTxt->position = Vector2(1.55f,-0.8f);
+	posTxt->scale = Vector2(1,1);
+	posTxt->text = "Position: ";
 
-	GuiText* guiTxt = new GuiText(&resources, "arial_16.fuv");
-	guiTxt->position = Vector2(1.55f,-0.8f);
-	guiTxt->scale = Vector2(1,1);
-	guiTxt->text = "Position: ";
+	editorGui.push_back(posTxt);
 
-	editorGui.push_back(guiTxt);
+	GuiText* meshTxt = new GuiText(&resources, "arial_16.fuv");
+	meshTxt->position = Vector2(1.55f,-0.72f);
+	meshTxt->scale = Vector2(1,1);
+	meshTxt->text = "Mesh file: ";
+
+	editorGui.push_back(meshTxt);
 
 	running = true;
 	while(running){
@@ -249,9 +255,17 @@ void EditorScene::EditorUpdate(){
 	if(selectedObj){
 		Vector3 position = selectedObj->transform.position;
 		static_cast<GuiText*>(editorGui[1])->text = "Position: " + to_string(position.x) + ", " + to_string(position.y) + ", " + to_string(position.z);
+		GuiText* meshTxt = static_cast<GuiText*>(editorGui[2]);
+		if(selectedObj->mesh != nullptr){
+			meshTxt->text = "Mesh: " + selectedObj->mesh->fileName;
+		}
+		else{
+			meshTxt->text = "Mesh: ";
+		}
 	}
 	else{
 		static_cast<GuiText*>(editorGui[1])->text = "Position:";
+		static_cast<GuiText*>(editorGui[2])->text = "";
 	}
 
 	prevX = input.mouseX;

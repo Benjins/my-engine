@@ -38,11 +38,10 @@ int main(int argc, char** argv){
 #endif
 
 #ifdef TESTING 
-
 	int retVal = RunAllTests();
 #else
 	
-#if 1
+#if 0
 	Scene& x = Scene::getInstance(argc, argv);
 #else
 	Scene& x = EditorScene::getInstance(argc, argv);
