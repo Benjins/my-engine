@@ -38,7 +38,6 @@ int main(int argc, char** argv){
 #endif
 
 #ifdef TESTING 
-
 	int retVal = RunAllTests();
 #else
 	
@@ -49,7 +48,7 @@ int main(int argc, char** argv){
 #endif
 
 	x.Init();
-	x.LoadScene("Scene1.xml");
+	x.LoadScene("Editor_Scene.xml");
 
 	x.Start();
 

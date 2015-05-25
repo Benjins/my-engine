@@ -49,7 +49,7 @@ struct GuiText : GuiElement{
 	GLuint texObj;
 	string fuvFileName;
 
-	GuiText(MaterialManager* resources, string& _fuvFileName);
+	GuiText(MaterialManager* resources, const string& _fuvFileName);
 
 	virtual void OnGui() const;
 
