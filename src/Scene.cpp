@@ -30,7 +30,7 @@ Scene::Scene(){
 }
 
 Scene::Scene(int argc, char** argv){
-	drawCalls = list<DrawCall>();
+	drawCalls = vector<DrawCall>();
 	camera = NULL;
 	rb = NULL;
 	physicsSim = new PhysicsSim();

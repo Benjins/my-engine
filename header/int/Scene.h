@@ -8,6 +8,7 @@
 #include "Input.h"
 #include "ResourceManager.h"
 #include "GuiElement.h"
+#include "Light.h"
 #include <time.h>
 #include <random>
 
@@ -29,8 +30,8 @@ struct Scene{
 	vector<GuiElement*> guiElements;
 	
 protected:
-	list<GameObject*> objects;
-	list<DrawCall> drawCalls;
+	vector<GameObject*> objects;
+	vector<DrawCall> drawCalls;
 
 	int prevX;
 	int prevY;
