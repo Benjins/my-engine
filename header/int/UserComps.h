@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "Vector4.h"
 #include "Scene.h"
+#include "Animation.h"
 #include "../ext/simple-xml.h"
 #include <iostream>
 
@@ -15,6 +16,20 @@ using std::cout; using std::endl;
 struct TestComp : Component{
 	virtual void OnCollision(Collider* col){
 		cout << "Collision: " << col->gameObject->name << endl;
+	}
+};
+
+struct SimpleAnimation : Component{
+	Animation<Vector3> posAnim;
+	float currTime;
+
+	virtual void OnAwake(){
+		currTime = 0;
+	}
+	
+	virtual void OnUpdate(){
+		currTime += gameObject->scene->deltaTime;
+		gameObject->transform.position = posAnim.Evaluate(currTime);
 	}
 };
 

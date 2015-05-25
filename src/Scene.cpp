@@ -177,7 +177,7 @@ void Scene::OnUpdate(){
 #endif
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
-	cout << "Scene::Update(): " << deltaTime * 1000 << " ms.\n";
+	//cout << "Scene::Update(): " << deltaTime * 1000 << " ms.\n";
 	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 
 	/*
@@ -234,6 +234,12 @@ void Scene::OnPostLoad(){
 	//FindGameObject("enemy1")->AddComponent<EnemyComp>();
 	//FindGameObject("enemy2")->AddComponent<EnemyComp>();
 	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+
+	SimpleAnimation* anim = FindGameObject("stairs2")->AddComponent<SimpleAnimation>();
+	anim->posAnim.AddKeyFrame(Vector3(4 ,0.75f, 4), 0);
+	anim->posAnim.AddKeyFrame(Vector3(4, 1.75f, 4), 4);
+	anim->posAnim.AddKeyFrame(Vector3(4, 0.75f, 3), 9);
+	anim->posAnim.AddKeyFrame(Vector3(6, 1.75f, 5), 10);
 }
 
 void Scene::Render(){
