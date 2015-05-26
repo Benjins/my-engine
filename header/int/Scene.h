@@ -26,8 +26,9 @@ struct Scene{
 	Input input;
 	MaterialManager resources;
 
-	Vector3 lightDir;
+	//Vector3 lightDir;
 	vector<GuiElement*> guiElements;
+	vector<Light> lights;
 	
 protected:
 	vector<GameObject*> objects;

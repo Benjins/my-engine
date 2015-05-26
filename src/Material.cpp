@@ -41,6 +41,14 @@ void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum S
     Lengths[0]= strlen(pShaderText);
     glShaderSource(ShaderObj, 1, p, Lengths);
     glCompileShader(ShaderObj);
+
+	GLint success;
+	glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		GLchar InfoLog[1024];
+		glGetShaderInfoLog(ShaderObj, sizeof(InfoLog), NULL, InfoLog);
+		fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
+	}
 	
     glAttachShader(ShaderProgram, ShaderObj);
 }
@@ -58,6 +66,15 @@ void Material::Switch(string _shaderName, string textureName){
 		AddShader(shaderProgram, fshaderText.c_str(), GL_FRAGMENT_SHADER);
 		
 		glLinkProgram(shaderProgram);
+
+		GLint Success;
+		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &Success);
+		if (Success == 0) {
+			GLchar ErrorLog[1024];
+			glGetProgramInfoLog(shaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
+			fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
+		}
+
 		glValidateProgram(shaderProgram);
 		
 		if(mainTexture != NULL){

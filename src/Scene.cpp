@@ -36,8 +36,6 @@ Scene::Scene(int argc, char** argv){
 	physicsSim = new PhysicsSim();
 	input = Input();
 
-	lightDir = Vector3(1,1,3).Normalized();
-
 	myRandom = default_random_engine(time(NULL));
 
 	glutInit(&argc, argv);
@@ -180,7 +178,6 @@ void Scene::OnUpdate(){
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
 
-	lightDir = Rotate(lightDir, Quaternion(Y_AXIS,deltaTime));
 	cout << "Scene::Update(): " << deltaTime * 1000 << " ms.\n";
 	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 
@@ -238,6 +235,16 @@ void Scene::OnPostLoad(){
 	//FindGameObject("enemy1")->AddComponent<EnemyComp>();
 	//FindGameObject("enemy2")->AddComponent<EnemyComp>();
 	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+
+	Light light;
+	light.position = Vector3(0,5,3);
+	light.isDirectional = false;
+	lights.push_back(light);
+
+	Light secondLight;
+	secondLight.rotation = Quaternion(Y_AXIS, 0.3f) * Quaternion(X_AXIS, 0.1f);
+	secondLight.isDirectional = true;
+	lights.push_back(secondLight);
 }
 
 void Scene::Render(){
@@ -264,6 +271,18 @@ void Scene::Render(){
 	for(auto iter = drawCalls.rbegin(); iter != drawCalls.rend(); iter++){
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
+
+		Vector3 lightVectors[6];
+		bool isDirectional[6];
+
+		for(int i = 0; i < lights.size(); i++){
+			lightVectors[i] = lights[i].isDirectional ? Rotate(Z_AXIS, lights[i].rotation) : lights[i].position;
+			isDirectional[i] = lights[i].isDirectional;
+		}
+
+		glUniform1i(iter->obj->material->GetUniformByName("numLights"), lights.size());
+		glUniform3fv(iter->obj->material->GetUniformByName("lightVectors"), lights.size(), (GLfloat*)lightVectors);
+		glUniform1iv(iter->obj->material->GetUniformByName("lightIsDirectional"), lights.size(), (GLint*)isDirectional);
 
 		iter->Draw();	
 	}

@@ -60,7 +60,6 @@ void DrawCall::Draw() const{
 	glUseProgram(material->shaderProgram);
 
 	glUniformMatrix4fv(material->GetUniformByName("_objectMatrix"), 1, GL_TRUE,  &obj->transform.LocalToGlobalMatrix().m[0][0]);
-	glUniform3fv(material->GetUniformByName("lightDirecton"), 1, (float*)&obj->scene->lightDir);
 	
 	glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertices);
