@@ -137,6 +137,19 @@ void Scene::RemoveObject(GameObject* obj){
 	}
 }
 
+int Scene::AddLight(){
+	int newId = 0;
+	if(lights.size() > 0){
+		newId = lights[lights.size() - 1].id + 1;
+	}
+
+	Light newLight = {};
+	newLight.id = newId;
+	lights.push_back(newLight);
+
+	return newId;
+}
+
 void Scene::Start(){
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 	timeval start;
@@ -231,20 +244,7 @@ void PhysicsUpdate(){
 }
 
 void Scene::OnPostLoad(){
-	//FindGameObject("myObj2_2")->AddComponent<MatChangeOnHit>();
-	//FindGameObject("enemy1")->AddComponent<EnemyComp>();
-	//FindGameObject("enemy2")->AddComponent<EnemyComp>();
 	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
-
-	Light light;
-	light.position = Vector3(0,5,3);
-	light.isDirectional = false;
-	lights.push_back(light);
-
-	Light secondLight;
-	secondLight.rotation = Quaternion(Y_AXIS, 0.3f) * Quaternion(X_AXIS, 0.1f);
-	secondLight.isDirectional = true;
-	lights.push_back(secondLight);
 }
 
 void Scene::Render(){
@@ -276,7 +276,7 @@ void Scene::Render(){
 		bool isDirectional[6];
 
 		for(int i = 0; i < lights.size(); i++){
-			lightVectors[i] = lights[i].isDirectional ? Rotate(Z_AXIS, lights[i].rotation) : lights[i].position;
+			lightVectors[i] = lights[i].isDirectional ? lights[i].direction : lights[i].position;
 			isDirectional[i] = lights[i].isDirectional;
 		}
 

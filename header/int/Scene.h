@@ -59,6 +59,8 @@ public:
 	Scene();
 	Scene(int argc, char** argv);
 
+	int AddLight();
+
 protected:
 	//Hide this, because it'll break things
 	Scene(const Scene& orig){}

@@ -19,6 +19,7 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(FireGun);
 	DEFINE_USER_COMPONENT(EnemyComp);
 	DEFINE_USER_COMPONENT(CameraControl);
+	DEFINE_USER_COMPONENT(LightComponent);
 	return nullptr;
 }
 

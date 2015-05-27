@@ -7,24 +7,33 @@
 <Material name='enemyMat' shader='shader' texture='Texture.bmp'/>
 <Material name='enemyMat2' shader='shader' texture='Texture.bmp'/>
 <Material name='gui-txt' shader='guitext'/>
+<Material name='monkey' shader='shader' texture='Monkey.bmp'/>
 <Material name='shaderTexture2.bmp' shader='shader' texture='Texture2.bmp'/>
 <GuiElement name='' width='300' height='1' position='0.100000,0.100000' scale='0.200000,0.020000'/>
 <GuiText name='healthText' fuv='CODE_Bold64.fuv' text='Health: 0' position='-0.600000,0.900000' scale='0.400000,0.400000'/>
 <GameObject name='myObj'>
-<Transform position='0.000000,3.000000,0.000000' rotation='-0.124050,0.000000,0.992278,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Transform position='0.121761,3.061710,-0.396604' rotation='-0.010371,0.000000,0.999949,0.000000' scale='1.000000,1.000000,1.000000'/>
 <Material name='floorMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
 </GameObject>
 <GameObject name='mainCam'>
-<Transform position='-5.160930,0.699939,5.546057' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Transform position='-1.475951,0.900000,-3.028517' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='0.200000,0.200000,0.200000'/>
 </GameObject>
 <GameObject name='mainCamSub'>
-<Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='-0.106059,-0.004643,0.993398,-0.043489' scale='1.000000,1.000000,1.000000'/>
+<Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='0.920645,0.145033,0.358046,-0.056404' scale='1.000000,1.000000,1.000000'/>
 <Camera/>
 <FireGun/>
 <CameraControl speed='6.000000' velocity='0.000000' isGrounded='T' health='0.000000'/>
+</GameObject>
+<GameObject name='light1'>
+<Transform position='0.000000,5.000000,3.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<LightComponent intensity='1.000000' isDirectional='F'/>
+</GameObject>
+<GameObject name='light2'>
+<Transform position='0.000000,-5.000000,0.000000' rotation='0.906308,0.000000,0.000000,0.422618' scale='1.000000,1.000000,1.000000'/>
+<LightComponent intensity='1.000000' isDirectional='T'/>
 </GameObject>
 <GameObject name='reticle'>
 <Transform parent='mainCamSub' position='0.000000,0.000000,0.100000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.001000,0.001000,0.001000'/>
@@ -43,7 +52,7 @@
 <Mesh source='test.obj'/>
 </GameObject>
 <GameObject name='myObj2_1'>
-<Transform parent='myObj' position='-2.000000,1.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.200000,0.200000,0.200000'/>
+<Transform parent='myObj' position='-2.048065,1.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.200000,0.200000,0.200000'/>
 <Material name='myMat'/>
 <Mesh source='test.obj'/>
 </GameObject>
@@ -54,33 +63,38 @@
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
 <MatChangeOnHit/>
 </GameObject>
+<GameObject name='monkey'>
+<Transform position='-2.487024,4.153775,-2.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Material name='monkey'/>
+<Mesh source='Monkey.obj'/>
+</GameObject>
 <GameObject name='wall1'>
-<Transform position='-2.000000,1.010000,1.000000' rotation='0.906308,0.000000,0.422618,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Transform position='-2.000000,0.684211,1.000000' rotation='0.906308,0.000000,0.422618,0.000000' scale='1.000000,1.000000,1.000000'/>
 <Material name='floorMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.100000,1.000000'/>
 </GameObject>
 <GameObject name='stairs1'>
-<Transform position='2.000000,0.000000,-2.000000' rotation='0.906308,0.422618,0.000000,0.000000' scale='4.000000,1.000000,1.000000'/>
+<Transform position='2.162069,3.618957,6.274128' rotation='0.906308,0.422618,0.000000,0.000000' scale='4.000000,1.000000,1.000000'/>
 <Material name='floorMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
 </GameObject>
 <GameObject name='stairs2'>
-<Transform position='4.000000,0.000000,4.000000' rotation='0.906308,0.000000,0.000000,0.422618' scale='2.000000,1.000000,1.000000'/>
+<Transform position='4.181658,0.750388,4.000000' rotation='0.906308,0.000000,0.000000,0.422618' scale='2.000000,1.000000,1.000000'/>
 <Material name='floorMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
 </GameObject>
 <GameObject name='enemy1'>
-<Transform position='-4.322885,0.827048,0.646026' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
+<Transform position='-7.476508,1.100000,3.238837' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
 <Material name='enemyMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-<EnemyComp speed='3.000000' health='4'/>
+<EnemyComp speed='3.000000' health='5'/>
 </GameObject>
 <GameObject name='enemy2'>
-<Transform position='-0.346280,0.800000,2.870031' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
+<Transform position='-5.744300,1.100000,-1.247778' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
 <Material name='enemyMat2'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>

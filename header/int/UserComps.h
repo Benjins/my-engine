@@ -6,11 +6,67 @@
 #include "PhysicsSim.h"
 #include "GameObject.h"
 #include "Vector4.h"
+#include "Light.h"
 #include "Scene.h"
+#include "LoadingUtilities.h"
 #include "../ext/simple-xml.h"
 #include <iostream>
 
 using std::cout; using std::endl;
+
+struct LightComponent : Component{
+	float intensity;
+	int id;
+	bool isDirectional;
+
+	virtual void OnAwake(){
+		id = gameObject->scene->AddLight();
+	}
+
+	virtual void OnUpdate(){
+		for(auto iter = gameObject->scene->lights.begin(); iter != gameObject->scene->lights.end(); iter++){
+			if(iter->id == id){
+				iter->intensity = intensity;
+				iter->isDirectional = isDirectional;
+				if(isDirectional){
+					iter->direction = gameObject->transform.Forward();
+				}
+				else{
+					iter->position = gameObject->transform.GlobalPosition();
+				}
+				break;
+			}
+		}
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "LightComponent";
+		elem.attributes.emplace_back("intensity", to_string(intensity));
+		elem.attributes.emplace_back("isDirectional", isDirectional ? "T" : "F");
+		return elem;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+		for(const XMLAttribute& attr : elem.attributes){
+			if(attr.name == "intensity"){
+				intensity = atof(attr.data.c_str());
+			}
+			else if(attr.name == "isDirectional"){
+				isDirectional = (attr.data == "T");
+			}
+		}
+	}
+
+	virtual ~LightComponent(){
+		for(auto iter = gameObject->scene->lights.begin(); iter != gameObject->scene->lights.end(); iter++){
+			if(iter->id == id){
+				gameObject->scene->lights.erase(iter);
+				break;
+			}
+		}
+	}
+};
 
 struct TestComp : Component{
 	virtual void OnCollision(Collider* col){

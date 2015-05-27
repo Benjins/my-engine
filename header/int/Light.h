@@ -3,8 +3,9 @@
 
 struct Light{
 	Vector3 position;
-	Quaternion rotation;
+	Vector3 direction;
 	float intensity;
+	int id;
 	bool isDirectional;
 };
 

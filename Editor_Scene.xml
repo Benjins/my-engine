@@ -27,6 +27,14 @@
 <FireGun/>
 <CameraControl speed='6.000000' velocity='0.000000' isGrounded='F' health='1.000000'/>
 </GameObject>
+<GameObject name='light1'>
+<Transform position='0,5,3' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<LightComponent intensity="1" isDirectional="F"/>
+</GameObject>
+<GameObject name='light2'>
+<Transform position='0,-5,0' rotation='0.906308,0.000000,0.000000,0.422618' scale='1.000000,1.000000,1.000000'/>
+<LightComponent intensity="1" isDirectional="T"/>
+</GameObject>
 <GameObject name='reticle'>
 <Transform parent='mainCamSub' position='0.000000,0.000000,0.100000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.001000,0.001000,0.001000'/>
 <Material name='myMat2'/>
