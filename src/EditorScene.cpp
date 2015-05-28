@@ -103,6 +103,11 @@ void EditorScene::RecalculateSelectionSim(){
 			boundingBox->gameObject = obj;
 			selectionSim.staticBoxBodies.push_back(boundingBox);
 		}
+		else{
+			BoxCollider* boundingBox = new BoxCollider(Vector3(0,0,0), Vector3(0.4f, 0.4f, 0.4f));
+			boundingBox->gameObject = obj;
+			selectionSim.staticBoxBodies.push_back(boundingBox);
+		}
 	}
 }
 
@@ -289,8 +294,14 @@ void EditorScene::EditorGUI(){
 		float nearClip = 0.01f;
 		float farClip = 1000;
 
-		vertColMat->SetMat4Uniform("_perspMatrix", GetPerspectiveMatrix(aspectRatio,fov,nearClip,farClip));
-		vertColMat->SetMat4Uniform("_cameraMatrix", editorCamera.GetCameraMatrix());
+		//vertColMat->SetMat4Uniform("_perspMatrix", GetPerspectiveMatrix(aspectRatio,fov,nearClip,farClip));
+		//vertColMat->SetMat4Uniform("_cameraMatrix", editorCamera.GetCameraMatrix());
+
+		Mat4x4 perspMatrix = GetPerspectiveMatrix(aspectRatio,fov,nearClip,farClip);
+		Mat4x4 camMatrix = editorCamera.GetCameraMatrix();
+
+		glUniformMatrix4fv(glGetUniformLocation(vertColMat->shaderProgram,  "_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(vertColMat->shaderProgram,  "_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 
 		Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
 		Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();

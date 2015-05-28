@@ -7,5 +7,5 @@ uniform mat4 _cameraMatrix;
 
 void main()
 {
-    gl_Position =  _perspMatrix * _cameraMatrix * vec4(Position, 1.0);
+    gl_Position = _perspMatrix * _cameraMatrix * vec4(Position, 1.0);
 }
