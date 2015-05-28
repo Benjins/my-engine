@@ -24,13 +24,13 @@ void main()
 	for(int i = 0; i < numLights; i++){
 		if(lightIsDirectional[i]){
 			lighting += (dot(normal, lightVectors[i]) + 1)/2;
-			color.r = 0;
 		}
 		else{
 			vec3 difference = lightVectors[i] - pos;
 			float distance = length(difference);
-			float thisLighting = dot(normal, difference/distance) * 5/distance;
-			lighting += (thisLighting+1)/2;
+			float normalDot = dot(normal, difference/distance);
+			float thisLighting =  normalDot;//  min(distance, 3);
+			lighting += max((thisLighting+1)/2, 0);
 		}
 	}
 	

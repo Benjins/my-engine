@@ -5,6 +5,7 @@
 #include "RaycastHit.h"
 #include "PhysicsSim.h"
 #include "GameObject.h"
+#include "Material.h"
 #include "Vector4.h"
 #include "Light.h"
 #include "Scene.h"
@@ -37,6 +38,10 @@ struct LightComponent : Component{
 				break;
 			}
 		}
+	}
+
+	virtual void OnEditorUpdate(){
+		OnUpdate();
 	}
 
 	virtual XMLElement Serialize(){

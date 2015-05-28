@@ -1,4 +1,5 @@
 #include "../header/int/EditorScene.h"
+#include "../header/int/UserComps.h"
 #include "../header/int/Input.h"
 #include "../header/int/RaycastHit.h"
 #include "../header/int/Collider.h"
@@ -273,6 +274,12 @@ void EditorScene::EditorUpdate(){
 		static_cast<GuiText*>(editorGui[2])->text = "";
 	}
 
+	for(GameObject* obj : objects){
+		for(Component* comp : obj->components){
+			comp->OnEditorUpdate();
+		}
+	}
+
 	prevX = input.mouseX;
 	prevY = input.mouseY;
 }
@@ -306,6 +313,21 @@ void EditorScene::EditorGUI(){
 		Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
 		Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
 		Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
+
+		glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 1, 0.8f, 1);
+
+		for(GameObject* obj : objects){
+			if(obj->GetComponent<LightComponent>() != nullptr){
+				glBegin(GL_LINES);
+				{
+					Vector3 origin = obj->transform.GlobalPosition();
+					Vector3 to = origin + X_AXIS/2;
+					glVertex3f(origin.x, origin.y, origin.z);
+					glVertex3f(to.x, to.y, to.z);
+				}
+				glEnd();
+			}
+		}
 
 		glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 0, 0, 1);
 		glBegin(GL_LINES);

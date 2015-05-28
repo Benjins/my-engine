@@ -11,10 +11,12 @@ struct Component;
 struct Material;
 struct Model;
 struct Scene;
+struct EditorScene;
 struct Collider;
 
 struct GameObject{
 	friend Scene; //Scene can access non-templated AddComponent
+	friend EditorScene;
 
 	private:
 	list<Component*> components;

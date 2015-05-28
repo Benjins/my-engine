@@ -280,9 +280,10 @@ void Scene::Render(){
 			isDirectional[i] = lights[i].isDirectional;
 		}
 
-		glUniform1i(iter->obj->material->GetUniformByName("numLights"), lights.size());
-		glUniform3fv(iter->obj->material->GetUniformByName("lightVectors"), lights.size(), (GLfloat*)lightVectors);
-		glUniform1iv(iter->obj->material->GetUniformByName("lightIsDirectional"), lights.size(), (GLint*)isDirectional);
+		
+		glUniform1i(glGetUniformLocation(iter->obj->material->shaderProgram, "numLights"), lights.size());
+		glUniform3fv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightVectors"), lights.size(), (GLfloat*)lightVectors);
+		glUniform1iv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightIsDirectional"), lights.size(), (GLint*)isDirectional);
 
 		iter->Draw();	
 	}

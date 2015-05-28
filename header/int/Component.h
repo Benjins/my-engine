@@ -15,6 +15,8 @@ struct Component{
 	
 	virtual void OnUpdate();
 
+	virtual void OnEditorUpdate(){}
+
 	virtual void OnCollision(Collider* col);
 
 	virtual XMLElement Serialize();
