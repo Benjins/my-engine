@@ -268,22 +268,21 @@ void Scene::Render(){
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
+	Vector3 lightVectors[6];
+	GLint isDirectional[6];
+
+	for(int i = 0; i < lights.size(); i++){
+		lightVectors[i] = lights[i].isDirectional ? lights[i].direction : lights[i].position;
+		isDirectional[i] = lights[i].isDirectional ? 1 : 0;
+	}
+
 	for(auto iter = drawCalls.rbegin(); iter != drawCalls.rend(); iter++){
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 
-		Vector3 lightVectors[6];
-		bool isDirectional[6];
-
-		for(int i = 0; i < lights.size(); i++){
-			lightVectors[i] = lights[i].isDirectional ? lights[i].direction : lights[i].position;
-			isDirectional[i] = lights[i].isDirectional;
-		}
-
-		
 		glUniform1i(glGetUniformLocation(iter->obj->material->shaderProgram, "numLights"), lights.size());
 		glUniform3fv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightVectors"), lights.size(), (GLfloat*)lightVectors);
-		glUniform1iv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightIsDirectional"), lights.size(), (GLint*)isDirectional);
+		glUniform1iv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightIsDirectional"), lights.size(), isDirectional);
 
 		iter->Draw();	
 	}
