@@ -43,11 +43,13 @@ void BoxCollider::OnAwake(){
 }
 
 BoxCollider::~BoxCollider(){
-	vector<BoxCollider*>& boxBodies = gameObject->scene->physicsSim->staticBoxBodies;
-	for(auto iter = boxBodies.begin(); iter != boxBodies.end(); iter++){
-		if(*iter == this){
-			boxBodies.erase(iter);
-			break;
+	if(gameObject != nullptr && gameObject->scene != nullptr){
+		vector<BoxCollider*>& boxBodies = gameObject->scene->physicsSim->staticBoxBodies;
+		for(auto iter = boxBodies.begin(); iter != boxBodies.end(); iter++){
+			if(*iter == this){
+				boxBodies.erase(iter);
+				break;
+			}
 		}
 	}
 }
@@ -79,11 +81,13 @@ void SphereCollider::OnAwake(){
 }
 
 SphereCollider::~SphereCollider(){
-	vector<SphereCollider*>& sphereBodies = gameObject->scene->physicsSim->staticSphereBodies;
-	for(auto iter = sphereBodies.begin(); iter != sphereBodies.end(); iter++){
-		if(*iter == this){
-			sphereBodies.erase(iter);
-			break;
+	if(gameObject != nullptr && gameObject->scene != nullptr){
+		vector<SphereCollider*>& sphereBodies = gameObject->scene->physicsSim->staticSphereBodies;
+		for(auto iter = sphereBodies.begin(); iter != sphereBodies.end(); iter++){
+			if(*iter == this){
+				sphereBodies.erase(iter);
+				break;
+			}
 		}
 	}
 }

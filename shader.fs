@@ -24,14 +24,13 @@ void main()
 	for(int i = 0; i < numLights; i++){
 		if(lightIsDirectional[i] != 0){
 			lighting += (dot(normal, lightVectors[i]) + 1)/2;
-			//discard;
 		}
 		else{
 			vec3 difference = lightVectors[i] - pos;
 			float distance = length(difference);
 			float normalDot = dot(normal, difference/distance);
 			float clampedDist = min(distance, 5);
-			float thisLighting = normalDot * (5 - clampedDist)/5;
+			float thisLighting = normalDot * (5 - clampedDist)/2;
 			lighting += (thisLighting+1)/2;
 		}
 	}

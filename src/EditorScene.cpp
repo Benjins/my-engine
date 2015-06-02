@@ -321,7 +321,7 @@ void EditorScene::EditorGUI(){
 				glBegin(GL_LINES);
 				{
 					Vector3 origin = obj->transform.GlobalPosition();
-					Vector3 to = origin + X_AXIS/2;
+					Vector3 to = origin + Vector3(0.4f,0.4f,0.4f);
 					glVertex3f(origin.x, origin.y, origin.z);
 					glVertex3f(to.x, to.y, to.z);
 				}
