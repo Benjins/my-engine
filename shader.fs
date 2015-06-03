@@ -30,8 +30,8 @@ void main()
 			float distance = length(difference);
 			float normalDot = dot(normal, difference/distance);
 			float clampedDist = min(distance, 5);
-			float thisLighting = normalDot * (5 - clampedDist)/2;
-			lighting += (thisLighting+1)/2;
+			float thisLighting = (normalDot+1)/2 * (5 - clampedDist);
+			lighting += thisLighting;
 		}
 	}
 	
