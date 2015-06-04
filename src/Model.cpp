@@ -89,6 +89,44 @@ void Model::CalculateNormals(){
 	}
 }
 
+void Model::CalculateTangents(){
+	for(int i = 0; i < vertices.size(); i++){
+		Vector3 totalTangent = Vector3(0,0,0);
+		int totalTangentCount = 0;
+
+		for(int j = 0; j < faces.size(); j++){
+			Face face = faces[j];
+			if(face.v0 == i || face.v1 == i || face.v2 == i){
+				Vector3 v0 = vertices[face.v0].position;
+				Vector3 v1 = vertices[face.v1].position;
+				Vector3 v2 = vertices[face.v2].position;
+
+				Vector3 edge1 = (v1 - v0).Normalized();
+				Vector3 edge2 = (v2 - v0).Normalized();
+
+				Vector2 uvEdge1 = (face.uv1 - face.uv0).Normalized();
+				Vector2 uvEdge2 = (face.uv2 - face.uv0).Normalized();
+
+				//uvEdge1.x * a + uvEdge2.x * b = 1;
+				//uvEdge1.y * a + uvEdge2.y * b = 0;
+				//uvEdge1.x * aOverB * b + uvEdge2.x * b = 1;
+				//1 / (uvEdge1.x * aOverB + uvEdge2.x) = b;
+
+				float aOverB = -uvEdge2.y/uvEdge1.y;
+				float b = 1 / (uvEdge1.x * aOverB + uvEdge2.x);
+				float a  = aOverB * b;
+
+				Vector3 tangent = edge1 * a + edge2 * b;
+				totalTangent = totalTangent + tangent;
+				totalTangentCount++;
+			}
+		}
+
+		Vector3 finalTangent = totalTangent / totalTangentCount;
+		vertices[i].tangent = finalTangent;
+	}
+}
+
 void Model::ImportFromOBJ(string fileName){
 	srand(time(NULL));
 	ifstream importer;
@@ -125,6 +163,7 @@ void Model::ImportFromOBJ(string fileName){
 	}
 
 	CalculateNormals();
+	CalculateTangents();
 }
 
 Vertex ParseVertexLine(string line){

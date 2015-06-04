@@ -25,6 +25,7 @@ struct Vertex{
 	Vector3 position;
 	Vector3 color;
 	Vector3 normal;
+	Vector3 tangent;
 	//Vector3 uv;
 	
 	Vertex(void);
@@ -47,6 +48,7 @@ struct Model{
 	void ImportFromOBJ(string fileName);
 
 	void CalculateNormals();
+	void CalculateTangents();
 };
 
 Vertex ParseVertexLine(string line);
