@@ -42,7 +42,7 @@ int main(int argc, char** argv){
 	int retVal = RunAllTests();
 #else
 	
-#if 0
+#if 1
 	Scene& x = Scene::getInstance(argc, argv);
 #else
 	Scene& x = EditorScene::getInstance(argc, argv);

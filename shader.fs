@@ -25,7 +25,9 @@ void main()
 	texCol.a = 1.0;
 	vec4 color = mix(texCol, _color, 0.5);
 	
-	vec3 usedNormal = normal * bumpCol.z + tangent * bumpCol.y + cross(normal, tangent) * bumpCol.x;
+	vec3 actualTangent = normalize(tangent - dot(tangent, normal) * normal);
+	bumpCol = bumpCol * 2.0 - vec4(1.0,1.0,1.0,0.0);
+	vec3 usedNormal = normal * bumpCol.z + actualTangent * bumpCol.y + cross(normal, actualTangent) * bumpCol.x;
 	
 	float lighting = 0.05;
 	for(int i = 0; i < numLights; i++){

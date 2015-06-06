@@ -3,6 +3,7 @@
 #include "../header/int/Mat4.h"
 #include "../header/int/Vector4.h"
 #include "../header/int/ResourceManager.h"
+#include "../header/ext/EasyBMP.h"
 #include <fstream>
 #include <iostream>
 #include <cstring>
@@ -104,7 +105,13 @@ void Material::Switch(string _shaderName, string textureName, string bumpMapName
 			bumpMap->Load(GL_TEXTURE1);
 		}
 		else{
-			bumpMap = NULL;
+			bumpMap = new Texture(1,1);
+			bumpMap->textureTarget = GL_TEXTURE_2D;
+			RGBApixel pix = {};
+			pix.Blue = 255;
+			pix.Alpha = 255;
+			bumpMap->SetPixel(0,0,pix);
+			bumpMap->Apply(GL_TEXTURE1);
 		}
 	}
 	else{
