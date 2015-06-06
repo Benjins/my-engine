@@ -66,7 +66,7 @@
 </GameObject>
 <GameObject name='monkey'>
 <Transform position='-2.487024,4.153775,-2.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
-<Material name='monkey'/>
+<Material name='stairMat'/>
 <Mesh source='Monkey.obj'/>
 </GameObject>
 <GameObject name='wall1'>

@@ -18,14 +18,14 @@ uniform int numLights;
 
 void main()
 {
-	if(abs(dot(tangent, normal)) > 0.01){discard;}
+	//if(abs(dot(tangent, normal)) > 0.01){discard;}
 	
 	vec4 texCol  = texture2D(_mainTex, uv_coord.st);
 	vec4 bumpCol = texture2D(_bumpMap, uv_coord.st);
 	texCol.a = 1.0;
 	vec4 color = mix(texCol, _color, 0.5);
 	
-	vec3 usedNormal = bumpCol.xyz;//normal * bumpCol.z + tangent * bumpCol.y + cross(normal, tangent) * bumpCol.x;
+	vec3 usedNormal = normal * bumpCol.z + tangent * bumpCol.y + cross(normal, tangent) * bumpCol.x;
 	
 	float lighting = 0.05;
 	for(int i = 0; i < numLights; i++){
