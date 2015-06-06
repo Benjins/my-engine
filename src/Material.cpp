@@ -21,14 +21,16 @@ using std::ifstream; using std::cout; using std::cerr; using std::strlen;
 Material::Material(void){
 	matName = "";
 	mainTexture = NULL;
+	bumpMap = NULL;
 	sharedMaterial = false;
 }
 
 
 //Requires an OpenGL context
-Material::Material(string _shaderName, string textureName){
+Material::Material(string _shaderName, string textureName, string bumpMapName){
 	mainTexture = NULL;
-	Switch(_shaderName, textureName);
+	bumpMap = NULL;
+	Switch(_shaderName, textureName, bumpMapName);
 	sharedMaterial = false;
 }
 
@@ -53,7 +55,7 @@ void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum S
     glAttachShader(ShaderProgram, ShaderObj);
 }
 
-void Material::Switch(string _shaderName, string textureName){
+void Material::Switch(string _shaderName, string textureName, string bumpMapName){
 	shaderProgram = glCreateProgram();
 	shaderName = _shaderName;
 	matName = _shaderName + textureName;
@@ -76,6 +78,14 @@ void Material::Switch(string _shaderName, string textureName){
 		}
 
 		glValidateProgram(shaderProgram);
+
+		uniformNames = GetUniformNames(vshaderText + fshaderText);
+		for(int i = 0; i < uniformNames.size(); i++){
+			uniforms[i] = glGetUniformLocation(shaderProgram, uniformNames[i].c_str());
+		}
+
+		cameraUniform = GetUniformByName("_cameraMatrix");
+		objectMatrixUniform = GetUniformByName("_objectMatrix");
 		
 		if(mainTexture != NULL){
 			delete mainTexture;
@@ -83,20 +93,18 @@ void Material::Switch(string _shaderName, string textureName){
 
 		if(textureName != ""){
 			mainTexture = new Texture(GL_TEXTURE_2D,textureName);
-			mainTexture->Load();
-
-			uniformNames = GetUniformNames(vshaderText + fshaderText);
-
-			for(int i = 0; i < uniformNames.size(); i++){
-				uniforms[i] = glGetUniformLocation(shaderProgram, uniformNames[i].c_str());
-			}
-
-			textureUniform = GetUniformByName("_mainTex");
-			cameraUniform = GetUniformByName("_cameraMatrix");
-			objectMatrixUniform = GetUniformByName("_objectMatrix");
+			mainTexture->Load(GL_TEXTURE0);
 		}
 		else{
 			mainTexture = NULL;
+		}
+
+		if(bumpMapName != ""){
+			bumpMap = new Texture(GL_TEXTURE_2D,bumpMapName);
+			bumpMap->Load(GL_TEXTURE1);
+		}
+		else{
+			bumpMap = NULL;
 		}
 	}
 	else{
@@ -279,5 +287,8 @@ GLuint Material::GetUniformByIndex(int index){
 Material::~Material(){
 	if(mainTexture != NULL){
 		delete mainTexture;
+	}
+	if(bumpMap != NULL){
+		delete bumpMap;
 	}
 }

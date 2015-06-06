@@ -22,13 +22,16 @@ Material* MaterialManager::GetMaterialByName(string name){
 int GetMaterialIdByName(string name);
 Material* GetMaterialById(int id);
 
-Material* MaterialManager::LoadMaterial(string matName, string shaderName, string textureName){
+Material* MaterialManager::LoadMaterial(string matName, string shaderName, string textureName, string bumpMapName){
 	for(int i = 0; i < matAlloc; i++){
 		if(materials[i].matName == ""){
-			materials[i].Switch(shaderName, textureName);
+			materials[i].Switch(shaderName, textureName, bumpMapName);
 			materials[i].matName = matName;
 			if(materials[i].mainTexture != NULL){
 				materials[i].mainTexture->fileName = textureName;
+			}
+			if(materials[i].bumpMap != NULL){
+				materials[i].bumpMap->fileName = bumpMapName;
 			}
 			return &(materials[i]);
 		}

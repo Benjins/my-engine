@@ -26,7 +26,7 @@ Texture::Texture(GLenum TextureTarget, const std::string& _fileName){
 }
 
 //Requires OpenGL context
-void Texture::Load(void){
+void Texture::Load(GLenum TextureTarget){
     BMP image;
 	
 	image.ReadFromFile(fileName.c_str());
@@ -41,7 +41,7 @@ void Texture::Load(void){
 	}
 
     glGenTextures(1, &textureObj);
-    Apply();
+    Apply(TextureTarget);
 }
 
 void Texture::SetPixel(int x, int y, float r, float g, float b){
@@ -64,8 +64,10 @@ void Texture::GetPixel(int x, int y){
 	//Not implemented yet.
 }
 
-void Texture::Apply(){
+void Texture::Apply(GLenum TextureTarget){
 	if(pixelData != NULL){
+
+		glActiveTexture(TextureTarget);
 		glBindTexture(textureTarget, textureObj);
 		glTexImage2D(textureTarget, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixelData);
 		glTexParameterf(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

@@ -64,7 +64,7 @@ Quaternion ParseQuaternion(string encoded){
 }
 
 void LoadMaterialXML(Scene* scene, XMLElement elem){
-	string matName="", shaderName="",textureName="";
+	string matName="", shaderName="",textureName="",bumpMapName="";
 	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
 		if(iter->name == "name"){
 			matName = iter->data;
@@ -75,9 +75,12 @@ void LoadMaterialXML(Scene* scene, XMLElement elem){
 		else if(iter->name == "texture"){
 			textureName = iter->data;
 		}
+		else if(iter->name == "bumpMap"){
+			bumpMapName = iter->data;
+		}
 	}
 
-	scene->resources.LoadMaterial(matName, shaderName, textureName);
+	scene->resources.LoadMaterial(matName, shaderName, textureName, bumpMapName);
 
 }
 
@@ -252,6 +255,12 @@ void Scene::SaveScene(string fileName){
 			if(mat->mainTexture != NULL){
 				attr.name = "texture";
 				attr.data = mat->mainTexture->fileName;
+				matElem.attributes.push_back(attr);
+			}
+
+			if(mat->bumpMap != NULL){
+				attr.name = "bumpMap";
+				attr.data = mat->bumpMap->fileName;
 				matElem.attributes.push_back(attr);
 			}
 
