@@ -139,6 +139,7 @@ void GuiText::OnGui() const{
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 
 	glUseProgram(guiProgram);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texObj);
 
 	float sx = 2.0f / glutGet(GLUT_WINDOW_WIDTH) * scale.x;
