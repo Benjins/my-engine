@@ -4,7 +4,7 @@
 <Material name='myMat' shader='shader' texture='Texture.bmp'/>
 <Material name='myMat2' shader='shader' texture='Texture.bmp'/>
 <Material name='floorMat' shader='shader' texture='Texture2.bmp'/>
-<Material name='stairMat' shader='shader' texture='Texture2.bmp' bumpMap='grass-dirt.bmp'/>
+<Material name='stairMat' shader='shader' texture='grass-dirt.bmp' bumpMap='grass-dirt-norm.bmp'/>
 <Material name='enemyMat' shader='shader' texture='Texture.bmp'/>
 <Material name='enemyMat2' shader='shader' texture='Texture.bmp'/>
 <Material name='gui-txt' shader='guitext'/>
