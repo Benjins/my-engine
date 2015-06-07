@@ -35,6 +35,7 @@ void GuiElement::OnGui() const{
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 
 	glUseProgram(guiProgram);
+	glActiveTexture(GL_TEXTURE0);
 	if(tex != NULL){
 		glBindTexture(tex->textureTarget, tex->textureObj);
 	}

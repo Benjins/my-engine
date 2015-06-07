@@ -291,7 +291,7 @@ void EditorScene::EditorGUI(){
 
 	if(selectedObj != nullptr){
 		glDisable(GL_DEPTH_TEST);
-		glLineWidth(5);
+		glLineWidth(8);
 		glUseProgram(vertColMat->shaderProgram);
 
 		float width = glutGet(GLUT_WINDOW_WIDTH);
@@ -320,14 +320,16 @@ void EditorScene::EditorGUI(){
 			if(obj->GetComponent<LightComponent>() != nullptr){
 				glBegin(GL_LINES);
 				{
-					Vector3 origin = obj->transform.GlobalPosition();
-					Vector3 to = origin + Vector3(0.4f,0.4f,0.4f);
+					Vector3 origin = obj->transform.GlobalPosition();// - Vector3(0.2f,0.2f,0.2f);
+					Vector3 to = origin + obj->transform.Forward() * 0.4f;
 					glVertex3f(origin.x, origin.y, origin.z);
 					glVertex3f(to.x, to.y, to.z);
 				}
 				glEnd();
 			}
 		}
+
+		glLineWidth(5);
 
 		glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 0, 0, 1);
 		glBegin(GL_LINES);

@@ -3,12 +3,13 @@
 <Material name='color' shader='col' bumpMap=''/>
 <Material name='myMat' shader='shader' texture='Texture.bmp' bumpMap=''/>
 <Material name='myMat2' shader='shader' texture='Texture.bmp' bumpMap=''/>
-<Material name='floorMat' shader='shader' texture='Texture2.bmp' bumpMap=''/>
+<Material name='floorMat' shader='shader' texture='grass-dirt.bmp' bumpMap='grass-dirt-norm.bmp' uvScale='5,5'/>
 <Material name='stairMat' shader='shader' texture='grass-dirt.bmp' bumpMap='grass-dirt-norm.bmp'/>
 <Material name='enemyMat' shader='shader' texture='Texture.bmp' bumpMap=''/>
 <Material name='enemyMat2' shader='shader' texture='Texture.bmp' bumpMap=''/>
 <Material name='gui-txt' shader='guitext' bumpMap=''/>
 <Material name='monkey' shader='shader' texture='Monkey.bmp' bumpMap=''/>
+<Material name='worm' shader='shader' texture='Worm_Diff.bmp' bumpMap='Panel_Floor_N.bmp'/>
 <Material name='shaderTexture2.bmp' shader='shader' texture='Texture2.bmp' bumpMap=''/>
 <GuiElement name='' width='300' height='1' position='0.100000,0.100000' scale='0.200000,0.020000'/>
 <GuiText name='healthText' fuv='CODE_Bold64.fuv' text='Health: 100' position='-0.600000,0.900000' scale='0.400000,0.400000'/>
@@ -37,13 +38,13 @@
 <LightComponent intensity='1.000000' isDirectional='T'/>
 </GameObject>
 <GameObject name='reticle'>
-<Transform parent='mainCamSub' position='0.000000,0.000000,0.100000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.001000,0.001000,0.001000'/>
+<Transform parent='mainCamSub' position='0.0100000,-0.01000000,0.300000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.003000,0.003000,0.003000'/>
 <Material name='myMat2'/>
 <Mesh source='test.obj'/>
 </GameObject>
 <GameObject name='floor'>
 <Transform position='0.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='3.000000,0.500000,3.000000'/>
-<Material name='stairMat'/>
+<Material name='floorMat'/>
 <Mesh source='floor.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='4.000000,1.000000,4.000000'/>
 </GameObject>
@@ -68,6 +69,11 @@
 <Transform position='-2.487024,4.153775,-2.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
 <Material name='stairMat'/>
 <Mesh source='Monkey.obj'/>
+</GameObject>
+<GameObject name='worm'>
+<Transform position='-3.487024,5.153775,-5.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Material name='worm'/>
+<Mesh source='Worm.obj'/>
 </GameObject>
 <GameObject name='wall1'>
 <Transform position='-2.000000,0.684211,1.000000' rotation='0.906308,0.000000,0.422618,0.000000' scale='1.000000,1.000000,1.000000'/>

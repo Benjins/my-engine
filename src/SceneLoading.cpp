@@ -65,6 +65,8 @@ Quaternion ParseQuaternion(string encoded){
 
 void LoadMaterialXML(Scene* scene, XMLElement elem){
 	string matName="", shaderName="",textureName="",bumpMapName="";
+	Vector2 uvOffset = Vector2(0,0), uvScale = Vector2(1,1);
+
 	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
 		if(iter->name == "name"){
 			matName = iter->data;
@@ -78,10 +80,17 @@ void LoadMaterialXML(Scene* scene, XMLElement elem){
 		else if(iter->name == "bumpMap"){
 			bumpMapName = iter->data;
 		}
+		else if(iter->name == "uvScale"){
+			uvScale = ParseVector2(iter->data);
+		}
+		else if(iter->name == "uvOffset"){
+			uvOffset = ParseVector2(iter->data);
+		}
 	}
 
-	scene->resources.LoadMaterial(matName, shaderName, textureName, bumpMapName);
-
+	Material* mat = scene->resources.LoadMaterial(matName, shaderName, textureName, bumpMapName);
+	mat->uvScale = uvScale;
+	mat->uvOffset = uvOffset;
 }
 
 void Scene::LoadGameObjectXML(const XMLElement& elem){

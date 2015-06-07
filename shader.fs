@@ -27,9 +27,9 @@ void main()
 	
 	vec3 actualTangent = normalize(tangent - dot(tangent, normal) * normal);
 	bumpCol = bumpCol * 2.0 - vec4(1.0,1.0,1.0,0.0);
-	vec3 usedNormal = normal * bumpCol.z + actualTangent * bumpCol.y + cross(normal, actualTangent) * bumpCol.x;
+	vec3 usedNormal = normal * bumpCol.b + actualTangent * bumpCol.g + cross(normal, actualTangent) * bumpCol.r;
 	
-	float lighting = 0.05;
+	float lighting = 0.1;
 	for(int i = 0; i < numLights; i++){
 		if(lightIsDirectional[i] != 0){
 			lighting += (dot(usedNormal, lightVectors[i]) + 1)/2;

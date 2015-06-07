@@ -36,6 +36,9 @@ struct Material{
 	GLuint textureUniform;
 	GLuint cameraUniform;
 	GLuint objectMatrixUniform;
+
+	Vector2 uvOffset;
+	Vector2 uvScale;
 	
 	Material(void);
 

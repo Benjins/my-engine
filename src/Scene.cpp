@@ -276,7 +276,7 @@ void Scene::Render(){
 		isDirectional[i] = lights[i].isDirectional ? 1 : 0;
 	}
 
-	for(auto iter = drawCalls.rbegin(); iter != drawCalls.rend(); iter++){
+	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 

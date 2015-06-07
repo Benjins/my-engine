@@ -26,6 +26,8 @@ Material* MaterialManager::LoadMaterial(string matName, string shaderName, strin
 	for(int i = 0; i < matAlloc; i++){
 		if(materials[i].matName == ""){
 			materials[i].Switch(shaderName, textureName, bumpMapName);
+			materials[i].uvOffset = Vector2(0,0);
+			materials[i].uvScale = Vector2(1,1);
 			materials[i].matName = matName;
 			if(materials[i].mainTexture != NULL){
 				materials[i].mainTexture->fileName = textureName;

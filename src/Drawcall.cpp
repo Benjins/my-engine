@@ -66,6 +66,12 @@ void DrawCall::Draw() const{
 	Material* material = obj->material;
 	glUseProgram(material->shaderProgram);
 
+	GLfloat uvMatrix[9] = { material->uvScale.x, 0, material->uvOffset.x,
+							0, material->uvScale.y, material->uvOffset.y,
+							0,                      0,                 1};
+
+	glUniformMatrix3fv(material->GetUniformByName("_uvMatrix"), 1, GL_TRUE, uvMatrix);
+
 	glUniformMatrix4fv(material->GetUniformByName("_objectMatrix"), 1, GL_TRUE,  &obj->transform.LocalToGlobalMatrix().m[0][0]);
 	glUniform1i(glGetUniformLocation(material->shaderProgram, "_mainTex"), 0);
 	if(material->bumpMap != nullptr){

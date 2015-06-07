@@ -86,6 +86,21 @@ struct HitComponent : Component{
 	virtual ~HitComponent(){}
 };
 
+struct AniamteUVOffset : Component{
+
+	//Animation<Vector2> anim;
+
+	virtual void OnAwake(){
+		
+	}
+
+	virtual void Onupdate(){
+		
+	}
+
+	virtual ~AniamteUVOffset(){}
+};
+
 struct FireGun : Component{
 	Input* input;
 	PhysicsSim* physicsSim;

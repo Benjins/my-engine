@@ -15,7 +15,7 @@ struct MaterialManager{
 	unsigned int matAlloc;
 
 public:
-	MaterialManager(int matCount = 25);
+	MaterialManager(int matCount = 40);
 
 	Material* GetMaterialByName(string name);
 	int GetMaterialIdByName(string name);
