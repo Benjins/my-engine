@@ -33,14 +33,16 @@ struct AnimationComponent : Component{
 
 	virtual XMLElement Serialize(){
 		XMLElement elem;
+		elem.name = "AnimationComponent";
 		elem.attributes.emplace_back("type", EncodeAnimationType(animType));
-		elem.attributes.emplace_back("type", EncodeAnimationTarget(animTarget));
+		elem.attributes.emplace_back("target", EncodeAnimationTarget(animTarget));
 		elem.attributes.emplace_back("loop", (loop ? "T" : "F"));
 		elem.attributes.emplace_back("autoplay", (playAutomatically ? "T" : "F"));
 
 		if(animType == AnimationType::Float){
 			for(const KeyFrame<float>& frame : floatAnim.keyFrames){
 				XMLElement child;
+				child.name = "KeyFrame";
 				child.attributes.emplace_back("time", to_string(frame.time));
 				child.attributes.emplace_back("value", to_string(frame.value));
 				elem.children.push_back(child);
@@ -49,6 +51,7 @@ struct AnimationComponent : Component{
 		else if(animType == AnimationType::Vector2){
 			for(const KeyFrame<Vector2>& frame : vec2Anim.keyFrames){
 				XMLElement child;
+				child.name = "KeyFrame";
 				child.attributes.emplace_back("time", to_string(frame.time));
 				child.attributes.emplace_back("value", EncodeVector2(frame.value));
 				elem.children.push_back(child);
@@ -57,6 +60,7 @@ struct AnimationComponent : Component{
 		else if(animType == AnimationType::Vector3){
 			for(const KeyFrame<Vector3>& frame : vec3Anim.keyFrames){
 				XMLElement child;
+				child.name = "KeyFrame";
 				child.attributes.emplace_back("time", to_string(frame.time));
 				child.attributes.emplace_back("value", EncodeVector3(frame.value));
 				elem.children.push_back(child);

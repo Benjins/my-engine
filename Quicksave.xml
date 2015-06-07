@@ -1,34 +1,37 @@
 <Scene name='my-engine'>
-<Material name='gui' shader='gui'/>
-<Material name='color' shader='col'/>
-<Material name='myMat' shader='shader' texture='Texture.bmp'/>
-<Material name='myMat2' shader='shader' texture='Texture.bmp'/>
-<Material name='floorMat' shader='shader' texture='Texture2.bmp'/>
-<Material name='enemyMat' shader='shader' texture='Texture.bmp'/>
-<Material name='enemyMat2' shader='shader' texture='Texture.bmp'/>
-<Material name='gui-txt' shader='guitext'/>
-<Material name='monkey' shader='shader' texture='Monkey.bmp'/>
-<Material name='shaderTexture2.bmp' shader='shader' texture='Texture2.bmp'/>
+<Material name='gui' shader='gui' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='color' shader='col' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='myMat' shader='shader' texture='Texture.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='myMat2' shader='shader' texture='Texture.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='floorOwnMat' shader='shader' texture='grass-dirt.bmp' bumpMap='grass-dirt-norm.bmp' uvScale='5.000000,5.000000' uvOffset='0.000000,0.925000'/>
+<Material name='floorMat' shader='shader' texture='grass-dirt.bmp' bumpMap='grass-dirt-norm.bmp' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='stairMat' shader='shader' texture='grass-dirt.bmp' bumpMap='grass-dirt-norm.bmp' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='enemyMat' shader='shader' texture='Texture.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='enemyMat2' shader='shader' texture='Texture.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='gui-txt' shader='guitext' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='monkey' shader='shader' texture='Monkey.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='worm' shader='shader' texture='Worm_Diff.bmp' bumpMap='Panel_Floor_N.bmp' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+<Material name='shaderTexture2.bmp' shader='shader' texture='Texture2.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
 <GuiElement name='' width='300' height='1' position='0.100000,0.100000' scale='0.200000,0.020000'/>
-<GuiText name='healthText' fuv='CODE_Bold64.fuv' text='Health: 0' position='-0.600000,0.900000' scale='0.400000,0.400000'/>
+<GuiText name='healthText' fuv='CODE_Bold64.fuv' text='Health: 98' position='-0.600000,0.900000' scale='0.400000,0.400000'/>
 <GameObject name='myObj'>
-<Transform position='0.121761,3.061710,-0.396604' rotation='-0.010371,0.000000,0.999949,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Transform position='0.121761,3.061710,-0.396604' rotation='0.988140,0.000000,0.153557,0.000000' scale='1.000000,1.000000,1.000000'/>
 <Material name='floorMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
 </GameObject>
 <GameObject name='mainCam'>
-<Transform position='-1.475951,0.900000,-3.028517' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Transform position='0.000000,0.900000,-2.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='0.200000,0.200000,0.200000'/>
 </GameObject>
 <GameObject name='mainCamSub'>
-<Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='0.920645,0.145033,0.358046,-0.056404' scale='1.000000,1.000000,1.000000'/>
+<Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='-0.701835,-0.035121,0.710584,-0.035559' scale='1.000000,1.000000,1.000000'/>
 <Camera/>
 <FireGun/>
-<CameraControl speed='6.000000' velocity='0.000000' isGrounded='T' health='0.000000'/>
+<CameraControl speed='6.000000' velocity='0.000000' isGrounded='T' health='0.983000'/>
 </GameObject>
 <GameObject name='light1'>
-<Transform position='0.000000,5.000000,3.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Transform position='0.000000,1.121765,3.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
 <LightComponent intensity='1.000000' isDirectional='F'/>
 </GameObject>
 <GameObject name='light2'>
@@ -36,15 +39,19 @@
 <LightComponent intensity='1.000000' isDirectional='T'/>
 </GameObject>
 <GameObject name='reticle'>
-<Transform parent='mainCamSub' position='0.000000,0.000000,0.100000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.001000,0.001000,0.001000'/>
+<Transform parent='mainCamSub' position='0.010000,-0.010000,0.300000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.003000,0.003000,0.003000'/>
 <Material name='myMat2'/>
 <Mesh source='test.obj'/>
 </GameObject>
 <GameObject name='floor'>
 <Transform position='0.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='3.000000,0.500000,3.000000'/>
-<Material name='floorMat'/>
+<Material name='floorOwnMat'/>
 <Mesh source='floor.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='4.000000,1.000000,4.000000'/>
+<AnimationComponent type='vector2' target='uvOffset' loop='T' autoplay='T'>
+<KeyFrame time='0.000000' value='0.000000,0.000000'/>
+<KeyFrame time='1.000000' value='0.000000,1.000000'/>
+</AnimationComponent>
 </GameObject>
 <GameObject name='myObj2'>
 <Transform parent='myObj' position='2.000000,1.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.200000,0.200000,0.200000'/>
@@ -65,8 +72,13 @@
 </GameObject>
 <GameObject name='monkey'>
 <Transform position='-2.487024,4.153775,-2.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
-<Material name='monkey'/>
+<Material name='stairMat'/>
 <Mesh source='Monkey.obj'/>
+</GameObject>
+<GameObject name='worm'>
+<Transform position='-3.487024,5.153775,-5.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+<Material name='worm'/>
+<Mesh source='Worm.obj'/>
 </GameObject>
 <GameObject name='wall1'>
 <Transform position='-2.000000,0.684211,1.000000' rotation='0.906308,0.000000,0.422618,0.000000' scale='1.000000,1.000000,1.000000'/>
@@ -76,25 +88,25 @@
 </GameObject>
 <GameObject name='stairs1'>
 <Transform position='2.162069,3.618957,6.274128' rotation='0.906308,0.422618,0.000000,0.000000' scale='4.000000,1.000000,1.000000'/>
-<Material name='floorMat'/>
+<Material name='stairMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
 </GameObject>
 <GameObject name='stairs2'>
 <Transform position='4.181658,0.750388,4.000000' rotation='0.906308,0.000000,0.000000,0.422618' scale='2.000000,1.000000,1.000000'/>
-<Material name='floorMat'/>
+<Material name='stairMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
 </GameObject>
 <GameObject name='enemy1'>
-<Transform position='-7.476508,1.100000,3.238837' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
+<Transform position='-4.736687,1.100000,4.164381' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
 <Material name='enemyMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
 <EnemyComp speed='3.000000' health='5'/>
 </GameObject>
 <GameObject name='enemy2'>
-<Transform position='-5.744300,1.100000,-1.247778' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
+<Transform position='-1.744254,1.100000,3.137789' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
 <Material name='enemyMat2'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>

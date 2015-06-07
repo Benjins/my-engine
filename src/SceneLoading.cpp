@@ -347,6 +347,9 @@ void Scene::SaveScene(string fileName){
 				matElem.attributes.push_back(attr);
 			}
 
+			matElem.attributes.emplace_back("uvScale", EncodeVector2(mat->uvScale));
+			matElem.attributes.emplace_back("uvOffset", EncodeVector2(mat->uvOffset));
+
 			scene.children.push_back(matElem);
 		}
 	}
