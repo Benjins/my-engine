@@ -10,10 +10,158 @@
 #include "Light.h"
 #include "Scene.h"
 #include "LoadingUtilities.h"
+#include "Animation.h"
 #include "../ext/simple-xml.h"
 #include <iostream>
+#include <assert.h>
 
 using std::cout; using std::endl;
+
+struct AnimationComponent : Component{
+	//Tried putting these in a union, caused issues with destruction...
+	Animation<float> floatAnim;
+	Animation<Vector2> vec2Anim;
+	Animation<Vector3> vec3Anim;
+
+	AnimationType animType;
+	AnimationTarget animTarget;
+	float currentTime;
+
+	bool loop;
+	bool playAutomatically;
+	bool isPlaying;
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.attributes.emplace_back("type", EncodeAnimationType(animType));
+		elem.attributes.emplace_back("type", EncodeAnimationTarget(animTarget));
+		elem.attributes.emplace_back("loop", (loop ? "T" : "F"));
+		elem.attributes.emplace_back("autoplay", (playAutomatically ? "T" : "F"));
+
+		if(animType == AnimationType::Float){
+			for(const KeyFrame<float>& frame : floatAnim.keyFrames){
+				XMLElement child;
+				child.attributes.emplace_back("time", to_string(frame.time));
+				child.attributes.emplace_back("value", to_string(frame.value));
+				elem.children.push_back(child);
+			}
+		}
+		else if(animType == AnimationType::Vector2){
+			for(const KeyFrame<Vector2>& frame : vec2Anim.keyFrames){
+				XMLElement child;
+				child.attributes.emplace_back("time", to_string(frame.time));
+				child.attributes.emplace_back("value", EncodeVector2(frame.value));
+				elem.children.push_back(child);
+			}
+		}
+		else if(animType == AnimationType::Vector3){
+			for(const KeyFrame<Vector3>& frame : vec3Anim.keyFrames){
+				XMLElement child;
+				child.attributes.emplace_back("time", to_string(frame.time));
+				child.attributes.emplace_back("value", EncodeVector3(frame.value));
+				elem.children.push_back(child);
+			}
+		}
+
+		return elem;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+		for(const XMLAttribute& attr : elem.attributes){
+			if(attr.name == "type"){
+				animType = ParseAnimationType(attr.data);
+			}
+			else if(attr.name == "target"){
+				animTarget = ParseAnimationTarget(attr.data);
+			}
+			else if(attr.name == "loop"){
+				loop = attr.data == "T";
+			}
+			else if(attr.name == "autoplay"){
+				playAutomatically = attr.data == "T";
+			}
+		}
+
+		//Maybe verify target and type?
+
+		for(const XMLElement& child : elem.children){
+			if(child.name == "KeyFrame"){
+				float floatVal;
+				Vector2 vec2Val;
+				Vector3 vec3Val;
+				float time;
+				for(const XMLAttribute& attr : child.attributes){
+					if(attr.name == "time"){
+						time = atof(attr.data.c_str());
+					}
+					else if(attr.name == "value"){
+						if(animType == AnimationType::Float){
+							floatVal = atof(attr.data.c_str());
+						}
+						else if(animType == AnimationType::Vector2){
+							vec2Val = ParseVector2(attr.data);
+						}
+						else if(animType == AnimationType::Vector3){
+							vec3Val = ParseVector3(attr.data);
+						}
+					}
+				}
+
+				if(animType == AnimationType::Float){
+					floatAnim.AddKeyFrame(floatVal, time);
+				}
+				else if(animType == AnimationType::Vector2){
+					vec2Anim.AddKeyFrame(vec2Val, time);
+				}
+				else if(animType == AnimationType::Vector3){
+					vec3Anim.AddKeyFrame(vec3Val, time);
+				}
+			}
+		}
+	}
+
+	virtual void OnAwake(){
+		currentTime = 0;
+		isPlaying = playAutomatically;
+	}
+
+	virtual void OnUpdate(){
+		float length = 0;
+		if(animType == AnimationType::Float){
+			length = floatAnim.Length();
+		}
+		else if(animType == AnimationType::Vector2){
+			length = vec2Anim.Length();
+		}
+		else if(animType == AnimationType::Vector3){
+			length = vec3Anim.Length();
+		}
+
+		if(isPlaying){
+			currentTime += gameObject->scene->deltaTime;
+			if(loop && currentTime >= length){
+				currentTime -= length;
+			}
+		}
+
+		if(animTarget == AnimationTarget::Position){
+			assert(animType == AnimationType::Vector3);
+			gameObject->transform.position = vec3Anim.Evaluate(currentTime);
+		}
+		else if(animTarget == AnimationTarget::Scale){
+			assert(animType == AnimationType::Vector3);
+			gameObject->transform.scale = vec3Anim.Evaluate(currentTime);
+		}
+		else if(animTarget == AnimationTarget::UVOffset){
+			assert(animType == AnimationType::Vector2);
+			gameObject->material->uvOffset = vec2Anim.Evaluate(currentTime);
+		}
+		else if(animTarget == AnimationTarget::UVScale){
+			assert(animType == AnimationType::Vector2);
+			gameObject->material->uvScale = vec2Anim.Evaluate(currentTime);
+		}
+	}
+};
 
 struct LightComponent : Component{
 	float intensity;
@@ -79,6 +227,20 @@ struct TestComp : Component{
 	}
 };
 
+struct SimpleAnimation : Component{
+	Animation<Vector3> posAnim;
+	float currTime;
+
+	virtual void OnAwake(){
+		currTime = 0;
+	}
+	
+	virtual void OnUpdate(){
+		currTime += gameObject->scene->deltaTime;
+		gameObject->transform.position = posAnim.Evaluate(currTime);
+	}
+};
+
 struct HitComponent : Component{
 
 	virtual void OnHit(RaycastHit hitInfo, GameObject* sender) = 0;
@@ -86,19 +248,23 @@ struct HitComponent : Component{
 	virtual ~HitComponent(){}
 };
 
-struct AniamteUVOffset : Component{
+struct AnimateUVOffset : Component{
 
-	//Animation<Vector2> anim;
+	Animation<Vector2> anim;
+	float currentTime;
 
 	virtual void OnAwake(){
-		
+		anim.AddKeyFrame(Vector2(0,0), 0);
+		anim.AddKeyFrame(Vector2(5,5), 20);
+		currentTime = 0;
 	}
 
-	virtual void Onupdate(){
-		
+	virtual void OnUpdate(){
+		currentTime += gameObject->scene->deltaTime;
+		gameObject->material->uvOffset = anim.Evaluate(currentTime);
 	}
 
-	virtual ~AniamteUVOffset(){}
+	virtual ~AnimateUVOffset(){}
 };
 
 struct FireGun : Component{

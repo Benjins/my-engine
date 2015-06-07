@@ -20,6 +20,7 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(EnemyComp);
 	DEFINE_USER_COMPONENT(CameraControl);
 	DEFINE_USER_COMPONENT(LightComponent);
+	DEFINE_USER_COMPONENT(AnimationComponent);
 	return nullptr;
 }
 
@@ -33,6 +34,43 @@ string EncodeVector2(Vector2 vec){
 
 string EncodeQuaternion(Quaternion quat){
 	return to_string(quat.w) + "," + to_string(quat.x) + "," + to_string(quat.y)+ "," + to_string(quat.z);
+}
+
+string EncodeAnimationType(AnimationType type){
+	switch(type){
+	case AnimationType::Float:
+		return "float";
+		break;
+	case AnimationType::Vector2:
+		return "vector2";
+		break;
+	case AnimationType::Vector3:
+		return "vector3";
+		break;
+	default:
+		return "";
+		break;
+	}
+}
+
+string EncodeAnimationTarget(AnimationTarget target){
+	switch(target){
+	case AnimationTarget::Position:
+		return "position";
+		break;
+	case AnimationTarget::Scale:
+		return "scale";
+		break;
+	case AnimationTarget::UVOffset:
+		return "uvOffset";
+		break;
+	case AnimationTarget::UVScale:
+		return "uvScale";
+		break;
+	default:
+		return "";
+		break;
+	}
 }
 
 Vector3 ParseVector3(string encoded){
@@ -61,6 +99,42 @@ Quaternion ParseQuaternion(string encoded){
 	float z = atof(parts[3].c_str());
 
 	return Quaternion(w,x,y,z);
+}
+
+AnimationType ParseAnimationType(string encoded){
+	if(encoded == "float"){
+		return AnimationType::Float;
+	}
+	else if(encoded == "vector2"){
+		return AnimationType::Vector2;
+	}
+	else if(encoded == "vector3"){
+		return AnimationType::Vector3;
+	}
+	else{
+		cout << "\nError: could not understand animation type of: '" << encoded << "'.\n";
+		return AnimationType::Float;
+	}
+}
+
+AnimationTarget ParseAnimationTarget(string encoded){
+	if(encoded == "position"){
+		return AnimationTarget::Position;
+	}
+	else if(encoded == "scale"){
+		return AnimationTarget::Scale;
+	}
+	else if(encoded == "uvOffset"){
+		return AnimationTarget::UVOffset;
+	}
+	else if(encoded == "uvScale"){
+		return AnimationTarget::UVScale;
+	}
+	else{
+		cout << "\nError: could not understand animation type of: '" << encoded << "'.\n";
+		return AnimationTarget::Position;
+	}
+	
 }
 
 void LoadMaterialXML(Scene* scene, XMLElement elem){

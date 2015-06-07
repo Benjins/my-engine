@@ -245,6 +245,8 @@ void PhysicsUpdate(){
 
 void Scene::OnPostLoad(){
 	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+
+	//FindGameObject("floor")->AddComponent<AnimateUVOffset>();
 }
 
 void Scene::Render(){
