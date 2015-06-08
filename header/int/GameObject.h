@@ -11,11 +11,18 @@ struct Component;
 struct Material;
 struct Model;
 struct Scene;
+struct EditorScene;
 struct Collider;
 
 struct GameObject{
-	private : list<Component*> components;
-	private : int _id;
+	friend Scene; //Scene can access non-templated AddComponent
+	friend EditorScene;
+
+	private:
+	list<Component*> components;
+	int _id;
+
+	void AddComponent(Component* comp);
 	
 	public:
 	SC_Transform transform;

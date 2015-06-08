@@ -19,6 +19,8 @@ struct Pathfinding{
 
 	void HookUpNodes(float maxDistance = 20);
 
+	void AddNode(Vector3 pos);
+
 	vector<Vector3> FindPath(Vector3 source, Vector3 destination);
 };
 

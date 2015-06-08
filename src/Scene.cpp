@@ -7,6 +7,8 @@
 #include "../header/int/RigidBody.h"
 #include "../header/int/Collider.h"
 #include "../header/int/PhysicsSim.h"
+#include "../header/int/FontBMPMaker.h"
+#include "../header/ext/simple-xml.h"
 #include <time.h>
 #include <cstdlib>
 
@@ -22,303 +24,13 @@
 #include <GL/freeglut.h>
 #endif
 
-struct TestComp : Component{
-	virtual void OnCollision(Collider* col){
-		cout << "Collision: " << col->gameObject->name << endl;
-	}
-};
-
-struct HitComponent : Component{
-
-	virtual void OnHit(RaycastHit hitInfo, GameObject* sender) = 0;
-
-	virtual ~HitComponent(){}
-};
-
-struct FireGun : Component{
-	Input* input;
-	PhysicsSim* physicsSim;
-	SC_Transform* camera;
-
-	FireGun(){
-		
-	}
-
-	virtual void OnAwake(){
-		input = &gameObject->scene->input;
-		physicsSim = gameObject->scene->physicsSim;
-		camera = gameObject->scene->camera;
-	}
-
-	virtual void OnUpdate(){
-		if(input->GetMouseUp(GLUT_LEFT_BUTTON)){
-			RaycastHit hit = physicsSim->Raycast(camera->GlobalPosition(), camera->Forward());
-			if(hit.hit){
-				HitComponent* hitComp = hit.col->gameObject->GetComponent<HitComponent>();
-				if(hitComp != NULL){
-					hitComp->OnHit(hit, gameObject);
-				}
-			}
-		}
-	}
-
-	virtual ~FireGun(){}
-};
-
-struct MatChangeOnHit : HitComponent{
-	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
-		double x = rand();
-		double ratio = x/RAND_MAX;
-		gameObject->material->SetVec4Uniform("_color", Vector4(ratio,1.0,ratio,1.0));
-	}
-
-	virtual ~MatChangeOnHit(){}
-};
-
-struct RotateConstantly : Component{
-	float rotationSpeed;
-
-	RotateConstantly(){
-		rotationSpeed = 30;
-	}
-
-	virtual void OnUpdate(){
-		gameObject->transform.rotation = gameObject->transform.rotation * Quaternion(Y_AXIS, rotationSpeed * gameObject->scene->deltaTime);
-	}
-};
-
-struct EnemyComp : HitComponent{
-	Vector3 currentTarget;
-	float speed;
-	PhysicsSim* physics;
-	GameObject* player;
-
-	int health;
-
-	EnemyComp(){
-		speed = 2;
-		health = 5;
-	}
-
-	void ResetTarget(){
-		float x = ((float)(rand() % 500 - 250)) / 25;
-		float z = ((float)(rand() % 500 - 250)) / 25;
-		currentTarget = Vector3(x, 0, z);
-	}
-
-	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
-		health--;
-		float ratio = ((float)health)/5;
-		gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
-		if(health <= 0){
-			gameObject->scene->RemoveObject(gameObject);	
-		}
-	}
-
-	virtual void OnAwake(){
-		ResetTarget();
-		physics = gameObject->scene->physicsSim;
-		player = gameObject->scene->FindGameObject("mainCam");
-	}
-
-	virtual void OnUpdate(){
-		Vector3 toPlayer = player->transform.position - gameObject->transform.position;
-		RaycastHit hitPlayer = physics->Raycast(gameObject->transform.position, toPlayer);
-		
-		Vector3 moveVec;
-
-		if(hitPlayer.hit && hitPlayer.col->gameObject == player){
-			moveVec = toPlayer;
-		}
-		else{
-			moveVec = currentTarget - gameObject->transform.position;
-		}
-		
-		moveVec.y = 0;
-
-		if(moveVec.MagnitudeSquared() < 0.1f){
-			ResetTarget();
-		}
-		else{
-			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
-
-			RaycastHit testHit = physics->Raycast(gameObject->transform.GlobalPosition(), moveVec);
-			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
-				gameObject->transform.position = gameObject->transform.position + moveVec;
-			}
-			else if (testHit.hit){
-				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
-				Vector3 goodVec = moveVec - badVec;
-				gameObject->transform.position = gameObject->transform.position + goodVec;
-			}
-		}
-
-		float floorHeight = -10;
-		RaycastHit lookDown = physics->Raycast(gameObject->transform.position, Y_AXIS*-1);
-		if(lookDown.hit){
-			floorHeight = lookDown.worldPos.y;
-		}
-
-		if(gameObject->transform.position.y <= floorHeight + 0.6f){
-			gameObject->transform.position.y = floorHeight + 0.6f;
-		}
-		else{
-			gameObject->transform.position.y -= 3 * gameObject->scene->deltaTime;
-		}
-	}
-};
-
-struct CameraControl : Component{
-	Input* input;
-	SC_Transform* camera;
-	PhysicsSim* physics;
-	GuiElement* slider;
-	float speed;
-	float velocity;
-
-	bool isGrounded;
-	float health;
-
-	int prevX;
-	int prevY;
-	float xRot;
-	float yRot;
-
-	CameraControl(){
-		speed = 5;
-		prevX = 0;
-		prevY = 0;
-		xRot = 0;
-		yRot = 0;
-		velocity = 0;
-		isGrounded = false;
-		health = 1;
-	}
-
-	virtual void OnAwake(){
-		input = &gameObject->scene->input;
-		camera = gameObject->scene->camera;
-		physics = gameObject->scene->physicsSim;
-		slider = gameObject->scene->guiElements[0];
-	}
-
-	virtual void OnUpdate(){
-		float deltaX = input->GetMouseX() - prevX;
-		float deltaY = input->GetMouseY() - prevY;
-	
-		xRot = xRot + deltaX;
-		yRot = yRot + deltaY;
-
-		camera->rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
-
-		prevX = input->GetMouseX();
-		prevY = input->GetMouseY();
-		Vector3 moveVec(0,0,0);
-		if(input->GetKey('w')){
-			moveVec = moveVec + camera->Forward();
-		}
-		if(input->GetKey('s')){
-			moveVec = moveVec + camera->Forward() * -1; 
-		}
-		if(input->GetKey('a')){
-			moveVec = moveVec + camera->Right() * -1;
-		}
-		if(input->GetKey('d')){
-			moveVec = moveVec + camera->Right();
-		}
-		if(input->GetKeyDown(' ') && isGrounded){
-			velocity = 4;
-		}
-
-		if(input->GetKeyUp('b')){
-			GameObject* newEnemy = new GameObject();
-			newEnemy->name = "enemyClone";
-			newEnemy->scene = gameObject->scene;
-			newEnemy->AddMesh("test.obj");
-			newEnemy->AddMaterial("shader","Texture.bmp");
-			newEnemy->AddComponent<BoxCollider>();
-			newEnemy->AddComponent<EnemyComp>();
-			newEnemy->transform.position = Vector3(-2, 1, 5);
-			newEnemy->transform.scale = Vector3(0.3f, 1, 0.3f);
-			gameObject->scene->AddObject(newEnemy);
-		}
-
-		health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
-		health = max(0.0f, min(1.0f, health));
-		GuiSetSliderValue(slider, health);
-
-		moveVec.y = 0;
-		if(moveVec.MagnitudeSquared() > 0){
-			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
-
-			RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), moveVec);
-			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
-				camera->GetParent()->position = camera->GetParent()->position + moveVec;
-			}
-			else if (testHit.hit){
-				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
-				Vector3 goodVec = moveVec - badVec;
-				camera->GetParent()->position = camera->GetParent()->position + goodVec;
-			}
-		}
-
-		float floorHeight = -10;
-		RaycastHit lookDown = physics->Raycast(camera->GetParent()->position, Y_AXIS*-1);
-		if(lookDown.hit){
-			floorHeight = lookDown.worldPos.y;
-		}
-
-		velocity -= gameObject->scene->deltaTime * 5;
-		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
-		if(camera->GetParent()->position.y <= floorHeight + 0.4f){
-			camera->GetParent()->position.y = floorHeight + 0.4f;
-			velocity = 0;
-			isGrounded = true;
-		}
-		else{
-			isGrounded = false;
-		}
-	}
-
-	virtual ~CameraControl(){}
-};
-
-struct OscillateUp : Component{
-	float time;
-	int frameCount;
-
-	virtual void OnAwake(){
-		time = 0;
-		frameCount = 0;
-	}
-
-	virtual void OnUpdate(){
-		time += gameObject->scene->deltaTime;
-		frameCount++;
-		gameObject->transform.position.y = sinf(time)*2;
-
-		if(frameCount % 60 == -1){
-			GameObject* z2 = new GameObject();
-			z2->scene = gameObject->scene;
-			//z2->transform.SetParent(gameObject->transform.GetParent());
-			z2->transform.position = gameObject->transform.GlobalPosition();
-			z2->transform.scale = Vector3(0.15f, 0.15f, 0.15f);
-			z2->AddMaterial("shader", "Texture.bmp");
-			z2->AddMesh("test.obj");
-			z2->AddComponent<BoxCollider>();
-			z2->name = "Child_ball_clone";
-
-			gameObject->scene->AddObject(z2);
-		}
-	}
-};
-
+#include "../header/int/UserComps.h"
 
 Scene::Scene(){
 }
 
 Scene::Scene(int argc, char** argv){
-	drawCalls = list<DrawCall>();
+	drawCalls = vector<DrawCall>();
 	camera = NULL;
 	rb = NULL;
 	physicsSim = new PhysicsSim();
@@ -368,11 +80,22 @@ Scene::Scene(int argc, char** argv){
 void Scene::Init(){
 }
 
-GameObject* Scene::FindGameObject(string name){
+GameObject* Scene::FindGameObject(const string& name){
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		GameObject* obj = *iter;
 		if(obj->name == name){
 			return obj;
+		}
+	}
+
+	return NULL;
+}
+
+GuiElement* Scene::FindGUIElement(const string& name){
+	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
+		GuiElement* elem = *iter;
+		if(elem->name == name){
+			return elem;
 		}
 	}
 
@@ -414,6 +137,19 @@ void Scene::RemoveObject(GameObject* obj){
 	}
 }
 
+int Scene::AddLight(){
+	int newId = 0;
+	if(lights.size() > 0){
+		newId = lights[lights.size() - 1].id + 1;
+	}
+
+	Light newLight = {};
+	newLight.id = newId;
+	lights.push_back(newLight);
+
+	return newId;
+}
+
 void Scene::Start(){
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 	timeval start;
@@ -430,6 +166,7 @@ void Scene::Start(){
 		physicsSim->Advance(deltaTime);
 
 		Render();
+		glutSwapBuffers();
 		glutPostRedisplay();
 
 		input.EndFrame();
@@ -453,41 +190,23 @@ void Scene::OnUpdate(){
 #endif
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
+
 	cout << "Scene::Update(): " << deltaTime * 1000 << " ms.\n";
 	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 
-	/*
-	float newX = guiElements[0]->position.x + 1.55*deltaTime;
-	newX = newX - (int)newX;
-	guiElements[0]->position.x = newX;
-
-	float newY = guiElements[0]->position.y + 0.9*deltaTime;
-	newY = newY - (int)newY;
-	guiElements[0]->position.y = newY;
-	*/
-
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());
-
 
 	clock_t before = clock();
 	GuiSetSliderValue(guiElements[0], (1+sin(float(currTime)/divisor))/2);
 	clock_t after = clock();
 	double sliderTime = ((double)after - before)/CLOCKS_PER_SEC;
-	//cout << "Time: " << sliderTime << endl;
-
-	if(child->transform.GetParent() == camera){
-		//child->transform.rotation = camera.rotation.Conjugate();
-	}
 
 	parent->transform.rotation = parent->transform.rotation * Quaternion(Y_AXIS, deltaTime/3);
-	//child->transform.position = child->transform.position + Vector3(2 + sin(((float)prevTime)/1000),0,0);
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		(*iter)->OnUpdate();
 	}
-
-	const float speed = 5;
 
 	if(input.GetKeyUp('o')){
 		SaveScene("Quicksave.xml");
@@ -506,21 +225,10 @@ void PhysicsUpdate(){
 }
 
 void Scene::OnPostLoad(){
-	GuiElement* elem = AddGuiElement();
-	elem->tex = new Texture(300, 1);
-	elem->position = Vector2(0.1, 0.1);
-	elem->scale = Vector2(0.2, 0.02);
-
-	camera->gameObject->AddComponent<FireGun>();
-	camera->gameObject->AddComponent<CameraControl>();
-
-	FindGameObject("myObj2_2")->AddComponent<MatChangeOnHit>();
-	FindGameObject("enemy1")->AddComponent<EnemyComp>();
-	FindGameObject("enemy2")->AddComponent<EnemyComp>();
 	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 
 	pathfinding.scene = this;
-	//pathfinding.HookUpNodes();
+	pathfinding.HookUpNodes();
 }
 
 void Scene::Render(){
@@ -544,55 +252,27 @@ void Scene::Render(){
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	for(auto iter = drawCalls.rbegin(); iter != drawCalls.rend(); iter++){
+	Vector3 lightVectors[6];
+	GLint isDirectional[6];
+
+	for(int i = 0; i < lights.size(); i++){
+		lightVectors[i] = lights[i].isDirectional ? lights[i].direction : lights[i].position;
+		isDirectional[i] = lights[i].isDirectional ? 1 : 0;
+	}
+
+	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
+
+		glUniform1i(glGetUniformLocation(iter->obj->material->shaderProgram, "numLights"), lights.size());
+		glUniform3fv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightVectors"), lights.size(), (GLfloat*)lightVectors);
+		glUniform1iv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightIsDirectional"), lights.size(), isDirectional);
 
 		iter->Draw();	
 	}
 
 	//Gui and gizmos stuff 
 	glDisable(GL_DEPTH_TEST);
-
-	Material* col = resources.GetMaterialByName("color");
-	glUseProgram(col->shaderProgram); 
-	col->SetMat4Uniform("_perspMatrix",  perspMatrix); 
-	col->SetMat4Uniform("_cameraMatrix", camMatrix); 
-	col->SetVec4Uniform("_color", Vector4(1,1,1,1));
-	for(auto iter = physicsSim->staticBoxBodies.begin(); iter != physicsSim->staticBoxBodies.end(); iter++){
-
-		Vector3 min = (*iter)->position - (*iter)->size;
-		Vector3 max = (*iter)->position + (*iter)->size;
-
-		//Vector3 minGlobal = (*iter)->gameObject->transform.LocalToGlobal(min);
-		//Vector3 maxGlobal = (*iter)->gameObject->transform.LocalToGlobal(max);
-
-		Vector3 corners[8] = {   Vector3(min.x, min.y, min.z),
-								 Vector3(min.x, max.y, min.z),
-							     Vector3(min.x, max.y, max.z),
-								 Vector3(min.x, min.y, max.z),
-								 Vector3(max.x, min.y, min.z),
-								 Vector3(max.x, max.y, min.z),
-								 Vector3(max.x, max.y, max.z),
-								 Vector3(max.x, min.y, max.z)};
-
-		for(int i = 0; i < 8; i++){
-			corners[i] = (*iter)->gameObject->transform.LocalToGlobal(corners[i]);
-		}
-
-		int indices[12] = {0,1,2,3, 7,6,5,4, 0,1,2,3};
-		break;
-
-		if((*iter)->gameObject->name == "floor"){
-			glBegin(GL_LINE_STRIP);
-			{
-				for(int i = 0; i < 12; i++){
-					glVertex3f(corners[indices[i]].x, corners[indices[i]].y, corners[indices[i]].z);
-				}
-			}
-			glEnd();
-		}
-	}
 
 	//Gui stuff
 	glEnable(GL_BLEND);
@@ -601,8 +281,6 @@ void Scene::Render(){
 	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
 		(*iter)->OnGui();
 	}
-
-	glutSwapBuffers();
 }
 
 void Scene::OnMouse(int button, int state, int x, int y){

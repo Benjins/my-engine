@@ -17,6 +17,12 @@ void Pathfinding::HookUpNodes(float maxDistance /*= 20*/){
 	}
 }
 
+void Pathfinding::AddNode(Vector3 pos){
+	PathNode newNode;
+	newNode.position = pos;
+	nodes.push_back(newNode);
+}
+
 vector<Vector3> Pathfinding::FindPath(Vector3 source, Vector3 destination){
 	float closestSourceDist = FLT_MAX;
 	float closestDestDist = FLT_MAX;

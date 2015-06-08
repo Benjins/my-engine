@@ -3,6 +3,7 @@
 #include "../header/int/Mat4.h"
 #include "../header/int/Vector4.h"
 #include "../header/int/ResourceManager.h"
+#include "../header/ext/EasyBMP.h"
 #include <fstream>
 #include <iostream>
 #include <cstring>
@@ -21,14 +22,16 @@ using std::ifstream; using std::cout; using std::cerr; using std::strlen;
 Material::Material(void){
 	matName = "";
 	mainTexture = NULL;
+	bumpMap = NULL;
 	sharedMaterial = false;
 }
 
 
 //Requires an OpenGL context
-Material::Material(string _shaderName, string textureName){
+Material::Material(string _shaderName, string textureName, string bumpMapName){
 	mainTexture = NULL;
-	Switch(_shaderName, textureName);
+	bumpMap = NULL;
+	Switch(_shaderName, textureName, bumpMapName);
 	sharedMaterial = false;
 }
 
@@ -41,11 +44,19 @@ void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum S
     Lengths[0]= strlen(pShaderText);
     glShaderSource(ShaderObj, 1, p, Lengths);
     glCompileShader(ShaderObj);
+
+	GLint success;
+	glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		GLchar InfoLog[1024];
+		glGetShaderInfoLog(ShaderObj, sizeof(InfoLog), NULL, InfoLog);
+		fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
+	}
 	
     glAttachShader(ShaderProgram, ShaderObj);
 }
 
-void Material::Switch(string _shaderName, string textureName){
+void Material::Switch(string _shaderName, string textureName, string bumpMapName){
 	shaderProgram = glCreateProgram();
 	shaderName = _shaderName;
 	matName = _shaderName + textureName;
@@ -58,7 +69,24 @@ void Material::Switch(string _shaderName, string textureName){
 		AddShader(shaderProgram, fshaderText.c_str(), GL_FRAGMENT_SHADER);
 		
 		glLinkProgram(shaderProgram);
+
+		GLint Success;
+		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &Success);
+		if (Success == 0) {
+			GLchar ErrorLog[1024];
+			glGetProgramInfoLog(shaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
+			fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
+		}
+
 		glValidateProgram(shaderProgram);
+
+		uniformNames = GetUniformNames(vshaderText + fshaderText);
+		for(int i = 0; i < uniformNames.size(); i++){
+			uniforms[i] = glGetUniformLocation(shaderProgram, uniformNames[i].c_str());
+		}
+
+		cameraUniform = GetUniformByName("_cameraMatrix");
+		objectMatrixUniform = GetUniformByName("_objectMatrix");
 		
 		if(mainTexture != NULL){
 			delete mainTexture;
@@ -66,20 +94,24 @@ void Material::Switch(string _shaderName, string textureName){
 
 		if(textureName != ""){
 			mainTexture = new Texture(GL_TEXTURE_2D,textureName);
-			mainTexture->Load();
-
-			uniformNames = GetUniformNames(vshaderText + fshaderText);
-
-			for(int i = 0; i < uniformNames.size(); i++){
-				uniforms[i] = glGetUniformLocation(shaderProgram, uniformNames[i].c_str());
-			}
-
-			textureUniform = GetUniformByName("_mainTex");
-			cameraUniform = GetUniformByName("_cameraMatrix");
-			objectMatrixUniform = GetUniformByName("_objectMatrix");
+			mainTexture->Load(GL_TEXTURE0);
 		}
 		else{
 			mainTexture = NULL;
+		}
+
+		if(bumpMapName != ""){
+			bumpMap = new Texture(GL_TEXTURE_2D,bumpMapName);
+			bumpMap->Load(GL_TEXTURE1);
+		}
+		else{
+			bumpMap = new Texture(1,1);
+			bumpMap->textureTarget = GL_TEXTURE_2D;
+			RGBApixel pix = {};
+			pix.Blue = 255;
+			pix.Alpha = 255;
+			bumpMap->SetPixel(0,0,pix);
+			bumpMap->Apply(GL_TEXTURE1);
 		}
 	}
 	else{
@@ -262,5 +294,8 @@ GLuint Material::GetUniformByIndex(int index){
 Material::~Material(){
 	if(mainTexture != NULL){
 		delete mainTexture;
+	}
+	if(bumpMap != NULL){
+		delete bumpMap;
 	}
 }

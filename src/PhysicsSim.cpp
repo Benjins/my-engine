@@ -102,7 +102,7 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 
 	SC_Transform trans = col->gameObject->transform;
 	Vector3 transformedOrigin = trans.GlobalToLocal(origin);
-	Vector3 transformedDirection = Rotate(direction, trans.TotalRotation().Conjugate());
+	Vector3 transformedDirection = trans.GlobalToLocal(direction) - trans.GlobalToLocal(Vector3(0,0,0));
 
 	Vector3 gameObjectScale = col->gameObject->transform.scale;
 	Vector3 corner1 = colMin - transformedOrigin;
@@ -117,6 +117,7 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 
 	Interval xInter = Interval(diffMin.x / transformedDirection.x, diffMax.x / transformedDirection.x, true);
 	Interval yInter = Interval(diffMin.y / transformedDirection.y, diffMax.y / transformedDirection.y, true);
+	
 	Interval zInter = Interval(diffMin.z / transformedDirection.z, diffMax.z / transformedDirection.z, true);
 
 	Interval yzInter = yInter.Intersection(zInter);

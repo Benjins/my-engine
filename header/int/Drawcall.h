@@ -13,6 +13,8 @@ struct Material; struct GameObject;
 struct DrawCall{
 	//Data for OpenGL
 	GLuint vertices;
+	GLuint normals;
+	GLuint tangents;
 	GLuint colors;
 	GLuint uvs;
 	
@@ -28,5 +30,6 @@ struct DrawCall{
 
 //Get uniform locations, and use them
 
+void CalculateTangents(Model* model, vector<Vector3>& outTangentData);
 
 #endif

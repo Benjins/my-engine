@@ -9,6 +9,7 @@
 #include "ResourceManager.h"
 #include "GuiElement.h"
 #include "Pathfinding.h"
+#include "Light.h"
 #include <time.h>
 #include <random>
 
@@ -16,6 +17,7 @@ using std::list;
 
 struct RigidBody;
 struct PhysicsSim;
+struct XMLElement;
 
 struct Scene{
 	SC_Transform* camera;
@@ -26,11 +28,13 @@ struct Scene{
 	MaterialManager resources;
 	Pathfinding pathfinding;
 
+	//Vector3 lightDir;
 	vector<GuiElement*> guiElements;
+	vector<Light> lights;
 	
 protected:
-	list<GameObject*> objects;
-	list<DrawCall> drawCalls;
+	vector<GameObject*> objects;
+	vector<DrawCall> drawCalls;
 
 	int prevX;
 	int prevY;
@@ -57,7 +61,9 @@ public:
 	Scene();
 	Scene(int argc, char** argv);
 
-private:
+	int AddLight();
+
+protected:
 	//Hide this, because it'll break things
 	Scene(const Scene& orig){}
 
@@ -73,7 +79,7 @@ public:
 
 	void RemoveObject(GameObject* obj);
 	
-	void Start();
+	virtual void Start();
 
 	void UpdateVertexBuffer();
 	
@@ -84,7 +90,9 @@ public:
 	void Render();
 	void PhysicsUpdate();
 
-	GameObject* FindGameObject(string name);
+	GameObject* FindGameObject(const string& name);
+
+	GuiElement* FindGUIElement(const string& name);
 
 	void OnMouse(int button, int state, int x, int y);
 	void OnPassiveMouse(int x, int y);
@@ -94,6 +102,11 @@ public:
 	void RemoveAllObjects();
 
 	void Stop();
+
+	void LoadGuiElement(const XMLElement& elem);
+	void LoadGuiText(const XMLElement& elem);
+
+	void LoadGameObjectXML(const XMLElement& elem);
 
 	virtual ~Scene();
 };

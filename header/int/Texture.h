@@ -30,12 +30,12 @@ struct Texture{
 	Texture(int _width, int _height);
 	Texture(GLenum TextureTarget, const string& FileName);
 
-    void Load(void);
+	void Load(GLenum TextureTarget = GL_TEXTURE0);
 
 	void SetPixel(int x, int y, float r, float g, float b);
 	void SetPixel(int x, int y, RGBApixel col);
 	void GetPixel(int x, int y);
-	void Apply();
+	void Apply(GLenum TextureTarget = GL_TEXTURE0);
 
     void Bind(GLenum TextureUnit);
 

@@ -15,13 +15,13 @@ struct MaterialManager{
 	unsigned int matAlloc;
 
 public:
-	MaterialManager(int matCount = 25);
+	MaterialManager(int matCount = 40);
 
 	Material* GetMaterialByName(string name);
 	int GetMaterialIdByName(string name);
 	Material* GetMaterialById(int id);
 
-	Material* LoadMaterial(string matName, string shaderName, string textureName="");
+	Material* LoadMaterial(string matName, string shaderName, string textureName="", string bumpMapName = "");
 
 	void Clear();
 

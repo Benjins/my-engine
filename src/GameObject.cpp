@@ -25,6 +25,12 @@ GameObject::GameObject(Scene& sceneRef){
 	scene = &sceneRef;
 }
 
+void GameObject::AddComponent(Component* comp){
+	components.push_back(comp);
+	comp->gameObject = this;
+	comp->OnAwake();
+}
+
 void GameObject::AddMesh(string fileName){
 	if(mesh != NULL){
 		delete[] mesh;

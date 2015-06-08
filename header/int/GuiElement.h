@@ -2,13 +2,14 @@
 #define GUI_ELEMENT_H
 
 #include "../header/ext/Vector2.h"
+#include "../header/int/FontBMPMaker.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <string>
 
 using std::string;
 
-struct Texture; struct MaterialManager; struct Scene;
+struct Texture; struct MaterialManager; struct Scene; struct FUV; struct XMLElement;
 
 enum struct GuiType{
 	RawTexture,
@@ -31,7 +32,9 @@ struct GuiElement{
 
 	//virtual void OnAddedToScene(Scene* scn);
 
-	void OnGui() const;
+	virtual void OnGui() const;
+
+	virtual XMLElement Serialize();
 
 	virtual ~GuiElement();
 };
@@ -41,7 +44,18 @@ struct GuiSlider : GuiElement{
 };
 
 struct GuiText : GuiElement{
-	
+	string text;
+	FUV fuv;
+	GLuint texObj;
+	string fuvFileName;
+
+	GuiText(MaterialManager* resources, const string& _fuvFileName);
+
+	virtual void OnGui() const;
+
+	virtual XMLElement Serialize();
+
+	virtual ~GuiText();
 };
 
 void GuiSetSliderValue(GuiElement* elem, float value);

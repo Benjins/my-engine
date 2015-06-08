@@ -1,0 +1,648 @@
+#ifndef USERCOMPS_H
+#define USERCOMPS_H
+#include "Component.h"
+#include "Collider.h"
+#include "RaycastHit.h"
+#include "PhysicsSim.h"
+#include "GameObject.h"
+#include "Material.h"
+#include "Vector4.h"
+#include "Light.h"
+#include "Scene.h"
+#include "LoadingUtilities.h"
+#include "Animation.h"
+#include "../ext/simple-xml.h"
+#include <iostream>
+#include <assert.h>
+
+using std::cout; using std::endl;
+
+struct PathNodeComponent : Component{
+	
+	int nodeIndex;
+
+	virtual void OnAwake(){
+		nodeIndex = gameObject->scene->pathfinding.nodes.size();
+		gameObject->scene->pathfinding.AddNode(gameObject->transform.GlobalPosition());
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "PathNodeComponent";
+		return elem;
+	}
+
+	virtual void OnEditorUpdate(){
+		gameObject->scene->pathfinding.nodes[nodeIndex].position = gameObject->transform.GlobalPosition();
+	}
+
+	virtual ~PathNodeComponent(){};
+};
+
+struct AnimationComponent : Component{
+	//Tried putting these in a union, caused issues with destruction...
+	Animation<float> floatAnim;
+	Animation<Vector2> vec2Anim;
+	Animation<Vector3> vec3Anim;
+
+	AnimationType animType;
+	AnimationTarget animTarget;
+	float currentTime;
+
+	bool loop;
+	bool playAutomatically;
+	bool isPlaying;
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "AnimationComponent";
+		elem.attributes.emplace_back("type", EncodeAnimationType(animType));
+		elem.attributes.emplace_back("target", EncodeAnimationTarget(animTarget));
+		elem.attributes.emplace_back("loop", (loop ? "T" : "F"));
+		elem.attributes.emplace_back("autoplay", (playAutomatically ? "T" : "F"));
+
+		if(animType == AnimationType::Float){
+			for(const KeyFrame<float>& frame : floatAnim.keyFrames){
+				XMLElement child;
+				child.name = "KeyFrame";
+				child.attributes.emplace_back("time", to_string(frame.time));
+				child.attributes.emplace_back("value", to_string(frame.value));
+				elem.children.push_back(child);
+			}
+		}
+		else if(animType == AnimationType::Vector2){
+			for(const KeyFrame<Vector2>& frame : vec2Anim.keyFrames){
+				XMLElement child;
+				child.name = "KeyFrame";
+				child.attributes.emplace_back("time", to_string(frame.time));
+				child.attributes.emplace_back("value", EncodeVector2(frame.value));
+				elem.children.push_back(child);
+			}
+		}
+		else if(animType == AnimationType::Vector3){
+			for(const KeyFrame<Vector3>& frame : vec3Anim.keyFrames){
+				XMLElement child;
+				child.name = "KeyFrame";
+				child.attributes.emplace_back("time", to_string(frame.time));
+				child.attributes.emplace_back("value", EncodeVector3(frame.value));
+				elem.children.push_back(child);
+			}
+		}
+
+		return elem;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+		for(const XMLAttribute& attr : elem.attributes){
+			if(attr.name == "type"){
+				animType = ParseAnimationType(attr.data);
+			}
+			else if(attr.name == "target"){
+				animTarget = ParseAnimationTarget(attr.data);
+			}
+			else if(attr.name == "loop"){
+				loop = attr.data == "T";
+			}
+			else if(attr.name == "autoplay"){
+				playAutomatically = attr.data == "T";
+			}
+		}
+
+		//Maybe verify target and type?
+
+		for(const XMLElement& child : elem.children){
+			if(child.name == "KeyFrame"){
+				float floatVal;
+				Vector2 vec2Val;
+				Vector3 vec3Val;
+				float time;
+				for(const XMLAttribute& attr : child.attributes){
+					if(attr.name == "time"){
+						time = atof(attr.data.c_str());
+					}
+					else if(attr.name == "value"){
+						if(animType == AnimationType::Float){
+							floatVal = atof(attr.data.c_str());
+						}
+						else if(animType == AnimationType::Vector2){
+							vec2Val = ParseVector2(attr.data);
+						}
+						else if(animType == AnimationType::Vector3){
+							vec3Val = ParseVector3(attr.data);
+						}
+					}
+				}
+
+				if(animType == AnimationType::Float){
+					floatAnim.AddKeyFrame(floatVal, time);
+				}
+				else if(animType == AnimationType::Vector2){
+					vec2Anim.AddKeyFrame(vec2Val, time);
+				}
+				else if(animType == AnimationType::Vector3){
+					vec3Anim.AddKeyFrame(vec3Val, time);
+				}
+			}
+		}
+	}
+
+	virtual void OnAwake(){
+		currentTime = 0;
+		isPlaying = playAutomatically;
+	}
+
+	virtual void OnUpdate(){
+		float length = 0;
+		if(animType == AnimationType::Float){
+			length = floatAnim.Length();
+		}
+		else if(animType == AnimationType::Vector2){
+			length = vec2Anim.Length();
+		}
+		else if(animType == AnimationType::Vector3){
+			length = vec3Anim.Length();
+		}
+
+		if(isPlaying){
+			currentTime += gameObject->scene->deltaTime;
+			if(loop && currentTime >= length){
+				currentTime -= length;
+			}
+		}
+
+		if(animTarget == AnimationTarget::Position){
+			assert(animType == AnimationType::Vector3);
+			gameObject->transform.position = vec3Anim.Evaluate(currentTime);
+		}
+		else if(animTarget == AnimationTarget::Scale){
+			assert(animType == AnimationType::Vector3);
+			gameObject->transform.scale = vec3Anim.Evaluate(currentTime);
+		}
+		else if(animTarget == AnimationTarget::UVOffset){
+			assert(animType == AnimationType::Vector2);
+			gameObject->material->uvOffset = vec2Anim.Evaluate(currentTime);
+		}
+		else if(animTarget == AnimationTarget::UVScale){
+			assert(animType == AnimationType::Vector2);
+			gameObject->material->uvScale = vec2Anim.Evaluate(currentTime);
+		}
+	}
+};
+
+struct LightComponent : Component{
+	float intensity;
+	int id;
+	bool isDirectional;
+
+	virtual void OnAwake(){
+		id = gameObject->scene->AddLight();
+	}
+
+	virtual void OnUpdate(){
+		for(auto iter = gameObject->scene->lights.begin(); iter != gameObject->scene->lights.end(); iter++){
+			if(iter->id == id){
+				iter->intensity = intensity;
+				iter->isDirectional = isDirectional;
+				if(isDirectional){
+					iter->direction = gameObject->transform.Forward();
+				}
+				else{
+					iter->position = gameObject->transform.GlobalPosition();
+				}
+				break;
+			}
+		}
+	}
+
+	virtual void OnEditorUpdate(){
+		OnUpdate();
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "LightComponent";
+		elem.attributes.emplace_back("intensity", to_string(intensity));
+		elem.attributes.emplace_back("isDirectional", isDirectional ? "T" : "F");
+		return elem;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+		for(const XMLAttribute& attr : elem.attributes){
+			if(attr.name == "intensity"){
+				intensity = atof(attr.data.c_str());
+			}
+			else if(attr.name == "isDirectional"){
+				isDirectional = (attr.data == "T");
+			}
+		}
+	}
+
+	virtual ~LightComponent(){
+		for(auto iter = gameObject->scene->lights.begin(); iter != gameObject->scene->lights.end(); iter++){
+			if(iter->id == id){
+				gameObject->scene->lights.erase(iter);
+				break;
+			}
+		}
+	}
+};
+
+struct TestComp : Component{
+	virtual void OnCollision(Collider* col){
+		cout << "Collision: " << col->gameObject->name << endl;
+	}
+};
+
+struct SimpleAnimation : Component{
+	Animation<Vector3> posAnim;
+	float currTime;
+
+	virtual void OnAwake(){
+		currTime = 0;
+	}
+	
+	virtual void OnUpdate(){
+		currTime += gameObject->scene->deltaTime;
+		gameObject->transform.position = posAnim.Evaluate(currTime);
+	}
+};
+
+struct HitComponent : Component{
+
+	virtual void OnHit(RaycastHit hitInfo, GameObject* sender) = 0;
+
+	virtual ~HitComponent(){}
+};
+
+struct AnimateUVOffset : Component{
+
+	Animation<Vector2> anim;
+	float currentTime;
+
+	virtual void OnAwake(){
+		anim.AddKeyFrame(Vector2(0,0), 0);
+		anim.AddKeyFrame(Vector2(5,5), 20);
+		currentTime = 0;
+	}
+
+	virtual void OnUpdate(){
+		currentTime += gameObject->scene->deltaTime;
+		gameObject->material->uvOffset = anim.Evaluate(currentTime);
+	}
+
+	virtual ~AnimateUVOffset(){}
+};
+
+struct FireGun : Component{
+	Input* input;
+	PhysicsSim* physicsSim;
+	SC_Transform* camera;
+
+	FireGun(){
+		
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "FireGun";
+		return elem;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+	}
+
+	virtual void OnAwake(){
+		input = &gameObject->scene->input;
+		physicsSim = gameObject->scene->physicsSim;
+		camera = gameObject->scene->camera;
+	}
+
+	virtual void OnUpdate(){
+		if(input->GetMouseUp(GLUT_LEFT_BUTTON)){
+			RaycastHit hit = physicsSim->Raycast(camera->GlobalPosition(), camera->Forward());
+			if(hit.hit){
+				HitComponent* hitComp = hit.col->gameObject->GetComponent<HitComponent>();
+				if(hitComp != NULL){
+					hitComp->OnHit(hit, gameObject);
+				}
+			}
+		}
+	}
+
+	virtual ~FireGun(){}
+};
+
+struct MatChangeOnHit : HitComponent{
+	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
+		double x = rand();
+		double ratio = x/RAND_MAX;
+		gameObject->material->SetVec4Uniform("_color", Vector4(ratio,1.0,ratio,1.0));
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "MatChangeOnHit";
+		return elem;
+	}
+
+	virtual ~MatChangeOnHit(){}
+};
+
+struct RotateConstantly : Component{
+	float rotationSpeed;
+
+	RotateConstantly(){
+		rotationSpeed = 30;
+	}
+
+	virtual void OnUpdate(){
+		gameObject->transform.rotation = gameObject->transform.rotation * Quaternion(Y_AXIS, rotationSpeed * gameObject->scene->deltaTime);
+	}
+};
+
+struct EnemyComp : HitComponent{
+	Vector3 currentTarget;
+	float speed;
+	PhysicsSim* physics;
+	GameObject* player;
+
+	int health;
+	int maxHealth;
+
+	EnemyComp(){
+		speed = 2;
+		health = 5;
+		maxHealth = 5;
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "EnemyComp";
+		elem.attributes.push_back(XMLAttribute("speed",  to_string(speed)));
+		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
+		elem.attributes.push_back(XMLAttribute("maxHalth", to_string(maxHealth)));
+
+		return elem;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+		for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
+			if(iter->name == "speed"){
+				speed = atoi(iter->data.c_str());
+			}
+			else if(iter->name == "health"){
+				health = atoi(iter->data.c_str());
+			}
+			else if(iter->name == "maxHealth"){
+				maxHealth = atoi(iter->data.c_str());
+			}
+		}
+	}
+
+	void ResetTarget(){
+		float x = ((float)(rand() % 500 - 250)) / 25;
+		float z = ((float)(rand() % 500 - 250)) / 25;
+		currentTarget = Vector3(x, 0, z);
+	}
+
+	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
+		health--;
+		float ratio = ((float)health)/maxHealth;
+		gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
+		if(health <= 0){
+			gameObject->scene->RemoveObject(gameObject);	
+		}
+	}
+
+	virtual void OnAwake(){
+		ResetTarget();
+		physics = gameObject->scene->physicsSim;
+		player = gameObject->scene->FindGameObject("mainCam");
+	}
+
+	virtual void OnUpdate(){
+		Vector3 toPlayer = player->transform.position - gameObject->transform.position;
+		RaycastHit hitPlayer = physics->Raycast(gameObject->transform.position, toPlayer);
+		
+		Vector3 moveVec;
+
+		if(hitPlayer.hit && hitPlayer.col->gameObject == player){
+			moveVec = toPlayer;
+		}
+		else{
+			moveVec = currentTarget - gameObject->transform.position;
+		}
+		
+		moveVec.y = 0;
+
+		if(moveVec.MagnitudeSquared() < 0.1f){
+			ResetTarget();
+		}
+		else{
+			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+
+			RaycastHit testHit = physics->Raycast(gameObject->transform.GlobalPosition(), moveVec);
+			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
+				gameObject->transform.position = gameObject->transform.position + moveVec;
+			}
+			else if (testHit.hit){
+				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+				Vector3 goodVec = moveVec - badVec;
+				gameObject->transform.position = gameObject->transform.position + goodVec;
+			}
+		}
+
+		float floorHeight = -10;
+		RaycastHit lookDown = physics->Raycast(gameObject->transform.position, Y_AXIS*-1);
+		if(lookDown.hit){
+			floorHeight = lookDown.worldPos.y;
+		}
+
+		if(gameObject->transform.position.y <= floorHeight + 0.6f){
+			gameObject->transform.position.y = floorHeight + 0.6f;
+		}
+		else{
+			gameObject->transform.position.y -= 3 * gameObject->scene->deltaTime;
+		}
+	}
+};
+
+struct CameraControl : Component{
+	Input* input;
+	SC_Transform* camera;
+	PhysicsSim* physics;
+	GuiElement* slider;
+	GuiText* healthBar;
+	float speed;
+	float velocity;
+
+	bool isGrounded;
+	float health;
+
+	int prevX;
+	int prevY;
+	float xRot;
+	float yRot;
+
+	CameraControl(){
+		speed = 5;
+		prevX = 0;
+		prevY = 0;
+		xRot = 0;
+		yRot = 0;
+		velocity = 0;
+		isGrounded = false;
+		health = 1;
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "CameraControl";
+		elem.attributes.push_back(XMLAttribute("speed",  to_string(speed)));
+		elem.attributes.push_back(XMLAttribute("velocity", to_string(velocity)));
+		elem.attributes.push_back(XMLAttribute("isGrounded", isGrounded ? "T" : "F"));
+		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
+
+		return elem;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+		for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
+			if(iter->name == "speed"){
+				speed = atoi(iter->data.c_str());
+			}
+			else if(iter->name == "health"){
+				health = atof(iter->data.c_str());
+			}
+			else if(iter->name == "velocity"){
+				velocity = atof(iter->data.c_str());
+			}
+			else if(iter->name == "isGrounded"){
+				isGrounded = (iter->data == "T");
+			}
+		}
+	}
+
+	virtual void OnAwake(){
+		input = &gameObject->scene->input;
+		camera = gameObject->scene->camera;
+		physics = gameObject->scene->physicsSim;
+		slider = gameObject->scene->guiElements[0];
+		healthBar = static_cast<GuiText*>(gameObject->scene->FindGUIElement("healthText"));
+	}
+
+	virtual void OnUpdate(){
+		float deltaX = input->GetMouseX() - prevX;
+		float deltaY = input->GetMouseY() - prevY;
+	
+		xRot = xRot + deltaX;
+		yRot = yRot + deltaY;
+
+		camera->rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
+
+		prevX = input->GetMouseX();
+		prevY = input->GetMouseY();
+		Vector3 moveVec(0,0,0);
+		if(input->GetKey('w')){
+			moveVec = moveVec + camera->Forward();
+		}
+		if(input->GetKey('s')){
+			moveVec = moveVec + camera->Forward() * -1; 
+		}
+		if(input->GetKey('a')){
+			moveVec = moveVec + camera->Right() * -1;
+		}
+		if(input->GetKey('d')){
+			moveVec = moveVec + camera->Right();
+		}
+		if(input->GetKeyDown(' ') && isGrounded){
+			velocity = 4;
+		}
+
+		if(input->GetKeyUp('b')){
+			GameObject* newEnemy = new GameObject();
+			newEnemy->name = "enemyClone";
+			newEnemy->scene = gameObject->scene;
+			newEnemy->AddMesh("test.obj");
+			newEnemy->AddMaterial("shader","Texture.bmp");
+			newEnemy->AddComponent<BoxCollider>();
+			newEnemy->AddComponent<EnemyComp>();
+			newEnemy->transform.position = Vector3(-2, 1, 5);
+			newEnemy->transform.scale = Vector3(0.3f, 1, 0.3f);
+			gameObject->scene->AddObject(newEnemy);
+		}
+
+		health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
+		health = max(0.0f, min(1.0f, health));
+		GuiSetSliderValue(slider, health);
+		if(healthBar != nullptr){
+			healthBar->text = "Health: " + to_string((int)(health*100));
+		}
+
+		moveVec.y = 0;
+		if(moveVec.MagnitudeSquared() > 0){
+			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+
+			RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), moveVec);
+			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
+				camera->GetParent()->position = camera->GetParent()->position + moveVec;
+			}
+			else if (testHit.hit){
+				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+				Vector3 goodVec = moveVec - badVec;
+				camera->GetParent()->position = camera->GetParent()->position + goodVec;
+			}
+		}
+
+		float floorHeight = -10;
+		RaycastHit lookDown = physics->Raycast(camera->GetParent()->position, Y_AXIS*-1);
+		if(lookDown.hit){
+			floorHeight = lookDown.worldPos.y;
+		}
+
+		velocity -= gameObject->scene->deltaTime * 5;
+		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
+		if(camera->GetParent()->position.y <= floorHeight + 0.4f){
+			camera->GetParent()->position.y = floorHeight + 0.4f;
+			velocity = 0;
+			isGrounded = true;
+		}
+		else{
+			isGrounded = false;
+		}
+	}
+
+	virtual ~CameraControl(){}
+};
+
+struct OscillateUp : Component{
+	float time;
+	int frameCount;
+
+	virtual void OnAwake(){
+		time = 0;
+		frameCount = 0;
+	}
+
+	virtual void OnUpdate(){
+		time += gameObject->scene->deltaTime;
+		frameCount++;
+		gameObject->transform.position.y = sinf(time)*2;
+
+		if(frameCount % 60 == -1){
+			GameObject* z2 = new GameObject();
+			z2->scene = gameObject->scene;
+			//z2->transform.SetParent(gameObject->transform.GetParent());
+			z2->transform.position = gameObject->transform.GlobalPosition();
+			z2->transform.scale = Vector3(0.15f, 0.15f, 0.15f);
+			z2->AddMaterial("shader", "Texture.bmp");
+			z2->AddMesh("test.obj");
+			z2->AddComponent<BoxCollider>();
+			z2->name = "Child_ball_clone";
+
+			gameObject->scene->AddObject(z2);
+		}
+	}
+};
+
+#endif

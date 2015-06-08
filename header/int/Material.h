@@ -28,6 +28,7 @@ struct Material{
 	
 	GLuint shaderProgram;
 	Texture* mainTexture;
+	Texture* bumpMap;
 
 	GLuint uniforms[MAX_NUMBER_OF_UNIFORMS];
 	vector<string> uniformNames;
@@ -35,14 +36,17 @@ struct Material{
 	GLuint textureUniform;
 	GLuint cameraUniform;
 	GLuint objectMatrixUniform;
+
+	Vector2 uvOffset;
+	Vector2 uvScale;
 	
 	Material(void);
 
-	Material(string _shaderName, string textureName = "");
+	Material(string _shaderName, string textureName = "", string bumpMapName = "");
 	
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
 
-	void Switch(string _shaderName, string textureName = "");
+	void Switch(string _shaderName, string textureName = "", string bumpMapName = "");
 	
 	void SetFloatUniform(string name, float value);
 	void SetVec2Uniform(string name, Vector2 value);
