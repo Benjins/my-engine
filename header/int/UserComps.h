@@ -345,10 +345,12 @@ struct EnemyComp : HitComponent{
 	GameObject* player;
 
 	int health;
+	int maxHealth;
 
 	EnemyComp(){
 		speed = 2;
 		health = 5;
+		maxHealth = 5;
 	}
 
 	virtual XMLElement Serialize(){
@@ -356,6 +358,7 @@ struct EnemyComp : HitComponent{
 		elem.name = "EnemyComp";
 		elem.attributes.push_back(XMLAttribute("speed",  to_string(speed)));
 		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
+		elem.attributes.push_back(XMLAttribute("maxHalth", to_string(maxHealth)));
 
 		return elem;
 	}
@@ -368,6 +371,9 @@ struct EnemyComp : HitComponent{
 			else if(iter->name == "health"){
 				health = atoi(iter->data.c_str());
 			}
+			else if(iter->name == "maxHealth"){
+				maxHealth = atoi(iter->data.c_str());
+			}
 		}
 	}
 
@@ -379,7 +385,7 @@ struct EnemyComp : HitComponent{
 
 	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
 		health--;
-		float ratio = ((float)health)/5;
+		float ratio = ((float)health)/maxHealth;
 		gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
 		if(health <= 0){
 			gameObject->scene->RemoveObject(gameObject);	

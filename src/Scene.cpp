@@ -194,38 +194,19 @@ void Scene::OnUpdate(){
 	cout << "Scene::Update(): " << deltaTime * 1000 << " ms.\n";
 	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 
-	/*
-	float newX = guiElements[0]->position.x + 1.55*deltaTime;
-	newX = newX - (int)newX;
-	guiElements[0]->position.x = newX;
-
-	float newY = guiElements[0]->position.y + 0.9*deltaTime;
-	newY = newY - (int)newY;
-	guiElements[0]->position.y = newY;
-	*/
-
 	GameObject* parent = (*objects.begin());
 	GameObject* child  = (*objects.rbegin());
-
 
 	clock_t before = clock();
 	GuiSetSliderValue(guiElements[0], (1+sin(float(currTime)/divisor))/2);
 	clock_t after = clock();
 	double sliderTime = ((double)after - before)/CLOCKS_PER_SEC;
-	//cout << "Time: " << sliderTime << endl;
-
-	if(child->transform.GetParent() == camera){
-		//child->transform.rotation = camera.rotation.Conjugate();
-	}
 
 	parent->transform.rotation = parent->transform.rotation * Quaternion(Y_AXIS, deltaTime/3);
-	//child->transform.position = child->transform.position + Vector3(2 + sin(((float)prevTime)/1000),0,0);
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		(*iter)->OnUpdate();
 	}
-
-	const float speed = 5;
 
 	if(input.GetKeyUp('o')){
 		SaveScene("Quicksave.xml");
