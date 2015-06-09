@@ -120,7 +120,7 @@
 <Material name='enemyMat2'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-<EnemyComp speed='1.000000' health='12' maxHalth='12'/>
+<EnemyComp speed='1.000000' health='12' maxHalth='5'/>
 </GameObject>
 <GameObject name=''>
 <Transform position='0.000000,1.000000,-1.383788' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>

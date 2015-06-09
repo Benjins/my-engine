@@ -35,6 +35,7 @@ Scene::Scene(int argc, char** argv){
 	rb = NULL;
 	physicsSim = new PhysicsSim();
 	input = Input();
+	pathfinding.scene = this;
 
 	myRandom = default_random_engine(time(NULL));
 
@@ -226,8 +227,6 @@ void PhysicsUpdate(){
 
 void Scene::OnPostLoad(){
 	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
-
-	pathfinding.scene = this;
 	pathfinding.HookUpNodes();
 }
 

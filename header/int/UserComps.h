@@ -19,11 +19,10 @@ using std::cout; using std::endl;
 
 struct PathNodeComponent : Component{
 	
-	int nodeIndex;
+	int nodeId;
 
 	virtual void OnAwake(){
-		nodeIndex = gameObject->scene->pathfinding.nodes.size();
-		gameObject->scene->pathfinding.AddNode(gameObject->transform.GlobalPosition());
+		nodeId = gameObject->scene->pathfinding.AddNode(gameObject->transform.GlobalPosition());
 	}
 
 	virtual XMLElement Serialize(){
@@ -33,10 +32,24 @@ struct PathNodeComponent : Component{
 	}
 
 	virtual void OnEditorUpdate(){
-		gameObject->scene->pathfinding.nodes[nodeIndex].position = gameObject->transform.GlobalPosition();
+		for(PathNode& node : gameObject->scene->pathfinding.nodes){
+			if(node.id == nodeId){
+				node.position = gameObject->transform.GlobalPosition();
+				break;
+			}
+		}
 	}
 
-	virtual ~PathNodeComponent(){};
+	virtual ~PathNodeComponent(){
+		int index = 0;
+		for(PathNode& node : gameObject->scene->pathfinding.nodes){
+			if(node.id == nodeId){
+				gameObject->scene->pathfinding.nodes.erase(gameObject->scene->pathfinding.nodes.begin() + index);
+				break;
+			}
+			index++;
+		}
+	};
 };
 
 struct AnimationComponent : Component{
