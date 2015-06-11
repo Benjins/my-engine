@@ -44,6 +44,7 @@ struct PathNodeComponent : Component{
 		int index = 0;
 		for(PathNode& node : gameObject->scene->pathfinding.nodes){
 			if(node.id == nodeId){
+				assert(index < gameObject->scene->pathfinding.nodes.size());
 				gameObject->scene->pathfinding.nodes.erase(gameObject->scene->pathfinding.nodes.begin() + index);
 				break;
 			}
@@ -375,17 +376,23 @@ struct RotateConstantly : Component{
 
 struct EnemyComp : HitComponent{
 	Vector3 currentTarget;
+	Vector3 longTermGoal;
 	float speed;
 	PhysicsSim* physics;
+	Pathfinding* pathing;
 	GameObject* player;
+	vector<Vector3> path;
 
 	int health;
 	int maxHealth;
+
+	bool pathNeedsUpdate;
 
 	EnemyComp(){
 		speed = 2;
 		health = 5;
 		maxHealth = 5;
+		pathNeedsUpdate = true;
 	}
 
 	virtual XMLElement Serialize(){
@@ -421,7 +428,7 @@ struct EnemyComp : HitComponent{
 	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
 		health--;
 		float ratio = ((float)health)/maxHealth;
-		gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
+		//gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
 		if(health <= 0){
 			gameObject->scene->RemoveObject(gameObject);	
 		}
@@ -430,40 +437,66 @@ struct EnemyComp : HitComponent{
 	virtual void OnAwake(){
 		ResetTarget();
 		physics = gameObject->scene->physicsSim;
+		pathing = &gameObject->scene->pathfinding;
 		player = gameObject->scene->FindGameObject("mainCam");
 	}
 
 	virtual void OnUpdate(){
+		
 		Vector3 toPlayer = player->transform.position - gameObject->transform.position;
 		RaycastHit hitPlayer = physics->Raycast(gameObject->transform.position, toPlayer);
-		
-		Vector3 moveVec;
 
 		if(hitPlayer.hit && hitPlayer.col->gameObject == player){
-			moveVec = toPlayer;
+			currentTarget = player->transform.position;
+			longTermGoal = currentTarget;
+			pathNeedsUpdate = true;
 		}
 		else{
-			moveVec = currentTarget - gameObject->transform.position;
+			if(pathNeedsUpdate){
+				path = pathing->FindPath(gameObject->transform.position, longTermGoal);
+				pathNeedsUpdate = false;
+			}
+			currentTarget = path.back();
 		}
 		
+		Vector3 moveVec = currentTarget - gameObject->transform.position;
+		//currentTarget.Print();
+
 		moveVec.y = 0;
 
-		if(moveVec.MagnitudeSquared() < 0.1f){
-			ResetTarget();
+		if(moveVec.MagnitudeSquared() < 0.05f){
+			if(path.size() > 0){
+				path.pop_back();
+				moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+			}
+			else{
+				moveVec = Vector3(0,0,0);
+			}
 		}
 		else{
 			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+		}
 
-			RaycastHit testHit = physics->Raycast(gameObject->transform.GlobalPosition(), moveVec);
-			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
-				gameObject->transform.position = gameObject->transform.position + moveVec;
-			}
-			else if (testHit.hit){
-				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
-				Vector3 goodVec = moveVec - badVec;
-				gameObject->transform.position = gameObject->transform.position + goodVec;
+		RaycastHit testHit = physics->Raycast(gameObject->transform.GlobalPosition(), moveVec);
+		if (testHit.hit && testHit.depth < moveVec.Magnitude() + 0.2f){
+			Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+			moveVec = moveVec - badVec;
+		}
+
+		float angle=0;
+		if(moveVec.MagnitudeSquared() < 0.0001f){
+			angle = 0;
+		}
+		else{
+			angle = acos(moveVec.Normalized().x);
+			if(CrossProduct(moveVec.Normalized(), X_AXIS).z > 0){
+				//angle = -angle;
 			}
 		}
+		
+		cout << "angle: " << angle << "\n";
+		gameObject->transform.rotation = Quaternion(Y_AXIS, angle);
+		gameObject->transform.position = gameObject->transform.position + moveVec;
 
 		float floorHeight = -10;
 		RaycastHit lookDown = physics->Raycast(gameObject->transform.position, Y_AXIS*-1);

@@ -357,20 +357,14 @@ void EditorScene::EditorGUI(){
 	glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0.4f, 0.6f, 0.6f, 1);
 
 	vector<Vector3> path = pathfinding.FindPath(Vector3(-4, 1, 4), Vector3(4, 1, -4));
-	Vector3 prevPos;
-	bool firstTime=true;
-	for(Vector3 pos : path){
-		if(firstTime){
-			prevPos = pos;
-			firstTime = false;
-		}
-		else{
-			glBegin(GL_LINES);
-			glVertex3f(prevPos.x, prevPos.y, prevPos.z);
-			glVertex3f(pos.x,     pos.y,     pos.z);
-			glEnd();
-			prevPos = pos;
-		}
+	Vector3 prevPos = Vector3(-4, 1, 4);
+	for(auto iter = path.rbegin(); iter != path.rend(); ++iter){
+		Vector3 pos = *iter;
+		glBegin(GL_LINES);
+		glVertex3f(prevPos.x, prevPos.y, prevPos.z);
+		glVertex3f(pos.x,     pos.y,     pos.z);
+		glEnd();
+		prevPos = pos;
 	}
 
 	glDisable(GL_DEPTH_TEST);
