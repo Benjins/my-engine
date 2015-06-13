@@ -428,7 +428,8 @@ struct EnemyComp : HitComponent{
 	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
 		health--;
 		float ratio = ((float)health)/maxHealth;
-		gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
+		gameObject->material->SetVec4Uniform("_color", Vector4(1.0f - ratio, 0, 0, 1.0));
+		cout << "Ratio: " << ratio << endl;
 		if(health <= 0){
 			gameObject->scene->RemoveObject(gameObject);	
 		}
