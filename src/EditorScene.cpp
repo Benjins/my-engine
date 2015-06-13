@@ -9,6 +9,12 @@
 #include "../header/int/Vector4.h"
 #include "../header/int/Mat4.h"
 
+#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
+#include <sys/time.h>
+#include <float.h>
+#endif 
+
+
 EditorScene::EditorScene(int argc, char** argv) : Scene(argc, argv){
 	glutMouseFunc(OnEditorMouseFunc);
 	glutPassiveMotionFunc(OnEditorPassiveMouseFunc);

@@ -1,8 +1,8 @@
 #ifndef GUI_ELEMENT_H
 #define GUI_ELEMENT_H
 
-#include "../header/ext/Vector2.h"
-#include "../header/int/FontBMPMaker.h"
+#include "../ext/Vector2.h"
+#include "FontBMPMaker.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <string>
