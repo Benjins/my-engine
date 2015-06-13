@@ -122,6 +122,10 @@ GuiElement* Scene::AddGuiElement(){
 }
 
 void Scene::RemoveObject(GameObject* obj){
+	for(SC_Transform* child : obj->transform.children){
+		RemoveObject(child->gameObject);
+	}
+
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		if(*iter == obj){
 			objects.erase(iter);

@@ -428,7 +428,7 @@ struct EnemyComp : HitComponent{
 	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
 		health--;
 		float ratio = ((float)health)/maxHealth;
-		//gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
+		gameObject->material->SetVec4Uniform("_color", Vector4(1.0, ratio, ratio, 1.0));
 		if(health <= 0){
 			gameObject->scene->RemoveObject(gameObject);	
 		}
@@ -456,7 +456,10 @@ struct EnemyComp : HitComponent{
 				path = pathing->FindPath(gameObject->transform.position, longTermGoal);
 				pathNeedsUpdate = false;
 			}
-			currentTarget = path.back();
+			if(path.size() > 0)
+			{
+				currentTarget = path.back();
+			}
 		}
 		
 		Vector3 moveVec = currentTarget - gameObject->transform.position;
@@ -494,7 +497,7 @@ struct EnemyComp : HitComponent{
 			}
 		}
 		
-		cout << "angle: " << angle << "\n";
+		//cout << "angle: " << angle << "\n";
 		gameObject->transform.rotation = Quaternion(Y_AXIS, angle);
 		gameObject->transform.position = gameObject->transform.position + moveVec;
 
