@@ -55,7 +55,7 @@
 <BoxCollider position='0.000000,0.000000,0.000000' size='4.000000,1.000000,4.000000'/>
 <AnimationComponent type='vector2' target='uvOffset' loop='T' autoplay='T'>
 <KeyFrame time='0.000000' value='0.000000,0.000000'/>
-<KeyFrame time='4.000000' value='0.000000,0.000000'/>
+<KeyFrame time='4.000000' value='0.000000,1.000000'/>
 </AnimationComponent>
 </GameObject>
 <GameObject name='myObj2'>
@@ -83,7 +83,7 @@
 <GameObject name='monkey'>
 <Transform position='-2.487024,4.153775,-2.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
 <Material name='stairMat'/>
-<Mesh source='Monkey.obj'/>
+<Mesh source='monkey.obj'/>
 </GameObject>
 <GameObject name='worm'>
 <Transform position='-3.487024,5.153775,-5.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
