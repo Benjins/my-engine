@@ -199,8 +199,7 @@ int RunAllTests(){
 		//AssertTrue(DetectCollision(col1,col1).collide, "Collider collides with itself");
 
 		obj1->transform.rotation = Quaternion(X_AXIS, 3.141592653589f/2);
-		AssertTrue(!DetectCollision(col1, col2).collide, "Box colliders offset, one shrunk one bigger, bigger one rotated do not collide. 1");
-		AssertTrue(!DetectCollision(col2, col1).collide, "Box colliders offset, one shrunk one bigger, bigger one rotated do not collide. 2");
+		AssertTrue(!DetectCollision(col2, col1).collide, "Box colliders offset, one shrunk one bigger, bigger one rotated do not collide.");
 		
 		delete obj1;
 		delete obj2;
