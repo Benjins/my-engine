@@ -31,4 +31,4 @@ before_script:
 
 script: 
   - cd ${TRAVIS_BUILD_DIR}
-  - make engine
+  - make engine && make editor && make testing && ./build/my-engine-test
