@@ -21,7 +21,7 @@ CrtCheckMemory::CrtCheckMemory(){
 #endif
   }
 
- CrtCheckMemory::~CrtCheckMemory(){
+CrtCheckMemory::~CrtCheckMemory(){
 #if defined(_WIN32) || defined(_WIN64)
     _CrtMemCheckpoint(&state2);
     // using google test you can just do this.
@@ -32,7 +32,7 @@ CrtCheckMemory::CrtCheckMemory(){
       _CrtMemDumpStatistics( &state3 );
 	}
 #endif
-  }
+}
 
 int RunAllTests(){
 	testCount = 0;
@@ -199,11 +199,8 @@ int RunAllTests(){
 		//AssertTrue(DetectCollision(col1,col1).collide, "Collider collides with itself");
 
 		obj1->transform.rotation = Quaternion(X_AXIS, 3.141592653589f/2);
-		AssertTrue(!DetectCollision(col1, col2).collide, "Box colliders offset, one shrunk one bigger, bigger one rotated do not collide.");
-		AssertTrue(!DetectCollision(col2, col1).collide, "Box colliders offset, one shrunk one bigger, bigger one rotated do not collide.");
-
-		AABB col1Bounds = col1->GetBounds(false);
-		AABB col2Bounds = col2->GetBounds();
+		AssertTrue(!DetectCollision(col1, col2).collide, "Box colliders offset, one shrunk one bigger, bigger one rotated do not collide. 1");
+		AssertTrue(!DetectCollision(col2, col1).collide, "Box colliders offset, one shrunk one bigger, bigger one rotated do not collide. 2");
 		
 		delete obj1;
 		delete obj2;
