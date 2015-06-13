@@ -78,8 +78,8 @@ void ConvertTrueTypeToFUV(const string& fileName, int fontSize, FUV& readInto){
 						y2 / bitmapSize, 
 						((float)(adv.x >> 6)), 
 						((float)(adv.y >> 6)),
-						face->glyph->bitmap_left,
-						face->glyph->bitmap_top};
+						static_cast<float>(face->glyph->bitmap_left),
+						static_cast<float>(face->glyph->bitmap_top)};
 
 		readInto.uvs[character] = uvs;
 		x += bitmap.width + 1;
