@@ -10,6 +10,7 @@
 #include "GuiElement.h"
 #include "Pathfinding.h"
 #include "Light.h"
+#include "AudioSystem.h"
 #include <time.h>
 #include <random>
 
@@ -27,6 +28,7 @@ struct Scene{
 	Input input;
 	MaterialManager resources;
 	Pathfinding pathfinding;
+	AudioSystem audio;
 
 	//Vector3 lightDir;
 	vector<GuiElement*> guiElements;

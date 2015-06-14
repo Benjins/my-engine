@@ -39,6 +39,10 @@ Scene::Scene(int argc, char** argv){
 
 	myRandom = default_random_engine(time(NULL));
 
+	audio.Initialise();
+	audio.clip.LoadFromWavFile("data/squeak.wav");
+	audio.clip.Play();
+
 	glutInit(&argc, argv);
 
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_ALPHA);
@@ -196,7 +200,7 @@ void Scene::OnUpdate(){
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
 
-	cout << "Scene::Update(): " << deltaTime * 1000 << " ms.\n";
+	//cout << "Scene::Update(): " << deltaTime * 1000 << " ms.\n";
 	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 
 	GameObject* parent = (*objects.begin());

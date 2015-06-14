@@ -1,5 +1,5 @@
 engine: src/*.cpp
-	$(CXX) -std=c++11 -Iheader/ext/freetype2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -o ./build/my-engine
+	$(CXX) -std=c++11 -Iheader/ext/freetype2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine
 
 editor: src/*.cpp
 	$(CXX) -std=c++11 -DEDITOR -Iheader/ext/freetype2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -o ./build/my-engine-editor
