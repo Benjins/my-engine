@@ -22,8 +22,13 @@ void XMLElement::Print() const{
 	}
 }
 
-string XMLElement::SaveElement(){
-	string save = "<" + name;
+string XMLElement::SaveElement(int depth/* = 0*/){
+	string tabDepth = "";
+	for(int i = 0; i < depth; i++){
+		tabDepth += "    ";
+	}
+
+	string save = tabDepth + "<" + name;
 	for(auto iter = attributes.begin(); iter != attributes.end(); iter++){
 		save = save + " " + iter->ToString(); 
 	}
@@ -36,11 +41,11 @@ string XMLElement::SaveElement(){
 		save += ">\n";
 			
 		for(auto iter = children.begin(); iter != children.end(); iter++){
-			save += iter->SaveElement();
+			save += iter->SaveElement(depth + 1);
 			save += "\n";
 		}
 
-		save = save + "</" + name + ">";
+		save = save + tabDepth + "</" + name + ">";
 		return save;
 	}
 }
@@ -193,7 +198,7 @@ void SaveXMLDoc(XMLDocument& doc, string fileName){
 	string docContents = "";
 
 	for(auto iter = doc.contents.begin(); iter != doc.contents.end(); iter++){
-		docContents += iter->SaveElement();
+		docContents += iter->SaveElement(0);
 		docContents += "\n";
 	}
 

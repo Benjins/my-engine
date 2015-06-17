@@ -2,10 +2,59 @@
 #include "../header/int/ResourceManager.h"
 #include "../header/ext/EasyBMP.h"
 #include <stdio.h>
+#include <iostream>
+
+using std::cout;
+
+#if defined(_WIN32) || defined(_WIN64)
+
+#pragma pack(1)
+struct BitMapHeader{
+	short fileTag;
+	int fileSize;
+	short reservedA;
+	short reservedB;
+	int imageDataOffset;
+
+	int headerSize;
+	int imageWidth;
+	int imageHeight;
+	short numColorPlanes;
+	short bitDepth;
+	int compressionMethod;
+	int imageDataSize;
+	int horizontalResolution;
+	int verticalResolution;
+	int numPaletteColors;
+	int numImportantColors;
+};
+#pragma pack()
+
+#else
+typedef struct __attribute((packed))__{
+	short fileTag;
+	int fileSize;
+	short reservedA;
+	short reservedB;
+	int imageDataOffset;
+
+	int headerSize;
+	int imageWidth;
+	int imageHeight;
+	short numColorPlanes;
+	short bitDepth;
+	int compressionMethod;
+	int imageDataSize;
+	int horizontalResolution;
+	int verticalResolution;
+	int numPaletteColors;
+	int numImportantColors;
+} BitMapHeader;
+#endif
 
 Texture::Texture(){
 	fileName = "";
-	this->pixelData = NULL;
+	pixelData = NULL;
 }
 
 Texture::Texture(int _width, int _height){
@@ -29,20 +78,31 @@ Texture::Texture(GLenum TextureTarget, const std::string& _fileName){
 //Requires OpenGL context
 void Texture::Load(GLenum TextureTarget){
 
+	FILE* bmpFile = fopen(fileName.c_str(), "rb");
+	BitMapHeader header;	
+	fread(&header, sizeof(header), 1, bmpFile);
 
+	unsigned char* imgBuffer = new unsigned char[header.imageDataSize];
+	fread(imgBuffer, 1, header.imageDataSize, bmpFile);
+	fclose(bmpFile);
 
-    BMP image;
-	
-	image.ReadFromFile(fileName.c_str());
-	width = image.TellWidth();
-	height = image.TellHeight();
+	width = header.imageWidth;
+	height = header.imageHeight;
+
+	if(pixelData != nullptr){
+		delete[] pixelData;
+	}
 
 	pixelData = new RGBApixel[width*height];
-	for(int j = 0; j < height; j++){
-		for(int i = 0; i < width; i++){
-			pixelData[j*width+i] = image.GetPixel(i,j); 
-		}
+
+	for(int i = 0; i < width*height; i++){
+		pixelData[i].Green = imgBuffer[i*3];
+		pixelData[i].Red = imgBuffer[i*3+1];
+		pixelData[i].Blue = imgBuffer[i*3+2];
+		pixelData[i].Alpha = 255;
 	}
+
+	delete[] imgBuffer;
 
     glGenTextures(1, &textureObj);
     Apply(TextureTarget);

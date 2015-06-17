@@ -61,7 +61,7 @@ struct XMLElement{
 
 	void Print() const;
 
-	string SaveElement();
+	string SaveElement(int depth = 0);
 };
 
 struct XMLDocument{
