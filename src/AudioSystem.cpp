@@ -81,7 +81,6 @@ void AudioClip::LoadFromWavFile(const char* name){
 
   	fclose(wavFile);
 
-  	data = dataBuffer;
   	frequency = sampleRate;
 
   	alGenBuffers(1, &buffer);
@@ -115,7 +114,9 @@ void AudioClip::LoadFromWavFile(const char* name){
   		cout << "Error: Invalid bits per sample: " << bitsPerSample << "\n";
   	}
 
-  	alBufferData(buffer, format, data, dataSize, frequency);
+  	alBufferData(buffer, format, dataBuffer, dataSize, frequency);
+
+  	delete[] dataBuffer;
 
   	ALfloat sourcePos[] = {0,0,0};
   	ALfloat sourceVel[] = {0,0,0};
@@ -151,4 +152,28 @@ void AudioSystem::Initialise(){
 	alListenerfv(AL_POSITION, listenerPos);
 	alListenerfv(AL_VELOCITY, listenerVel);
 	alListenerfv(AL_ORIENTATION, listenerOri);
+}
+
+int AudioSystem::AddClip(){
+	if(clips.size() == 0){
+		clips.emplace_back();
+		clips[0].id = 0;
+		return 0;
+	}
+	else{
+		int prevLastId = clips[clips.size()-1].id;
+		clips.emplace_back();
+		clips[clips.size()-1].id = prevLastId + 1;
+		return prevLastId + 1;
+	}
+}
+
+AudioClip* AudioSystem::GetClipById(int id){
+	for(AudioClip& clip : clips){
+		if(clip.id == id){
+			return &clip;
+		}
+	}
+
+	return nullptr;
 }

@@ -40,8 +40,9 @@ Scene::Scene(int argc, char** argv){
 	myRandom = default_random_engine(time(NULL));
 
 	audio.Initialise();
-	audio.clip.LoadFromWavFile("data/squeak.wav");
-	audio.clip.Play();
+	//audio.clips.emplace_back();
+	//audio.clips[0].LoadFromWavFile("data/squeak.wav");
+	//audio.clips[0].Play();
 
 	glutInit(&argc, argv);
 
@@ -57,10 +58,7 @@ Scene::Scene(int argc, char** argv){
     }
 #endif
 
-	//glutDisplayFunc(RenderScene);
-	//glutIdleFunc(RenderScene);
 	glutMouseFunc(OnMouseFunc);
-	//glutMotionFunc(OnPassiveMouseFunc);
 	glutPassiveMotionFunc(OnPassiveMouseFunc);
 	glutMotionFunc(OnPassiveMouseFunc);
 	glutKeyboardFunc(OnKeyFunc);
@@ -212,6 +210,8 @@ void Scene::OnUpdate(){
 	double sliderTime = ((double)after - before)/CLOCKS_PER_SEC;
 
 	parent->transform.rotation = parent->transform.rotation * Quaternion(Y_AXIS, deltaTime/3);
+
+	audio.SetListenerPos(camera->GlobalPosition());
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		(*iter)->OnUpdate();

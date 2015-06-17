@@ -1,6 +1,7 @@
 #include "../header/int/Texture.h"
 #include "../header/int/ResourceManager.h"
 #include "../header/ext/EasyBMP.h"
+#include <stdio.h>
 
 Texture::Texture(){
 	fileName = "";
@@ -27,6 +28,13 @@ Texture::Texture(GLenum TextureTarget, const std::string& _fileName){
 
 //Requires OpenGL context
 void Texture::Load(GLenum TextureTarget){
+
+	FILE* bmpFile = fopen(fileName.c_str());
+
+	
+
+	fclose(bmpFile);
+
     BMP image;
 	
 	image.ReadFromFile(fileName.c_str());

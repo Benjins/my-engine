@@ -1,9 +1,19 @@
+#ifndef AUDIOSYSTEM_H
+#define AUDIOSYSTEM_H
+
 #include <AL/al.h>
 #include <AL/alc.h>
 
+#include "../ext/Vector3.h"
+
+#include <vector>
+
+using std::vector;
+
 struct AudioClip{
-	unsigned char* data;
 	int dataSize;
+
+	int id;
 
 	ALuint source;
 	ALuint buffer;
@@ -11,7 +21,6 @@ struct AudioClip{
 	ALenum format;
 
 	AudioClip(){
-		data = nullptr;
 		dataSize = 0;
 		source = 0;
 		buffer = 0;
@@ -22,20 +31,19 @@ struct AudioClip{
 		alSourcePlay(source);
 	}
 
-	void LoadFromWavFile(const char* name);
-
-	~AudioClip(){
-		delete[] data;
-		alDeleteSources(1, &source);
-		alDeleteBuffers(1, &buffer);
+	void SetPosition(const Vector3& pos){
+		ALfloat place[] = {pos.x, pos.y, pos.z};
+		alListenerfv(AL_POSITION, place);
 	}
+
+	void LoadFromWavFile(const char* name);
 };
 
 struct AudioSystem{
 	ALCdevice* device;
 	ALCcontext* context;
 
-	AudioClip clip;
+	vector<AudioClip> clips;
 
 	AudioSystem(){
 		device = nullptr;
@@ -44,9 +52,29 @@ struct AudioSystem{
 
 	void Initialise();
 
+	void SetListenerPos(const Vector3& pos){
+		ALfloat listen[] = {pos.x, pos.y, pos.z};
+		alListenerfv(AL_POSITION, listen);
+	}
+
+	int AddClip();
+
+	AudioClip* GetClipById(int id);
+
 	~AudioSystem(){
+		for(AudioClip& clip : clips){
+			alDeleteSources(1, &clip.source);
+			alDeleteBuffers(1, &clip.buffer);
+		}
+
+		clips.clear();
+
 		alcMakeContextCurrent(nullptr);
 		alcDestroyContext(context);
 		alcCloseDevice(device);
 	}
 };
+
+
+
+#endif

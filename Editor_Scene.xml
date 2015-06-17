@@ -101,6 +101,7 @@
 <Material name='stairMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+<AudioComponent fileName='data/cough.wav'/>
 </GameObject>
 <GameObject name='stairs2'>
 <Transform position='4.181658,0.750388,4.000000' rotation='0.906308,0.000000,0.000000,0.422618' scale='2.000000,1.000000,1.000000'/>

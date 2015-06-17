@@ -11,11 +11,52 @@
 #include "Scene.h"
 #include "LoadingUtilities.h"
 #include "Animation.h"
+#include "AudioSystem.h"
 #include "../ext/simple-xml.h"
 #include <iostream>
 #include <assert.h>
 
 using std::cout; using std::endl;
+
+struct AudioComponent : Component{
+	int clipId;
+	string fileName;
+
+	virtual void OnAwake(){
+		clipId = gameObject->scene->audio.AddClip();
+		gameObject->scene->audio.GetClipById(clipId)->LoadFromWavFile(fileName.c_str());
+		gameObject->scene->audio.GetClipById(clipId)->Play();
+	}
+
+	virtual void OnUpdate(){
+		gameObject->scene->audio.GetClipById(clipId)->SetPosition(gameObject->transform.GlobalPosition());	
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "AudioComponent";
+		elem.attributes.emplace_back("fileName", fileName);
+		return elem;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+		for(const XMLAttribute& attr : elem.attributes){
+			if(attr.name == "fileName"){
+				fileName = attr.data;
+			}
+		}
+	}
+
+	virtual ~AudioComponent(){
+		int index = 0;
+		for(auto iter = gameObject->scene->audio.clips.begin(); iter != gameObject->scene->audio.clips.end(); iter++){
+			if(iter->id == clipId){
+				gameObject->scene->audio.clips.erase(iter);
+				break;
+			}
+		}
+	}
+};
 
 struct PathNodeComponent : Component{
 	
@@ -50,7 +91,7 @@ struct PathNodeComponent : Component{
 			}
 			index++;
 		}
-	};
+	}
 };
 
 struct AnimationComponent : Component{

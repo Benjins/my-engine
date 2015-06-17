@@ -22,6 +22,7 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(LightComponent);
 	DEFINE_USER_COMPONENT(AnimationComponent);
 	DEFINE_USER_COMPONENT(PathNodeComponent);
+	DEFINE_USER_COMPONENT(AudioComponent);
 	return nullptr;
 }
 
