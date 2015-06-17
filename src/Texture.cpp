@@ -29,11 +29,7 @@ Texture::Texture(GLenum TextureTarget, const std::string& _fileName){
 //Requires OpenGL context
 void Texture::Load(GLenum TextureTarget){
 
-	FILE* bmpFile = fopen(fileName.c_str());
 
-	
-
-	fclose(bmpFile);
 
     BMP image;
 	
