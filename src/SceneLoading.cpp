@@ -49,6 +49,9 @@ string EncodeAnimationType(AnimationType type){
 	case AnimationType::Vector3:
 		return "vector3";
 		break;
+	case AnimationType::Quaternion:
+		return "quaternion";
+		break;
 	default:
 		return "";
 		break;
@@ -68,6 +71,9 @@ string EncodeAnimationTarget(AnimationTarget target){
 		break;
 	case AnimationTarget::UVScale:
 		return "uvScale";
+		break;
+	case AnimationTarget::Rotation:
+		return "rotation";
 		break;
 	default:
 		return "";
@@ -113,6 +119,9 @@ AnimationType ParseAnimationType(string encoded){
 	else if(encoded == "vector3"){
 		return AnimationType::Vector3;
 	}
+	else if(encoded == "quaternion"){
+		return AnimationType::Quaternion;
+	}
 	else{
 		cout << "\nError: could not understand animation type of: '" << encoded << "'.\n";
 		return AnimationType::Float;
@@ -131,6 +140,9 @@ AnimationTarget ParseAnimationTarget(string encoded){
 	}
 	else if(encoded == "uvScale"){
 		return AnimationTarget::UVScale;
+	}
+	else if(encoded == "rotation"){
+		return AnimationTarget::Rotation;
 	}
 	else{
 		cout << "\nError: could not understand animation type of: '" << encoded << "'.\n";

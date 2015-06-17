@@ -99,6 +99,7 @@ struct AnimationComponent : Component{
 	Animation<float> floatAnim;
 	Animation<Vector2> vec2Anim;
 	Animation<Vector3> vec3Anim;
+	Animation<Quaternion> quatAnim;
 
 	AnimationType animType;
 	AnimationTarget animTarget;
@@ -143,6 +144,15 @@ struct AnimationComponent : Component{
 				elem.children.push_back(child);
 			}
 		}
+		else if(animType == AnimationType::Quaternion){
+			for(const KeyFrame<Quaternion>& frame : quatAnim.keyFrames){
+				XMLElement child;
+				child.name = "KeyFrame";
+				child.attributes.emplace_back("time", to_string(frame.time));
+				child.attributes.emplace_back("value", EncodeQuaternion(frame.value));
+				elem.children.push_back(child);
+			}
+		}
 
 		return elem;
 	}
@@ -170,6 +180,7 @@ struct AnimationComponent : Component{
 				float floatVal;
 				Vector2 vec2Val;
 				Vector3 vec3Val;
+				Quaternion quatVal;
 				float time;
 				for(const XMLAttribute& attr : child.attributes){
 					if(attr.name == "time"){
@@ -185,6 +196,9 @@ struct AnimationComponent : Component{
 						else if(animType == AnimationType::Vector3){
 							vec3Val = ParseVector3(attr.data);
 						}
+						else if(animType == AnimationType::Quaternion){
+							quatVal = ParseQuaternion(attr.data);
+						}
 					}
 				}
 
@@ -196,6 +210,9 @@ struct AnimationComponent : Component{
 				}
 				else if(animType == AnimationType::Vector3){
 					vec3Anim.AddKeyFrame(vec3Val, time);
+				}
+				else if(animType == AnimationType::Quaternion){
+					quatAnim.AddKeyFrame(quatVal, time);
 				}
 			}
 		}
@@ -216,6 +233,9 @@ struct AnimationComponent : Component{
 		}
 		else if(animType == AnimationType::Vector3){
 			length = vec3Anim.Length();
+		}
+		else if(animType == AnimationType::Quaternion){
+			length = quatAnim.Length();
 		}
 
 		if(isPlaying){
@@ -240,6 +260,10 @@ struct AnimationComponent : Component{
 		else if(animTarget == AnimationTarget::UVScale){
 			assert(animType == AnimationType::Vector2);
 			gameObject->material->uvScale = vec2Anim.Evaluate(currentTime);
+		}
+		else if(animTarget == AnimationTarget::Rotation){
+			assert(animType == AnimationType::Quaternion);
+			gameObject->transform.rotation = quatAnim.Evaluate(currentTime);
 		}
 	}
 };

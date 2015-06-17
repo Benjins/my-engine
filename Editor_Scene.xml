@@ -95,6 +95,11 @@
 <Material name='floorMat'/>
 <Mesh source='test.obj'/>
 <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.100000,1.000000'/>
+<AnimationComponent type='quaternion' target='rotation' loop='T' autoplay='T'>
+<KeyFrame time='0.000000' value='0.906308,0.000000,0.000000,0.422618'/>
+<KeyFrame time='1.000000' value='1,0,0,0'/>
+<KeyFrame time='2.000000' value='0.906308,0.000000,0.000000,0.422618'/>
+</AnimationComponent>
 </GameObject>
 <GameObject name='stairs1'>
 <Transform position='2.162069,3.618957,6.274128' rotation='0.906308,0.422618,0.000000,0.000000' scale='4.000000,1.000000,1.000000'/>

@@ -23,7 +23,7 @@ void main()
 	vec4 texCol  = texture2D(_mainTex, uv_coord.st);
 	vec4 bumpCol = texture2D(_bumpMap, uv_coord.st);
 	texCol.a = 1.0;
-	vec4 color = mix(texCol, _color, 0.4);
+	vec4 color = mix(texCol, _color, 0.5);
 	
 	vec3 actualTangent = normalize(tangent - dot(tangent, normal) * normal);
 	bumpCol = bumpCol * 2.0 - vec4(1.0,1.0,1.0,0.0);

@@ -6,6 +6,7 @@
 using std::vector;
 
 enum struct AnimationType{
+	Quaternion,
 	Vector3,
 	Vector2,
 	Float
@@ -15,7 +16,8 @@ enum struct AnimationTarget{
 	Position,
 	Scale,
 	UVScale,
-	UVOffset
+	UVOffset,
+	Rotation
 };
 
 template<typename T>
