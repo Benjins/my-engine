@@ -644,6 +644,7 @@ struct CameraControl : Component{
 	bool isGrounded;
 	float health;
 
+	float stepDelay;
 	float timeMoving;
 
 	int prevX;
@@ -661,6 +662,7 @@ struct CameraControl : Component{
 		isGrounded = false;
 		health = 1;
 		timeMoving = 0;
+		stepDelay = 0.6f;
 	}
 
 	virtual XMLElement Serialize(){
@@ -670,6 +672,7 @@ struct CameraControl : Component{
 		elem.attributes.push_back(XMLAttribute("velocity", to_string(velocity)));
 		elem.attributes.push_back(XMLAttribute("isGrounded", isGrounded ? "T" : "F"));
 		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
+		elem.attributes.push_back(XMLAttribute("stepDelay", to_string(stepDelay)));
 
 		return elem;
 	}
@@ -687,6 +690,9 @@ struct CameraControl : Component{
 			}
 			else if(iter->name == "isGrounded"){
 				isGrounded = (iter->data == "T");
+			}
+			else if(iter->name == "stepDelay"){
+				stepDelay = atof(iter->data.c_str());
 			}
 		}
 	}

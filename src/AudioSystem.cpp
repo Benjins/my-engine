@@ -90,11 +90,9 @@ void AudioClip::LoadFromWavFile(const char* name){
   	if(bitsPerSample == 8){
   		if(channels == 1){ 
 			format = AL_FORMAT_MONO8;
-      printf("MONO;\n");
   		}
   		else if(channels == 2){
   			format = AL_FORMAT_STEREO8;
-         printf("STEREO;\n");
   		}
   		else{
   			cout << "\nError: nvalid number of channels: " << channels << "\n";
@@ -104,11 +102,9 @@ void AudioClip::LoadFromWavFile(const char* name){
   	else if(bitsPerSample == 16){
   		if(channels == 1){
 			format = AL_FORMAT_MONO16;
-      printf("MONO;\n");
   		}
   		else if(channels == 2){
   			format = AL_FORMAT_STEREO16;
-        printf("STEREO;\n");
   		}
   		else{
   			cout << "\nError: nvalid number of channels: " << channels << "\n";
@@ -150,6 +146,9 @@ void AudioSystem::Initialise(){
 		cout << "\nError: no sound context found, could not initialise OpenAL.\n";
 		return;
 	}
+
+  printf("%s\n", alGetString(AL_EXTENSIONS));
+  printf("%s\n", alGetString(AL_VERSION));
 
 	ALfloat listenerPos[] = {0,0,0};
 	ALfloat listenerVel[] = {0,0,0};
