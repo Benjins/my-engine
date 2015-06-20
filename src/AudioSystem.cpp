@@ -11,6 +11,7 @@ void AudioClip::LoadFromWavFile(const char* name){
 	short formatType,channels;
 	int sampleRate, avgBytesPerSec;
 	short bytesPerSample,bitsPerSample;
+  int dataSize=0;
 
 	FILE* wavFile;
   	wavFile = fopen (name,"rb");
@@ -87,11 +88,13 @@ void AudioClip::LoadFromWavFile(const char* name){
   	alGenSources(1, &source);
 
   	if(bitsPerSample == 8){
-  		if(channels == 1){
+  		if(channels == 1){ 
 			format = AL_FORMAT_MONO8;
+      printf("MONO;\n");
   		}
   		else if(channels == 2){
   			format = AL_FORMAT_STEREO8;
+         printf("STEREO;\n");
   		}
   		else{
   			cout << "\nError: nvalid number of channels: " << channels << "\n";
@@ -101,9 +104,11 @@ void AudioClip::LoadFromWavFile(const char* name){
   	else if(bitsPerSample == 16){
   		if(channels == 1){
 			format = AL_FORMAT_MONO16;
+      printf("MONO;\n");
   		}
   		else if(channels == 2){
   			format = AL_FORMAT_STEREO16;
+        printf("STEREO;\n");
   		}
   		else{
   			cout << "\nError: nvalid number of channels: " << channels << "\n";
@@ -114,6 +119,7 @@ void AudioClip::LoadFromWavFile(const char* name){
   		cout << "Error: Invalid bits per sample: " << bitsPerSample << "\n";
   	}
 
+    clipFileName = name;
   	alBufferData(buffer, format, dataBuffer, dataSize, frequency);
 
   	delete[] dataBuffer;
@@ -152,28 +158,4 @@ void AudioSystem::Initialise(){
 	alListenerfv(AL_POSITION, listenerPos);
 	alListenerfv(AL_VELOCITY, listenerVel);
 	alListenerfv(AL_ORIENTATION, listenerOri);
-}
-
-int AudioSystem::AddClip(){
-	if(clips.size() == 0){
-		clips.emplace_back();
-		clips[0].id = 0;
-		return 0;
-	}
-	else{
-		int prevLastId = clips[clips.size()-1].id;
-		clips.emplace_back();
-		clips[clips.size()-1].id = prevLastId + 1;
-		return prevLastId + 1;
-	}
-}
-
-AudioClip* AudioSystem::GetClipById(int id){
-	for(AudioClip& clip : clips){
-		if(clip.id == id){
-			return &clip;
-		}
-	}
-
-	return nullptr;
 }

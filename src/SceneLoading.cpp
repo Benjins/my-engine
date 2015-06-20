@@ -151,6 +151,19 @@ AnimationTarget ParseAnimationTarget(string encoded){
 	
 }
 
+void LoadAudioXML(Scene* scene, XMLElement elem){
+	AudioClip* clip = scene->audio.AddClip();
+	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
+		if(iter->name == "fileName"){
+			clip->clipFileName = iter->data;
+			clip->LoadFromWavFile(iter->data.c_str());
+		}
+		else if(iter->name == "name"){
+			clip->clipName = iter->data;
+		}
+	}
+}
+
 void LoadMaterialXML(Scene* scene, XMLElement elem){
 	string matName="", shaderName="",textureName="",bumpMapName="";
 	Vector2 uvOffset = Vector2(0,0), uvScale = Vector2(1,1);
@@ -315,6 +328,9 @@ void Scene::LoadScene(string fileName){
 				}
 				else if(res.name == "GuiText"){
 					LoadGuiText(res);
+				}
+				else if(res.name == "AudioClip"){
+					LoadAudioXML(this, res);
 				}
 			}
 		}

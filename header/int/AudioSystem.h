@@ -5,36 +5,20 @@
 #include <AL/alc.h>
 
 #include "../ext/Vector3.h"
-
 #include <vector>
+
+#define MAX_CLIP_COUNT 20
 
 using std::vector;
 
 struct AudioClip{
-	int dataSize;
-
-	int id;
+	string clipFileName;
+	string clipName;
 
 	ALuint source;
 	ALuint buffer;
 	ALuint frequency;
 	ALenum format;
-
-	AudioClip(){
-		dataSize = 0;
-		source = 0;
-		buffer = 0;
-		format = 0;
-	}
-
-	void Play(){
-		alSourcePlay(source);
-	}
-
-	void SetPosition(const Vector3& pos){
-		ALfloat place[] = {pos.x, pos.y, pos.z};
-		alListenerfv(AL_POSITION, place);
-	}
 
 	void LoadFromWavFile(const char* name);
 };
@@ -43,11 +27,14 @@ struct AudioSystem{
 	ALCdevice* device;
 	ALCcontext* context;
 
-	vector<AudioClip> clips;
+	AudioClip clips[MAX_CLIP_COUNT];
+
+	int clipCount;
 
 	AudioSystem(){
 		device = nullptr;
 		context = nullptr;
+		clipCount = 0;
 	}
 
 	void Initialise();
@@ -57,17 +44,26 @@ struct AudioSystem{
 		alListenerfv(AL_POSITION, listen);
 	}
 
-	int AddClip();
+	AudioClip* AddClip(){
+		AudioClip* clip = &clips[clipCount];
+		clipCount++;
+		return clip;
+	}
 
-	AudioClip* GetClipById(int id);
-
-	~AudioSystem(){
-		for(AudioClip& clip : clips){
-			alDeleteSources(1, &clip.source);
-			alDeleteBuffers(1, &clip.buffer);
+	AudioClip* FindClip(const string& clipName){
+		for(int i = 0; i < clipCount; i++){
+			if(clips[i].clipName == clipName){
+				return &clips[i];
+			}
 		}
 
-		clips.clear();
+		return nullptr;
+	}
+
+	~AudioSystem(){
+		for(int i = 0; i < clipCount; i++){
+			alDeleteBuffers(1, &(clips[i].buffer));
+		}
 
 		alcMakeContextCurrent(nullptr);
 		alcDestroyContext(context);

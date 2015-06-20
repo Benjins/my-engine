@@ -19,42 +19,91 @@
 using std::cout; using std::endl;
 
 struct AudioComponent : Component{
-	int clipId;
-	string fileName;
+	string clipName;
+
+	ALuint source;
+
+	float volume;
+	bool loop;
+	bool autoPlay = true;
+
+	AudioComponent(){
+		volume = 1;
+		loop = false;
+	}
 
 	virtual void OnAwake(){
-		clipId = gameObject->scene->audio.AddClip();
-		gameObject->scene->audio.GetClipById(clipId)->LoadFromWavFile(fileName.c_str());
-		gameObject->scene->audio.GetClipById(clipId)->Play();
+		AudioClip* clip = gameObject->scene->audio.FindClip(clipName);
+		assert(clip != nullptr);
+		alGenSources(1, &source);
+
+		alSourcei(source, AL_BUFFER, clip->buffer);
+	  	alSourcef(source, AL_PITCH, 1);
+	  	alSourcef(source, AL_GAIN,  volume);
+
+	  	alSourcei(source,  AL_LOOPING, (loop ? AL_TRUE : AL_FALSE));
+	  	if(autoPlay){
+	  		alSourcePlay(source);
+	  	}
 	}
 
 	virtual void OnUpdate(){
-		gameObject->scene->audio.GetClipById(clipId)->SetPosition(gameObject->transform.GlobalPosition());	
+		Vector3 place = gameObject->transform.GlobalPosition();
+		ALfloat placeData[] = {place.x, place.y, place.z};
+		alSourcefv(source, AL_POSITION, placeData);
+	}
+
+	void Stop(){
+		alSourceStop(source);
+	}
+
+	void Pause(){
+		alSourcePause(source);
+	}
+
+	void Play(){
+		alSourcePlay(source);
+	}
+
+	bool IsPlaying(){
+		ALint state;
+	    alGetSourcei(source, AL_SOURCE_STATE, &state);
+	    return (state == AL_PLAYING);
+	}
+
+	void SetVolume(float volume){
+		alSourcef(source, AL_GAIN,  volume);
 	}
 
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "AudioComponent";
-		elem.attributes.emplace_back("fileName", fileName);
+		elem.attributes.emplace_back("clipName", clipName);
+		elem.attributes.emplace_back("volume", to_string(volume));
+		elem.attributes.emplace_back("loop", (loop ? "T" : "F"));
+		elem.attributes.emplace_back("autoPlay", (autoPlay ? "T" : "F"));
 		return elem;
 	}
 
 	virtual void Deserialize(const XMLElement& elem){
 		for(const XMLAttribute& attr : elem.attributes){
-			if(attr.name == "fileName"){
-				fileName = attr.data;
+			if(attr.name == "clipName"){
+				clipName = attr.data;
+			}
+			else if(attr.name == "volume"){
+				volume = atof(attr.data.c_str());
+			}
+			else if(attr.name == "loop"){
+				loop = (attr.data == "T");
+			}
+			else if(attr.name == "autoPlay"){
+				autoPlay = (attr.data == "T");
 			}
 		}
 	}
 
 	virtual ~AudioComponent(){
-		int index = 0;
-		for(auto iter = gameObject->scene->audio.clips.begin(); iter != gameObject->scene->audio.clips.end(); iter++){
-			if(iter->id == clipId){
-				gameObject->scene->audio.clips.erase(iter);
-				break;
-			}
-		}
+		alDeleteSources(1, &source);
 	}
 };
 
@@ -588,11 +637,14 @@ struct CameraControl : Component{
 	PhysicsSim* physics;
 	GuiElement* slider;
 	GuiText* healthBar;
+	AudioComponent* audioComp;
 	float speed;
 	float velocity;
 
 	bool isGrounded;
 	float health;
+
+	float timeMoving;
 
 	int prevX;
 	int prevY;
@@ -608,6 +660,7 @@ struct CameraControl : Component{
 		velocity = 0;
 		isGrounded = false;
 		health = 1;
+		timeMoving = 0;
 	}
 
 	virtual XMLElement Serialize(){
@@ -644,6 +697,7 @@ struct CameraControl : Component{
 		physics = gameObject->scene->physicsSim;
 		slider = gameObject->scene->guiElements[0];
 		healthBar = static_cast<GuiText*>(gameObject->scene->FindGUIElement("healthText"));
+		audioComp = gameObject->GetComponent<AudioComponent>();
 	}
 
 	virtual void OnUpdate(){
@@ -707,6 +761,11 @@ struct CameraControl : Component{
 				Vector3 goodVec = moveVec - badVec;
 				camera->GetParent()->position = camera->GetParent()->position + goodVec;
 			}
+
+			timeMoving += gameObject->scene->deltaTime;
+		}
+		else{
+			timeMoving = 0;
 		}
 
 		float floorHeight = -10;
@@ -724,6 +783,11 @@ struct CameraControl : Component{
 		}
 		else{
 			isGrounded = false;
+		}
+
+		if(timeMoving > 0.8f && isGrounded){
+			audioComp->Play();
+			timeMoving = 0;
 		}
 	}
 
