@@ -77,7 +77,6 @@ Texture::Texture(GLenum TextureTarget, const std::string& _fileName){
 
 //Requires OpenGL context
 void Texture::Load(GLenum TextureTarget){
-
 	FILE* bmpFile = fopen(fileName.c_str(), "rb");
 	BitMapHeader header;	
 	fread(&header, sizeof(header), 1, bmpFile);
@@ -130,9 +129,8 @@ void Texture::GetPixel(int x, int y){
 
 void Texture::Apply(GLenum TextureTarget){
 	if(pixelData != NULL){
-
 		glActiveTexture(TextureTarget);
-		glBindTexture(textureTarget, textureObj);
+		glBindTexture(GL_TEXTURE_2D, textureObj);
 		glTexImage2D(textureTarget, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixelData);
 		glTexParameterf(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

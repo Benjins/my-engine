@@ -205,7 +205,7 @@ void Scene::OnUpdate(){
 	GameObject* child  = (*objects.rbegin());
 
 	clock_t before = clock();
-	GuiSetSliderValue(guiElements[0], (1+sin(float(currTime)/divisor))/2);
+	//GuiSetSliderValue(guiElements[0], (1+sin(float(currTime)/divisor))/2);
 	clock_t after = clock();
 	double sliderTime = ((double)after - before)/CLOCKS_PER_SEC;
 

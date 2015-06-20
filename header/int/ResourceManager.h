@@ -10,9 +10,10 @@ struct Texture; struct Material; struct Model; struct GameObject;
 
 struct MaterialManager{
 	Material* materials;
-
+	Texture* textures;
 
 	unsigned int matAlloc;
+	unsigned int texAlloc;
 
 public:
 	MaterialManager(int matCount = 40);
@@ -23,11 +24,13 @@ public:
 
 	Material* LoadMaterial(string matName, string shaderName, string textureName="", string bumpMapName = "");
 
+	Texture* LoadTexture(const string& fileName, bool forceInstance = false);
+	Texture* GetTextureByFileName(const string& fileName);
+
 	void Clear();
 
 	~MaterialManager();
 };
-
 
 
 #endif

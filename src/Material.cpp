@@ -24,15 +24,17 @@ Material::Material(void){
 	mainTexture = NULL;
 	bumpMap = NULL;
 	sharedMaterial = false;
+	ownBumpMap = false;
 }
 
 
 //Requires an OpenGL context
-Material::Material(string _shaderName, string textureName, string bumpMapName){
+Material::Material(string _shaderName, MaterialManager* manager, string textureName, string bumpMapName){
 	mainTexture = NULL;
 	bumpMap = NULL;
-	Switch(_shaderName, textureName, bumpMapName);
+	Switch(_shaderName, manager, textureName, bumpMapName);
 	sharedMaterial = false;
+	ownBumpMap = false;
 }
 
 void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType){
@@ -56,7 +58,7 @@ void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum S
     glAttachShader(ShaderProgram, ShaderObj);
 }
 
-void Material::Switch(string _shaderName, string textureName, string bumpMapName){
+void Material::Switch(string _shaderName, MaterialManager* manager, string textureName, string bumpMapName){
 	shaderProgram = glCreateProgram();
 	shaderName = _shaderName;
 	matName = _shaderName + textureName;
@@ -93,18 +95,17 @@ void Material::Switch(string _shaderName, string textureName, string bumpMapName
 		}
 
 		if(textureName != ""){
-			mainTexture = new Texture(GL_TEXTURE_2D,textureName);
-			mainTexture->Load(GL_TEXTURE0);
+			mainTexture = manager->LoadTexture(textureName);
 		}
 		else{
 			mainTexture = NULL;
 		}
 
 		if(bumpMapName != ""){
-			bumpMap = new Texture(GL_TEXTURE_2D,bumpMapName);
-			bumpMap->Load(GL_TEXTURE1);
+			bumpMap = manager->LoadTexture(bumpMapName);
 		}
 		else{
+			ownBumpMap = true;
 			bumpMap = new Texture(1,1);
 			bumpMap->textureTarget = GL_TEXTURE_2D;
 			RGBApixel pix = {};
@@ -293,9 +294,9 @@ GLuint Material::GetUniformByIndex(int index){
 
 Material::~Material(){
 	if(mainTexture != NULL){
-		delete mainTexture;
+		//delete mainTexture;
 	}
-	if(bumpMap != NULL){
+	if(bumpMap != NULL && ownBumpMap){
 		delete bumpMap;
 	}
 }

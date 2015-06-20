@@ -16,6 +16,7 @@ using std::string;
 struct Texture;
 struct Vector4;
 struct Mat4x4;
+struct MaterialManager;
 struct ResourceManager;
 
 struct Material{
@@ -25,6 +26,7 @@ struct Material{
 	string matName;
 
 	bool sharedMaterial;
+	bool ownBumpMap;
 	
 	GLuint shaderProgram;
 	Texture* mainTexture;
@@ -42,11 +44,13 @@ struct Material{
 	
 	Material(void);
 
-	Material(string _shaderName, string textureName = "", string bumpMapName = "");
+	Material(string _shaderName, MaterialManager* manager, string textureName = "", string bumpMapName = "");
+
+	Material* Clone() const;
 	
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
 
-	void Switch(string _shaderName, string textureName = "", string bumpMapName = "");
+	void Switch(string _shaderName, MaterialManager* manager, string textureName = "", string bumpMapName = "");
 	
 	void SetFloatUniform(string name, float value);
 	void SetVec2Uniform(string name, Vector2 value);
