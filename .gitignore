@@ -30,9 +30,7 @@
 out/*
 build/*
 #autosaves
-*.h~
-*.cpp~
-.gitignore~
+*.*~
 build.b
 run.b
 
