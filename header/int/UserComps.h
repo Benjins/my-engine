@@ -13,6 +13,7 @@
 #include "Animation.h"
 #include "AudioSystem.h"
 #include "../ext/simple-xml.h"
+#include "3DUtilities.h"
 #include <iostream>
 #include <assert.h>
 
@@ -606,15 +607,18 @@ struct EnemyComp : HitComponent{
 			angle = 0;
 		}
 		else{
-			angle = acos(moveVec.Normalized().x);
-			if(CrossProduct(moveVec.Normalized(), X_AXIS).z > 0){
-				//angle = -angle;
+			angle = acos(moveVec.Normalized().z);
+			if(moveVec.x < 0){
+				angle = -angle;
 			}
+
+			Quaternion targetRot = Quaternion(Y_AXIS, angle);
+			gameObject->transform.rotation = RotateTowards(gameObject->transform.rotation, targetRot, 60*gameObject->scene->deltaTime);
 		}
 		
 		//cout << "angle: " << angle << "\n";
-		gameObject->transform.rotation = Quaternion(Y_AXIS, angle);
-		gameObject->transform.position = gameObject->transform.position + moveVec;
+		
+		gameObject->transform.position = gameObject->transform.position + gameObject->transform.Forward() * speed * gameObject->scene->deltaTime;
 
 		float floorHeight = -10;
 		RaycastHit lookDown = physics->Raycast(gameObject->transform.position, Y_AXIS*-1);
