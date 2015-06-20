@@ -3,7 +3,8 @@ my-engine
 My attempt at creating a usable game engine in C++.
 ---------
 
-This project requires EasyBMP by Paul Macklin, http://www.easybmp.sourceforge.net/
-and 3dbasics, by myself, available on my Github as well.
+This project requires 3dbasics, by myself, available on my Github as well.
 
-This project uses OpenGL, GLEW, and FreeGLUT.
+This used to use EasyBMP to load Bitmap files, but that's being phased out.
+
+This project uses OpenGL, GLEW, FreeGLUT, and OpenAL.
