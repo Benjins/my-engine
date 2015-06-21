@@ -276,7 +276,7 @@ void EditorScene::EditorUpdate(){
 			selectedObj->transform.position = selectedObj->transform.position + axis * amount;
 		}
 		else if(transformMode == TransformMode::Rotation){
-			float amount = DotProduct(orthoPart, axis);
+			float amount = DotProduct(orthoPart, axes[(selectedAxis + 1) % 3]) * DotProduct(orthoPart, axes[(selectedAxis + 2) % 3]);
 			selectedObj->transform.rotation = selectedObj->transform.rotation * Quaternion(axis, amount);
 		}
 	}
@@ -451,17 +451,17 @@ void EditorScene::EditorGUI(){
 				float sinAngle = sin(angle);
 				float cosAngle = cos(angle);
 
-				Vector3 xRingPos =  origin + upVector * sinAngle + forwardVector * cosAngle;
+				Vector3 xRingPos =  origin + (upVector * sinAngle + forwardVector * cosAngle)/2;
 				xRing[xIndex] = xRingPos.x;
 				xRing[yIndex] = xRingPos.y;
 				xRing[zIndex] = xRingPos.z;
 
-				Vector3 yRingPos = origin + rightVector * sinAngle + forwardVector * cosAngle;
+				Vector3 yRingPos = origin + (rightVector * sinAngle + forwardVector * cosAngle)/2;
 				yRing[xIndex] = yRingPos.x;
 				yRing[yIndex] = yRingPos.y;
 				yRing[zIndex] = yRingPos.z;
 
-				Vector3 zRingPos =  origin + rightVector * sinAngle + upVector * cosAngle;
+				Vector3 zRingPos =  origin + (rightVector * sinAngle + upVector * cosAngle)/2;
 				zRing[xIndex] = zRingPos.x;
 				zRing[yIndex] = zRingPos.y;
 				zRing[zIndex] = zRingPos.z;
