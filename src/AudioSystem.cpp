@@ -146,8 +146,7 @@ void AudioSystem::Initialise(){
 		cout << "\nError: no sound context found, could not initialise OpenAL.\n";
 		return;
 	}
-
-  printf("%s\n", alGetString(AL_EXTENSIONS));
+  
   printf("%s\n", alGetString(AL_VERSION));
 
 	ALfloat listenerPos[] = {0,0,0};

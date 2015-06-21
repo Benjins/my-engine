@@ -4,6 +4,11 @@
 #include "Scene.h"
 #include "PhysicsSim.h"
 
+enum struct TransformMode{
+	Translation,
+	Rotation
+};
+
 struct EditorScene : Scene{
 
 	EditorScene();
@@ -19,6 +24,7 @@ struct EditorScene : Scene{
 
 	GameObject* selectedObj;
 	int selectedAxis;
+	TransformMode transformMode;
 	bool globalManipulator;
 
 	static EditorScene& getInstance(){

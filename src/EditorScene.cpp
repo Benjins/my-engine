@@ -25,6 +25,7 @@ EditorScene::EditorScene(int argc, char** argv) : Scene(argc, argv){
 	selectedObj = nullptr;
 	selectedAxis = -1;
 	globalManipulator = false;
+	transformMode = TransformMode::Translation;
 }
 
 void EditorScene::Start(){
@@ -198,6 +199,13 @@ void EditorScene::EditorUpdate(){
 		camera = &editorCamera;
 	}
 
+	if(input.GetKeyUp('e')){
+		transformMode = TransformMode::Translation;
+	}
+	if(input.GetKeyUp('r')){
+		transformMode = TransformMode::Rotation;
+	}
+
 	Vector3 mouseWorldPos = editorCamera.position;
 	mouseWorldPos = mouseWorldPos - (editorCamera.Up()    * mouseYNormalized);
 	mouseWorldPos = mouseWorldPos + (editorCamera.Right() * mouseXNormalized * (windowWidth/windowHeight));
@@ -221,14 +229,19 @@ void EditorScene::EditorUpdate(){
 				float yBit = DotProduct(orthoPart, upVector);
 				float zBit = DotProduct(orthoPart, forwardVector);
 
-				if(xBit > yBit && xBit > zBit){
-					selectedAxis = 0;
+				if(transformMode == TransformMode::Translation){
+					if(xBit > yBit && xBit > zBit){
+						selectedAxis = 0;
+					}
+					else if(yBit > xBit && yBit > zBit){
+						selectedAxis = 1;
+					}
+					else if(zBit > yBit && zBit > xBit){
+						selectedAxis = 2;
+					}
 				}
-				else if(yBit > xBit && yBit > zBit){
-					selectedAxis = 1;
-				}
-				else if(zBit > yBit && zBit > xBit){
-					selectedAxis = 2;
+				else if(transformMode == TransformMode::Rotation){
+
 				}
 			}
 		}
@@ -250,9 +263,13 @@ void EditorScene::EditorUpdate(){
 		Vector3 projectedCenter = rayDirection * projectionAmount;
 		Vector3 orthoPart = projectedCenter - cameraToObj;
 
-		float amount = DotProduct(orthoPart, axis);
-
-		selectedObj->transform.position = selectedObj->transform.position + axis * amount;
+		if(transformMode == TransformMode::Translation){
+			float amount = DotProduct(orthoPart, axis);
+			selectedObj->transform.position = selectedObj->transform.position + axis * amount;
+		}
+		else if(transformMode == TransformMode::Rotation){
+			
+		}
 	}
 
 	if(input.GetMouse(GLUT_RIGHT_BUTTON)){
@@ -377,39 +394,44 @@ void EditorScene::EditorGUI(){
 
 	if(selectedObj != nullptr){
 
-		Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
-		Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
-		Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
+		if(transformMode == TransformMode::Translation){
+			Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
+			Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
+			Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
 
-		glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 0, 0, 1);
-		glBegin(GL_LINES);
-		{
-			Vector3 origin = selectedObj->transform.GlobalPosition();
-			Vector3 to = origin + rightVector/2;
-			glVertex3f(origin.x, origin.y, origin.z);
-			glVertex3f(to.x, to.y, to.z);
-		}
-		glEnd();
+			glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 0, 0, 1);
+			glBegin(GL_LINES);
+			{
+				Vector3 origin = selectedObj->transform.GlobalPosition();
+				Vector3 to = origin + rightVector/2;
+				glVertex3f(origin.x, origin.y, origin.z);
+				glVertex3f(to.x, to.y, to.z);
+			}
+			glEnd();
 
-		glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 1, 0, 1);
-		glBegin(GL_LINES);
-		{
-			Vector3 origin = selectedObj->transform.GlobalPosition();
-			Vector3 to = origin + upVector/2;
-			glVertex3f(origin.x, origin.y, origin.z);
-			glVertex3f(to.x, to.y, to.z);
-		}
-		glEnd();
+			glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 1, 0, 1);
+			glBegin(GL_LINES);
+			{
+				Vector3 origin = selectedObj->transform.GlobalPosition();
+				Vector3 to = origin + upVector/2;
+				glVertex3f(origin.x, origin.y, origin.z);
+				glVertex3f(to.x, to.y, to.z);
+			}
+			glEnd();
 
-		glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 0, 1, 1);
-		glBegin(GL_LINES);
-		{
-			Vector3 origin = selectedObj->transform.GlobalPosition();
-			Vector3 to = origin + forwardVector/2;
-			glVertex3f(origin.x, origin.y, origin.z);
-			glVertex3f(to.x, to.y, to.z);
+			glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 0, 1, 1);
+			glBegin(GL_LINES);
+			{
+				Vector3 origin = selectedObj->transform.GlobalPosition();
+				Vector3 to = origin + forwardVector/2;
+				glVertex3f(origin.x, origin.y, origin.z);
+				glVertex3f(to.x, to.y, to.z);
+			}
+			glEnd();
 		}
-		glEnd();
+		else if(transformMode == TransformMode::Rotation){
+			
+		}
 	}
 
 	for(GuiElement* elem : editorGui){
