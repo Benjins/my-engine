@@ -241,7 +241,15 @@ void EditorScene::EditorUpdate(){
 					}
 				}
 				else if(transformMode == TransformMode::Rotation){
-
+					if(xBit < yBit && xBit < zBit){
+						selectedAxis = 0;
+					}
+					else if(yBit < xBit && yBit < zBit){
+						selectedAxis = 1;
+					}
+					else if(zBit < yBit && zBit < xBit){
+						selectedAxis = 2;
+					}
 				}
 			}
 		}
@@ -268,7 +276,8 @@ void EditorScene::EditorUpdate(){
 			selectedObj->transform.position = selectedObj->transform.position + axis * amount;
 		}
 		else if(transformMode == TransformMode::Rotation){
-			
+			float amount = DotProduct(orthoPart, axis);
+			selectedObj->transform.rotation = selectedObj->transform.rotation * Quaternion(axis, amount);
 		}
 	}
 
@@ -394,15 +403,16 @@ void EditorScene::EditorGUI(){
 
 	if(selectedObj != nullptr){
 
-		if(transformMode == TransformMode::Translation){
-			Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
-			Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
-			Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
+		Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
+		Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
+		Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
 
+		Vector3 origin = selectedObj->transform.GlobalPosition();
+
+		if(transformMode == TransformMode::Translation){
 			glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 0, 0, 1);
 			glBegin(GL_LINES);
 			{
-				Vector3 origin = selectedObj->transform.GlobalPosition();
 				Vector3 to = origin + rightVector/2;
 				glVertex3f(origin.x, origin.y, origin.z);
 				glVertex3f(to.x, to.y, to.z);
@@ -412,7 +422,6 @@ void EditorScene::EditorGUI(){
 			glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 1, 0, 1);
 			glBegin(GL_LINES);
 			{
-				Vector3 origin = selectedObj->transform.GlobalPosition();
 				Vector3 to = origin + upVector/2;
 				glVertex3f(origin.x, origin.y, origin.z);
 				glVertex3f(to.x, to.y, to.z);
@@ -422,7 +431,6 @@ void EditorScene::EditorGUI(){
 			glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 0, 1, 1);
 			glBegin(GL_LINES);
 			{
-				Vector3 origin = selectedObj->transform.GlobalPosition();
 				Vector3 to = origin + forwardVector/2;
 				glVertex3f(origin.x, origin.y, origin.z);
 				glVertex3f(to.x, to.y, to.z);
@@ -430,7 +438,61 @@ void EditorScene::EditorGUI(){
 			glEnd();
 		}
 		else if(transformMode == TransformMode::Rotation){
-			
+			const int precision = 24;
+
+			float xRing[precision * 3];
+			float yRing[precision * 3];
+			float zRing[precision * 3];
+
+			for(int i = 0; i < precision; i++){
+				int xIndex = 3*i, yIndex = 3*i+1, zIndex = 3*i+2;
+				float angle = ((float)i)/precision * 2 * 3.141592653589f;
+
+				float sinAngle = sin(angle);
+				float cosAngle = cos(angle);
+
+				Vector3 xRingPos =  origin + upVector * sinAngle + forwardVector * cosAngle;
+				xRing[xIndex] = xRingPos.x;
+				xRing[yIndex] = xRingPos.y;
+				xRing[zIndex] = xRingPos.z;
+
+				Vector3 yRingPos = origin + rightVector * sinAngle + forwardVector * cosAngle;
+				yRing[xIndex] = yRingPos.x;
+				yRing[yIndex] = yRingPos.y;
+				yRing[zIndex] = yRingPos.z;
+
+				Vector3 zRingPos =  origin + rightVector * sinAngle + upVector * cosAngle;
+				zRing[xIndex] = zRingPos.x;
+				zRing[yIndex] = zRingPos.y;
+				zRing[zIndex] = zRingPos.z;
+			}
+
+			glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 0, 0, 1);
+			glBegin(GL_LINE_LOOP);
+			{
+				for(int i = 0; i < precision*3; i += 3){
+					glVertex3fv(&xRing[i]);
+				}
+			}
+			glEnd();
+
+			glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 1, 0, 1);
+			glBegin(GL_LINE_LOOP);
+			{
+				for(int i = 0; i < precision*3; i += 3){
+					glVertex3fv(&yRing[i]);
+				}
+			}
+			glEnd();
+
+			glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0, 0, 1, 1);
+			glBegin(GL_LINE_LOOP);
+			{
+				for(int i = 0; i < precision*3; i += 3){
+					glVertex3fv(&zRing[i]);
+				}
+			}
+			glEnd();
 		}
 	}
 

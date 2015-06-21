@@ -388,6 +388,14 @@ void Scene::SaveScene(string fileName){
 		scene.children.push_back((*iter)->Serialize());
 	}
 
+	for(int i = 0; i < audio.clipCount; i++){
+		XMLElement elem;
+		elem.name = "AudioClip";
+		elem.attributes.emplace_back("name", audio.clips[i].clipName);
+		elem.attributes.emplace_back("fileName", audio.clips[i].clipFileName);
+		scene.children.push_back(elem);
+	}
+
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		GameObject* obj = *iter;
 		XMLElement elem;
