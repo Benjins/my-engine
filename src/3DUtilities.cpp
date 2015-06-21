@@ -3,7 +3,7 @@
 
 Quaternion RotateTowards(const Quaternion& from, const Quaternion& to, float maxDegreesDelta){
 	
-	maxDegreesDelta *= (1.0f/60);
+	maxDegreesDelta *= (3.14159265358979f/180);
 
 	float distance = (from - to).Magnitude();
 	float otherDistance = (from + to).Magnitude();
