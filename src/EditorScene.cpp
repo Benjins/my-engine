@@ -277,7 +277,7 @@ void EditorScene::EditorUpdate(){
 		}
 		else if(transformMode == TransformMode::Rotation){
 			float amount = DotProduct(orthoPart, axes[(selectedAxis + 1) % 3]) * DotProduct(orthoPart, axes[(selectedAxis + 2) % 3]);
-			selectedObj->transform.rotation = selectedObj->transform.rotation * Quaternion(axis, amount);
+			selectedObj->transform.rotation = Quaternion(axis, amount) * selectedObj->transform.rotation;
 		}
 	}
 
