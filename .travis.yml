@@ -28,7 +28,6 @@ install:
   - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
   - cd ${TRAVIS_BUILD_DIR}
 
-
 before_script: 
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build
