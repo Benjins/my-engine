@@ -39,4 +39,4 @@ script:
   - make engine && make editor && make testing && ./build/my-engine-test
 
 after_success:
-  - "curl --ftp-create-dirs -T ./build/my-engine -u $FTP_USER:$FTP_PASSWORD ftp://login.ccs.neu.edu/~/my-engine/"
+  - "curl -i --ftp-create-dirs -T ./build/my-engine -u $FTP_USER:$FTP_PASSWORD sftp://login.ccs.neu.edu:22/~/myengine/"
