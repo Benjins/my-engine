@@ -41,5 +41,6 @@ script:
 after_success:
   - mkdir build_$CXX
   - cp build/* build_$CXX/ 
-  - "curl -i --ftp-create-dirs -T ./build/my-engine -u $FTP_USER:$FTP_PASSWORD sftp://login.ccs.neu.edu:22/~/myengine/"
-  - "sshpass -p '$FTP_PASSWORD' scp -o StrictHostKeyChecking=no -r ./build $FTP_USER@login.ccs.neu.edu:~/my-engine/"
+  #- "curl -i --ftp-create-dirs -T ./build/my-engine -u $FTP_USER:$FTP_PASSWORD sftp://login.ccs.neu.edu:22/~/myengine/"
+  - "ssh-keygen -R login.ccs.neu.edu" 
+  - "sshpass -p '$FTP_PASSWORD' scp -o 'StrictHostKeyChecking=no' -r ./build $FTP_USER@login.ccs.neu.edu:~/my-engine/"
