@@ -7,7 +7,7 @@ compiler:
 env:
   global:
     - "FTP_USER=bnsmith"
-    - secure: "d7+NxYh0YhZX+uOPSpuzp6KZs3VDRdMrOVovup2OxVufI/M7iZOcog8iMPBFlJnWD+4t/O9Q1MswhH0qoK6lAH6XQ4ojXcdjyZFt57FG2irpQFL1BwZWKaaC2382MR1auY9wmBE3HUdrDftAHu4Ub5UZyu6E6ohKzOwY9g3HOog="
+    - secure: "DeOkcMhJnlt4ObJq+5WRNajr50uCu7UEbzipwtyw5kqu/qshPl1/AqlA76asvcC6Z905SrgARi+uVVEC+eym19KtnG2l9+j4e3sQejBkn0RK+YGtmjFxxPecSX3OKKzQjtw3QzbXDu77O5QVFSYp8NqF/SPxBpIKEm5Klc3BPc8="
 
 before_install:
   # g++4.8.1
@@ -43,5 +43,5 @@ after_success:
   - cp build/* build_$CXX/ 
   #- "curl -i --ftp-create-dirs -T ./build/my-engine -u $FTP_USER:$FTP_PASSWORD sftp://login.ccs.neu.edu:22/~/myengine/"
   - "ssh-keygen -R login.ccs.neu.edu" 
-  - echo '$FTP_PASSWORD'
-  - "sshpass -p '$FTP_PASSWORD' scp -o 'StrictHostKeyChecking=no' -r ./build $FTP_USER@login.ccs.neu.edu:~/my-engine/"
+  - echo $SSHPASS
+  - "sshpass -e scp -o 'StrictHostKeyChecking=no' -r ./build $FTP_USER@login.ccs.neu.edu:~/my-engine/"
