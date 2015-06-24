@@ -38,8 +38,9 @@ script:
   - make engine && make editor && make testing && ./build/my-engine-test
 
 after_success:
-  - mkdir build_$CXX
-  - cp build/* build_$CXX/ 
+  - cd ${TRAVIS_BUILD_DIR}
+  - cd build
+  - zip my-engine_$CXX.zip my-engine my-engine-editor
   #- "curl -i --ftp-create-dirs -T ./build/my-engine -u $FTP_USER:$FTP_PASSWORD sftp://login.ccs.neu.edu:22/~/myengine/"
   - "ssh-keygen -R login.ccs.neu.edu" 
-  - "sshpass -e scp -o 'StrictHostKeyChecking=no' -r ./build_$CXX $FTP_USER@login.ccs.neu.edu:~/.www/personal-projects/deployment/my-engine/"
+  - "sshpass -e scp -o 'StrictHostKeyChecking=no' my-engine_$CXX.zip $FTP_USER@login.ccs.neu.edu:~/.www/personal-projects/deployment/my-engine/"
