@@ -43,5 +43,5 @@ after_success:
   - cp build/* build_$CXX/ 
   #- "curl -i --ftp-create-dirs -T ./build/my-engine -u $FTP_USER:$FTP_PASSWORD sftp://login.ccs.neu.edu:22/~/myengine/"
   - "ssh-keygen -R login.ccs.neu.edu" 
-  - echo $FTP_PASSWORD
+  - echo '$FTP_PASSWORD'
   - "sshpass -p '$FTP_PASSWORD' scp -o 'StrictHostKeyChecking=no' -r ./build $FTP_USER@login.ccs.neu.edu:~/my-engine/"
