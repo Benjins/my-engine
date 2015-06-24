@@ -4,6 +4,12 @@ compiler:
   - clang++
   - g++
 
+env:
+  global:
+    - "FTP_USER=bnsmith"
+    - secure: "Iqkk6B8HCcZ0L/RswzGTxEw0u4RueobQrgpbfFXhbu55rroxMaIPVM2PYmKREDlNqBBiIVgaWQHMme7W6A5eFko9lBD+oVk2BhoJaVOsATZ6aRdFnrzZJ3/+kw+VqLMrhDsOqm3zdJ7BSNSFAJubmaYeSUgt9WEQj1E9sfS8wm4="
+    - secure: "PYtEaHI9TIMsGuALWDDA8qpdbZynA4aJnNWlSeb7sovIC3S34bYwVn6DQl/q/dkE8+IzWCAOvmfjUoQFGPqqtQTc85lSxfl8CfH1CKnXOFb2zttQxAzC7+/6MMBI0e0qI0xGlzKZW7/UMf2JRvIACTiFY3Rsh1B0e0RyvLwSKXE="
+
 before_install:
   # g++4.8.1
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
@@ -32,3 +38,6 @@ before_script:
 script: 
   - cd ${TRAVIS_BUILD_DIR}
   - make engine && make editor && make testing && ./build/my-engine-test
+
+after_success:
+  -curl --ftp-create-dirs -T uploadfilename -u $FTP_USER:$FTP_PASSWORD ftp://login.ccs.neu.edu:'~/my-engine'

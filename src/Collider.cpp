@@ -97,7 +97,7 @@ Collision DetectCollision(const SphereCollider* col1, const SphereCollider* col2
 	float maxDistanceSqr = maxDistance*maxDistance;
 
 	Vector3 col1TransformedPos = col1->position;
-	if(col2->gameObject != NULL && col2->gameObject != NULL){
+	if(col2 != NULL && col2->gameObject != NULL){
 		col1TransformedPos = col2->gameObject->transform.GlobalToLocal(col1->gameObject->transform.LocalToGlobal(col1->position));
 	}
 	float distanceSqr = (col1TransformedPos - col2->position).MagnitudeSquared();

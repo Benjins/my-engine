@@ -16,3 +16,9 @@ engine_profile:
 
 engine_profile_analyse:
 	gprof ./build/my-engine_prof gmon.out > analysis.txt
+
+check:
+	cppcheck --enable=all --std=c++11 -I header/ext/freetype2 src/*.cpp 2> cpp-check-analysis.txt
+
+docs:
+	doxygen .doxyconfig

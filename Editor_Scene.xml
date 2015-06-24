@@ -17,7 +17,7 @@
     <AudioClip name='cough' fileName='data/coughing.wav'/>
     <AudioClip name='footstep' fileName='data/footstep.wav'/>
     <GameObject name='myObj'>
-        <Transform position='0.121761,3.061710,-0.396604' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <Material name='floorMat'/>
         <Mesh source='test.obj'/>
         <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
@@ -84,7 +84,7 @@
         </AnimationComponent>
     </GameObject>
     <GameObject name='monkey'>
-        <Transform position='-2.487024,4.153775,-2.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <Transform position='-2.487024,4.153775,-2.078232' rotation='0.814109,0.258640,0.157428,-0.495528' scale='1.000000,1.000000,1.000000'/>
         <Material name='stairMat'/>
         <Mesh source='monkey.obj'/>
     </GameObject>
