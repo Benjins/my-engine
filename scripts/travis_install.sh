@@ -1,6 +1,8 @@
 #!/bin/bash
 
 
+echo $CXX
+
 #g++4.8.1
 if [ "$CXX" == "g++" ]; then sudo apt-get install -qq gcc-4.8 g++-4.8; fi
 if [ "$CXX" == "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90; fi
