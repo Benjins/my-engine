@@ -12,9 +12,6 @@ before_install:
   - chmod +x scripts/*.sh
   - sudo . ./scripts/travis_setup.sh
 
-install:
-  - sudo ./scripts/travis_install.sh
-
 before_script: 
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build
