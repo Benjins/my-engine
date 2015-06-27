@@ -10,7 +10,7 @@ env:
 
 before_install:
   - chmod +x scripts/*.sh
-  - sudo . ./scripts/travis_setup.sh
+  - . sudo ./scripts/travis_setup.sh
 
 before_script: 
   - cd ${TRAVIS_BUILD_DIR}
