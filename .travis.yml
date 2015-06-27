@@ -8,9 +8,12 @@ env:
   global:
     - "FTP_USER=bnsmith"
 
-install:
+before_install:
   - chmod +x scripts/*.sh
   - sudo ./scripts/travis_setup.sh
+
+install:
+  - sudo ./scripts/travis_install.sh
 
 before_script: 
   - cd ${TRAVIS_BUILD_DIR}
@@ -18,7 +21,7 @@ before_script:
 
 script: 
   - cd ${TRAVIS_BUILD_DIR}
-  - make engine && make editor && make testing && ./build/my-engine-test
+  - make engine && make editor && make testing && ./build/my-engine-test && make docs
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}
