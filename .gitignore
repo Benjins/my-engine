@@ -37,13 +37,15 @@ run.b
 #mac specific
 .DS_Store
 
+#generated documentation
+docs_gen/*
+
 #misc
 *.cpp~
 *.h~
 *.fs~
 *.vs~
 EngineNP++Work.txt
-*.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
 Debug/*
@@ -53,3 +55,4 @@ build/*
 temp/*
 my-engine/*
 my-engine/my-engine.xcodeproj/*
+
