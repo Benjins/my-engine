@@ -24,5 +24,5 @@ test_coverage: src/*.cpp
 check: src/*.cpp header/int/*.h
 	cppcheck --force --inline-suppr --template '{file},{line},{severity},{id},{message}' --enable=all --std=c++11 -I header/ext/freetype2 src/*.cpp 2> cpp-check-analysis.txt
 
-docs: src/*.cpp header/int/*.h docs/*.dox
+docs: src/*.cpp header/int/*.h docs_in/*.dox
 	doxygen .doxyconfig
