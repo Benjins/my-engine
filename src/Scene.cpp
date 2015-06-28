@@ -132,6 +132,7 @@ GuiElement* Scene::AddGuiElement(){
 }
 
 void Scene::RemoveObject(GameObject* obj){
+	assert(std::find(destroyedObjects.begin(), destroyedObjects.end(), obj)==destroyedObjects.end());
 	destroyedObjects.push_back(obj);
 }
 

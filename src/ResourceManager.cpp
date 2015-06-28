@@ -77,6 +77,7 @@ Material* MaterialManager::GetFreeMaterial(){
 		}
 	}
 
+	cout << "\n\nWarning: could not find free material, returning null.\n";
 	return nullptr;
 }
 

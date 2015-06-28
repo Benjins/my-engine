@@ -109,6 +109,10 @@ void Material::Switch(string _shaderName, MaterialManager* manager, string textu
 			mainTexture = NULL;
 		}
 
+		if(ownBumpMap && bumpMap != nullptr){
+			delete bumpMap;
+		}
+
 		if(bumpMapName != ""){
 			bumpMap = manager->LoadTexture(bumpMapName);
 			ownBumpMap = false;

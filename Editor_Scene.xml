@@ -21,7 +21,7 @@
         <Material name='floorMat'/>
         <Mesh source='test.obj'/>
         <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-        <BulletComponent speed='2'/>
+        <BulletComponent speed='6'/>
     </Prefab>
     <GameObject name='myObj'>
         <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
