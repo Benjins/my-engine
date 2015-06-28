@@ -5,7 +5,9 @@ if [ "$1" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/tes
 
 # clang 3.4
 if [ "$1" == "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
-sudo apt-get install freeglut3-dev glew1.5-dev libfreetype6-dev libopenal-dev sshpass doxygen
+sudo apt-get install freeglut3-dev glew1.5-dev libfreetype6-dev libopenal-dev sshpass
+#only install doxygen if we're on g++, save time on clang
+if [ "$1" == "g++" ]; then sudo apt-get install doxygen; fi
 sudo apt-get update -qq
 
 #g++4.8.1

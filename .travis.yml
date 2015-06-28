@@ -18,7 +18,8 @@ before_script:
 
 script: 
   - cd ${TRAVIS_BUILD_DIR}
-  - make engine && make editor && make testing && ./build/my-engine-test && make docs
+  - make engine && make editor && make testing && ./build/my-engine-test
+  - if [ "$CXX" == "g++" ]; then make docs; fi
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}

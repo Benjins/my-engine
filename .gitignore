@@ -38,7 +38,7 @@ run.b
 .DS_Store
 
 #generated documentation
-docs_gen/*
+docs/*
 
 #misc
 *.cpp~
