@@ -86,9 +86,9 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;3dbasics.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64;C:\Users\Benji Snith\Documents\Visual Studio 2012\Projects\my-engine\my-engine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,21 +117,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64;C:\Users\Benji Snith\Documents\Visual Studio 2012\Projects\my-engine\my-engine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;3dbasics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\3dbasics\Basis.cpp" />
-    <ClCompile Include="..\..\..\..\3dbasics\Box.cpp" />
-    <ClCompile Include="..\..\..\..\3dbasics\Matrix.cpp" />
-    <ClCompile Include="..\..\..\..\3dbasics\Plane.cpp" />
-    <ClCompile Include="..\..\..\..\3dbasics\Quaternion.cpp" />
-    <ClCompile Include="..\..\..\..\3dbasics\Ray.cpp" />
-    <ClCompile Include="..\..\..\..\3dbasics\Sphere.cpp" />
-    <ClCompile Include="..\..\..\..\3dbasics\Triangle.cpp" />
-    <ClCompile Include="..\..\..\..\3dbasics\Vector2.cpp" />
-    <ClCompile Include="..\..\..\..\3dbasics\Vector3.cpp" />
-    <ClCompile Include="..\..\..\..\EasyBMP_1.06\EasyBMP.cpp" />
     <ClCompile Include="src\3DUtilities.cpp" />
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
