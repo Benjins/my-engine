@@ -101,10 +101,6 @@ void Material::Switch(string _shaderName, MaterialManager* manager, string textu
 
 		cameraUniform = GetUniformByName("_cameraMatrix");
 		objectMatrixUniform = GetUniformByName("_objectMatrix");
-		
-		if(mainTexture != NULL){
-			delete mainTexture;
-		}
 
 		if(textureName != ""){
 			mainTexture = manager->LoadTexture(textureName);

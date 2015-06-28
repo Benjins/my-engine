@@ -601,9 +601,9 @@ struct EnemyComp : HitComponent{
 		health--;
 		float ratio = ((float)health)/maxHealth;
 		gameObject->material->SetVec4Uniform("_color", Vector4(1.0f - ratio, 0, 0, 1.0));
-		cout << "Ratio: " << ratio << endl;
 		if(health <= 0){
 			GameObject* newObj = gameObject->Clone();
+			gameObject->material->matName = "";
 			newObj->transform.position = gameObject->transform.position + Vector3(0.5f, 1, 0);
 			gameObject->scene->AddObject(newObj);
 			gameObject->scene->RemoveObject(gameObject);	
