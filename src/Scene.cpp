@@ -11,6 +11,7 @@
 #include "../header/ext/simple-xml.h"
 #include <time.h>
 #include <cstdlib>
+#include <algorithm>
 
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 #include <sys/time.h>
