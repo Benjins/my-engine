@@ -22,6 +22,7 @@ public:
 	int GetMaterialIdByName(string name);
 	Material* GetMaterialById(int id);
 
+	Material* GetFreeMaterial();
 	Material* LoadMaterial(string matName, string shaderName, string textureName="", string bumpMapName = "");
 
 	Texture* LoadTexture(const string& fileName, bool forceInstance = false);

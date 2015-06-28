@@ -33,6 +33,16 @@ struct AudioComponent : Component{
 		loop = false;
 	}
 
+	virtual Component* Clone(){
+		AudioComponent* newAudio = new AudioComponent();
+		newAudio->clipName = clipName;
+		newAudio->volume = volume;
+		newAudio->autoPlay = autoPlay;
+		newAudio->loop = loop;
+
+		return newAudio;
+	}
+
 	virtual void OnAwake(){
 		AudioClip* clip = gameObject->scene->audio.FindClip(clipName);
 		assert(clip != nullptr);
@@ -158,6 +168,28 @@ struct AnimationComponent : Component{
 	bool loop;
 	bool playAutomatically;
 	bool isPlaying;
+
+	virtual Component* Clone(){
+		AnimationComponent* newAnim = new AnimationComponent();
+		newAnim->animType = animType;
+		newAnim->animTarget = animTarget;
+
+		if(animType == AnimationType::Float){
+			newAnim->floatAnim = floatAnim;
+		}
+		else if(animType == AnimationType::Vector2){
+			newAnim->vec2Anim = vec2Anim;
+		}
+		else if(animType == AnimationType::Vector3){
+			newAnim->vec3Anim = vec3Anim;
+		}
+		else if(animType == AnimationType::Quaternion){
+			newAnim->quatAnim = quatAnim;
+		}
+
+		newAnim->loop = loop;
+		newAnim->playAutomatically = playAutomatically;
+	}
 
 	virtual XMLElement Serialize(){
 		XMLElement elem;
@@ -343,6 +375,14 @@ struct LightComponent : Component{
 		}
 	}
 
+	virtual Component* Clone(){
+		LightComponent* newLight = new LightComponent();
+		newLight->intensity = intensity;
+		newLight->isDirectional = isDirectional;
+
+		return newLight;
+	}
+
 	virtual void OnEditorUpdate(){
 		OnUpdate();
 	}
@@ -446,6 +486,10 @@ struct FireGun : Component{
 		camera = gameObject->scene->camera;
 	}
 
+	virtual Component* Clone(){
+		return new FireGun();
+	}
+
 	virtual void OnUpdate(){
 		if(input->GetMouseUp(GLUT_LEFT_BUTTON)){
 			RaycastHit hit = physicsSim->Raycast(camera->GlobalPosition(), camera->Forward());
@@ -472,6 +516,10 @@ struct MatChangeOnHit : HitComponent{
 		XMLElement elem;
 		elem.name = "MatChangeOnHit";
 		return elem;
+	}
+
+	virtual Component* Clone(){
+		return new MatChangeOnHit();
 	}
 
 	virtual ~MatChangeOnHit(){}
@@ -520,6 +568,15 @@ struct EnemyComp : HitComponent{
 		return elem;
 	}
 
+	virtual Component* Clone(){
+		EnemyComp* newComp = new EnemyComp();
+		newComp->speed = speed;
+		newComp->health = maxHealth;
+		newComp->maxHealth = maxHealth;
+
+		return newComp;
+	}
+
 	virtual void Deserialize(const XMLElement& elem){
 		for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
 			if(iter->name == "speed"){
@@ -546,6 +603,9 @@ struct EnemyComp : HitComponent{
 		gameObject->material->SetVec4Uniform("_color", Vector4(1.0f - ratio, 0, 0, 1.0));
 		cout << "Ratio: " << ratio << endl;
 		if(health <= 0){
+			GameObject* newObj = gameObject->Clone();
+			newObj->transform.position = gameObject->transform.position + Vector3(0.5f, 1, 0);
+			gameObject->scene->AddObject(newObj);
 			gameObject->scene->RemoveObject(gameObject);	
 		}
 	}
@@ -679,6 +739,15 @@ struct CameraControl : Component{
 		elem.attributes.push_back(XMLAttribute("stepDelay", to_string(stepDelay)));
 
 		return elem;
+	}
+
+	virtual Component* Clone(){
+		CameraControl* newCam = new CameraControl();
+		newCam->speed = speed;
+		newCam->health = health;
+		newCam->stepDelay = stepDelay;
+
+		return newCam;
 	}
 
 	virtual void Deserialize(const XMLElement& elem){

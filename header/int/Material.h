@@ -46,7 +46,7 @@ struct Material{
 
 	Material(string _shaderName, MaterialManager* manager, string textureName = "", string bumpMapName = "");
 
-	Material* Clone() const;
+	Material* Clone(MaterialManager* resources) const;
 	
 	void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
 

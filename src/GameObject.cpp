@@ -31,11 +31,33 @@ void GameObject::AddComponent(Component* comp){
 	comp->OnAwake();
 }
 
+void GameObject::AddComponentDirect(Component* comp){
+	components.push_back(comp);
+	comp->gameObject = this;
+}
+
 void GameObject::AddMesh(string fileName){
 	if(mesh != NULL){
 		delete[] mesh;
 	}
 	mesh = new Model(fileName);
+}
+
+GameObject* GameObject::Clone() const{
+	GameObject* newObj = new GameObject();
+	newObj->transform.scale = transform.scale;
+	newObj->transform.rotation = transform.rotation;
+	newObj->transform.SetParent(nullptr);
+	newObj->scene = scene;
+
+	newObj->name = name + "(clone)";
+	newObj->mesh = new Model(mesh->fileName);
+	newObj->material = material->Clone(&scene->resources);
+	for(Component* comp : components){
+		newObj->AddComponent(comp->Clone());
+	}
+
+	return newObj;
 }
 
 void GameObject::AddMaterial(string matName, string textureName){

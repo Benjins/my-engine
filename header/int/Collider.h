@@ -24,6 +24,8 @@ struct Collider : Component{
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
 
+	virtual Component* Clone() = 0;
+
 	virtual ~Collider();
 };
 
@@ -41,6 +43,8 @@ struct BoxCollider : Collider{
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
 
+	virtual Component* Clone();
+
 	virtual ~BoxCollider();
 };
 
@@ -55,6 +59,8 @@ struct SphereCollider : Collider{
 	virtual Collision CollisionWith(const SphereCollider* col) const;
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
+
+	virtual Component* Clone();
 
 	virtual ~SphereCollider();
 };

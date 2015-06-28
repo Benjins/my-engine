@@ -23,6 +23,7 @@ struct GameObject{
 	int _id;
 
 	void AddComponent(Component* comp);
+	void AddComponentDirect(Component* comp);
 	
 	public:
 	SC_Transform transform;
@@ -36,6 +37,8 @@ struct GameObject{
 	GameObject();
 	explicit GameObject(Scene& sceneRef);
 	~GameObject();
+
+	GameObject* Clone() const;
 	
 	void AddMesh(string fileName);
 	void AddMaterial(string matName, string textureName = "");

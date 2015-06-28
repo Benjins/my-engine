@@ -70,6 +70,16 @@ Texture* MaterialManager::GetTextureByFileName(const string& fileName){
 	return nullptr;
 }
 
+Material* MaterialManager::GetFreeMaterial(){
+	for(int i = 0; i < matAlloc; i++){
+		if(materials[i].matName == ""){
+			return &(materials[i]);
+		}
+	}
+
+	return nullptr;
+}
+
 void MaterialManager::Clear(){
 	if(materials != NULL){
 		delete[] materials;

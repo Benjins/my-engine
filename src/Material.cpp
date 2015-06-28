@@ -37,6 +37,18 @@ Material::Material(string _shaderName, MaterialManager* manager, string textureN
 	ownBumpMap = false;
 }
 
+Material* Material::Clone(MaterialManager* resources) const{
+	Material* newMat = resources->GetFreeMaterial();
+
+	newMat->matName = matName + "(clone)";
+	newMat->Switch(shaderName, resources, mainTexture->fileName, bumpMap->fileName);
+
+	newMat->uvOffset = uvOffset;
+	newMat->uvScale = uvScale;
+
+	return newMat;
+}
+
 void Material::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType){
     GLuint ShaderObj = glCreateShader(ShaderType);
 

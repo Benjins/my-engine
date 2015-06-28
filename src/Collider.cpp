@@ -42,6 +42,14 @@ void BoxCollider::OnAwake(){
 	}
 }
 
+Component* BoxCollider::Clone(){
+	BoxCollider* newBox = new BoxCollider();
+	newBox->position = position;
+	newBox->size = size;
+
+	return newBox;
+}
+
 BoxCollider::~BoxCollider(){
 	if(gameObject != nullptr && gameObject->scene != nullptr){
 		vector<BoxCollider*>& boxBodies = gameObject->scene->physicsSim->staticBoxBodies;
@@ -78,6 +86,14 @@ void SphereCollider::OnAwake(){
 	if(gameObject->scene != NULL){
 		AddToSim(gameObject->scene->physicsSim);
 	}
+}
+
+Component* SphereCollider::Clone(){
+	SphereCollider* newSphere = new SphereCollider();
+	newSphere->position = position;
+	newSphere->radius = radius;
+
+	return newSphere;
 }
 
 SphereCollider::~SphereCollider(){
