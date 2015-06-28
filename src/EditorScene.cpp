@@ -9,6 +9,9 @@
 #include "../header/int/Vector4.h"
 #include "../header/int/Mat4.h"
 
+#include <sstream>
+#include <iomanip>
+
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 #include <sys/time.h>
 #include <float.h>
@@ -64,11 +67,25 @@ void EditorScene::Start(){
 	editorGui.push_back(posTxt);
 
 	GuiText* meshTxt = new GuiText(&resources, "arial_16.fuv");
-	meshTxt->position = Vector2(1.55f,-0.72f);
+	meshTxt->position = Vector2(1.55f,-0.68f);
 	meshTxt->scale = Vector2(1,1);
 	meshTxt->text = "Mesh file: ";
 
 	editorGui.push_back(meshTxt);
+
+	GuiText* nameTxt = new GuiText(&resources, "arial_16.fuv");
+	nameTxt->position = Vector2(1.55f,-0.9f);
+	nameTxt->scale = Vector2(1,1);
+	nameTxt->text = "Name: ";
+
+	editorGui.push_back(nameTxt);
+
+	GuiText* rotTxt = new GuiText(&resources, "arial_16.fuv");
+	rotTxt->position = Vector2(1.55f,-0.74f);
+	rotTxt->scale = Vector2(1,1);
+	rotTxt->text = "Rotation: ";
+
+	editorGui.push_back(rotTxt);
 
 	running = true;
 	while(running){
@@ -241,6 +258,10 @@ void EditorScene::EditorUpdate(){
 					}
 				}
 				else if(transformMode == TransformMode::Rotation){
+					xBit = abs(xBit);
+					yBit = abs(yBit);
+					zBit = abs(zBit);
+					printf("xBit: %f yBit: %f zBit: %f\n", xBit, yBit, zBit);
 					if(xBit < yBit && xBit < zBit){
 						selectedAxis = 0;
 					}
@@ -273,10 +294,15 @@ void EditorScene::EditorUpdate(){
 
 		if(transformMode == TransformMode::Translation){
 			float amount = DotProduct(orthoPart, axis);
-			selectedObj->transform.position = selectedObj->transform.position + axis * amount;
+			Vector3 delta = axis * amount;
+			if(globalManipulator){
+				//delta = selectedObj->transform.GlobalToLocal(delta);
+			}
+			selectedObj->transform.position = selectedObj->transform.position + delta;
 		}
 		else if(transformMode == TransformMode::Rotation){
 			float amount = DotProduct(orthoPart, axes[(selectedAxis + 1) % 3]) * DotProduct(orthoPart, axes[(selectedAxis + 2) % 3]);
+			//float currentAmount = Rotate(axis, selectedObj->transform.rotation)
 			selectedObj->transform.rotation = Quaternion(axis, amount) * selectedObj->transform.rotation;
 		}
 	}
@@ -304,7 +330,18 @@ void EditorScene::EditorUpdate(){
 	
 	if(selectedObj){
 		Vector3 position = selectedObj->transform.position;
-		static_cast<GuiText*>(editorGui[1])->text = "Position: " + to_string(position.x) + ", " + to_string(position.y) + ", " + to_string(position.z);
+		static_cast<GuiText*>(editorGui[1])->text = "Position: " + ToString(position.x, 4) + ", " + ToString(position.y, 4) + ", " + ToString(position.z, 4);
+
+		Vector3 eulerAngles;
+		Vector3 transformedAxes[3] = {selectedObj->transform.Right(), selectedObj->transform.Up(), selectedObj->transform.Forward()};
+		const float rad2deg = 180/3.14159265f;
+		eulerAngles.x = acos(transformedAxes[1].y) * ((transformedAxes[2].z > 0) ? 1 : -1) * rad2deg;
+		eulerAngles.y = acos(transformedAxes[2].z) * ((transformedAxes[0].x > 0) ? 1 : -1) * rad2deg;
+		eulerAngles.z = acos(transformedAxes[0].x) * ((transformedAxes[1].y > 0) ? 1 : -1) * rad2deg;
+		static_cast<GuiText*>(editorGui[4])->text = "Rotation: " + ToString(eulerAngles.x) + ", " + ToString(eulerAngles.y) + ", " + ToString(eulerAngles.z);
+
+		static_cast<GuiText*>(editorGui[3])->text = "Name: '" + selectedObj->name + "'";
+
 		GuiText* meshTxt = static_cast<GuiText*>(editorGui[2]);
 		if(selectedObj->mesh != nullptr){
 			meshTxt->text = "Mesh: " + selectedObj->mesh->fileName;
@@ -316,6 +353,8 @@ void EditorScene::EditorUpdate(){
 	else{
 		static_cast<GuiText*>(editorGui[1])->text = "Position:";
 		static_cast<GuiText*>(editorGui[2])->text = "";
+		static_cast<GuiText*>(editorGui[3])->text = "Name:";
+		static_cast<GuiText*>(editorGui[4])->text = "Rotation:";
 	}
 
 	for(GameObject* obj : objects){
@@ -501,6 +540,12 @@ void EditorScene::EditorGUI(){
 	}
 
 	glEnable(GL_DEPTH);
+}
+
+string ToString(float val, int precision /*= 2*/){
+	std::ostringstream out;
+    out << std::setprecision(precision) << std::fixed << val;
+    return out.str();
 }
 
 static void OnEditorMouseFunc(int button, int state, int x, int y){

@@ -46,6 +46,7 @@ struct EditorScene : Scene{
 	virtual ~EditorScene();
 };
 
+string ToString(float val, int precision = 2);
 
 static void OnEditorMouseFunc(int button, int state, int x, int y);
 
