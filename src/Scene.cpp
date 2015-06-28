@@ -384,6 +384,10 @@ Scene::~Scene(){
 		delete (*iter);
 	}
 
+	for(GameObject* prefab : prefabs){
+		delete prefab;
+	}
+
 	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
 		delete (*iter);
 	}
