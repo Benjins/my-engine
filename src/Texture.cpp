@@ -54,7 +54,9 @@ typedef struct __attribute((packed))__{
 
 Texture::Texture(){
 	fileName = "";
-	pixelData = NULL;
+	pixelData = nullptr;
+	width = 0;
+	height = 0;
 }
 
 Texture::Texture(int _width, int _height){
@@ -72,7 +74,7 @@ Texture::Texture(int _width, int _height){
 Texture::Texture(GLenum TextureTarget, const std::string& _fileName){
     textureTarget = TextureTarget;
     fileName      = _fileName;
-	pixelData = NULL;
+	pixelData = nullptr;
 }
 
 //Requires OpenGL context
