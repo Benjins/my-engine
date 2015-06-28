@@ -1,8 +1,19 @@
 language: cpp
 
+os:
+  - linux
+  - osx
+
 compiler:
   - clang++
   - g++
+
+matrix:
+  allow_failures:
+    - os: osx
+  exclude:
+    - os: osx
+      compiler: g++
 
 env:
   global:
