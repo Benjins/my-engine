@@ -605,7 +605,7 @@ struct EnemyComp : HitComponent{
 			GameObject* newObj = gameObject->Clone();
 			gameObject->material->matName = "";
 			newObj->transform.position = gameObject->transform.position + Vector3(0.5f, 1, 0);
-			gameObject->scene->AddObject(newObj);
+			gameObject->scene->AddObjectAndDescendants(newObj);
 			gameObject->scene->RemoveObject(gameObject);	
 		}
 	}

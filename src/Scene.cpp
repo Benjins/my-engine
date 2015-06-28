@@ -32,7 +32,6 @@ Scene::Scene(){
 Scene::Scene(int argc, char** argv){
 	drawCalls = vector<DrawCall>();
 	camera = NULL;
-	rb = NULL;
 	physicsSim = new PhysicsSim();
 	input = Input();
 	pathfinding.scene = this;
@@ -114,6 +113,13 @@ GameObject* Scene::AddObject(GameObject* obj){
 	}
 
 	return obj;
+}
+
+GameObject* Scene::AddObjectAndDescendants(GameObject* obj){
+	AddObject(obj);
+	for(SC_Transform* child : obj->transform.children){
+		AddObjectAndDescendants(child->gameObject);
+	}
 }
 
 GuiElement* Scene::AddGuiElement(){

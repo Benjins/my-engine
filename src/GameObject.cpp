@@ -50,6 +50,14 @@ GameObject* GameObject::Clone() const{
 	newObj->transform.SetParent(nullptr);
 	newObj->scene = scene;
 
+	for(SC_Transform* child : transform.children){
+		GameObject* newChild = child->gameObject->Clone();
+		newChild->transform.scale = child->scale;
+		newChild->transform.rotation = child->rotation;
+		newChild->transform.position = child->position;
+		newChild->transform.SetParent(&newObj->transform);
+	}
+
 	newObj->name = name + "(clone)";
 	newObj->mesh = (mesh == nullptr) ? nullptr : new Model(mesh->fileName);
 	newObj->material = (material == nullptr) ? nullptr : material->Clone(&scene->resources);

@@ -35,6 +35,7 @@ struct Scene{
 	vector<Light> lights;
 	
 protected:
+	vector<GameObject*> prefabs;
 	vector<GameObject*> objects;
 	vector<DrawCall> drawCalls;
 
@@ -45,8 +46,6 @@ protected:
 	float yRot;
 
 	bool running;
-
-	RigidBody* rb;
 
 	clock_t prevTime;
 public:
@@ -77,6 +76,7 @@ public:
 	void SaveScene(string fileName);
 
 	GameObject* AddObject(GameObject* obj);
+	GameObject* AddObjectAndDescendants(GameObject* obj);
 	GuiElement* AddGuiElement();
 
 	void RemoveObject(GameObject* obj);
