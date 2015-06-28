@@ -130,8 +130,12 @@ GuiElement* Scene::AddGuiElement(){
 }
 
 void Scene::RemoveObject(GameObject* obj){
+	destroyedObjects.push_back(obj);
+}
+
+void Scene::DestroyObject(GameObject* obj){
 	for(SC_Transform* child : obj->transform.children){
-		RemoveObject(child->gameObject);
+		DestroyObject(child->gameObject);
 	}
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
@@ -208,7 +212,6 @@ void Scene::OnUpdate(){
 	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 
 	GameObject* parent = (*objects.begin());
-	GameObject* child  = (*objects.rbegin());
 
 	clock_t before = clock();
 	//GuiSetSliderValue(guiElements[0], (1+sin(float(currTime)/divisor))/2);
@@ -220,8 +223,21 @@ void Scene::OnUpdate(){
 	audio.SetListenerPos(camera->GlobalPosition());
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
+		//cout << "Updating object at position: " << (size_t)(*iter) << endl;
 		(*iter)->OnUpdate();
 	}
+
+	for(GameObject* obj : spawnedObjects){
+		AddObjectAndDescendants(obj);
+	}
+
+	spawnedObjects.clear();
+
+	for(GameObject* obj : destroyedObjects){
+		DestroyObject(obj);
+	}
+
+	destroyedObjects.clear();
 
 	if(input.GetKeyUp('o')){
 		SaveScene("Quicksave.xml");
@@ -245,12 +261,6 @@ void Scene::OnPostLoad(){
 }
 
 void Scene::Render(){
-	//rb->StepForward(deltaTime);
-
-	GameObject* y = *objects.begin();
-	//y->transform.rotation = Quaternion(Y_AXIS, ((float)currTime)/1000);
-	//y->transform.position.y = sinf(((float)currTime)/1000);
-
 	float aspectRatio = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
 	float fieldOfView = 80;
 	float nearZ = 0.01;
@@ -316,6 +326,26 @@ void Scene::OnKey(unsigned char key, int x, int y){
 
 void Scene::OnKeyUp(unsigned char key, int x, int y){
 	input.ReleaseKey(key);
+}
+
+GameObject* Scene::FindPrefab(const string& name){
+	for(GameObject* prefab : prefabs){
+		if(prefab->name == name){
+			return prefab;
+		}
+	}
+
+	return nullptr;
+}
+
+GameObject* Scene::Instantiate(GameObject* obj, Vector3 position, Quaternion rotation /*= QUAT_IDENTITY*/){
+	GameObject* instance = obj->Clone();
+
+	instance->transform.position = position;
+	instance->transform.rotation = rotation;
+
+	spawnedObjects.push_back(instance);
+	return instance;
 }
 
 void Scene::RemoveAllObjects(){

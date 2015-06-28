@@ -4,6 +4,7 @@
 #include "../header/int/GameObject.h"
 #include "../header/int/Scene.h"
 #include "../header/int/PhysicsSim.h"
+#include "../header/ext/simple-xml.h"
 
 
 RigidBody::RigidBody(SC_Transform* _transform, Collider* _col, float _mass){
@@ -26,6 +27,35 @@ void RigidBody::AddForce(Vector3 force){
 
 void RigidBody::Translate(const Vector3& move){
 	state.position = state.position + move;
+}
+
+void RigidBody::OnAwake(){
+	transform = &gameObject->transform;
+	col = gameObject->GetComponent<Collider>();
+	gameObject->scene->physicsSim->AddRigidBody(this);
+
+	state.position = transform->position;
+}
+
+XMLElement RigidBody::Serialize(){
+	XMLElement elem;
+	elem.name = "Rigidbody";
+	elem.attributes.emplace_back("mass", to_string(mass));
+	elem.attributes.emplace_back("isKinematic", (isKinematic ? "T" : "F"));
+}
+
+void RigidBody::Deserialize(const XMLElement& elem){
+	for(const XMLAttribute& attr : elem.attributes){
+		if(attr.name == "mass"){
+			mass = atof(attr.data.c_str());
+			state.invMass = 1/mass;
+		}
+		else if(attr.name == "isKinematic"){
+			isKinematic = attr.data == "T";
+		}
+	}
+
+	cout << "Rigidbody " << (isKinematic ? "is" : " isn't") << " kinematic.\n";
 }
 
 void RigidBody::StepForward(float deltaTime){
@@ -52,7 +82,6 @@ void RigidBody::StepForward(float deltaTime){
 }
 
 RBDeriv Evaluate(const RBState& init, float dt, const RBDeriv& d){
-
 	RBDeriv deriv;
 	deriv.instantVelocity = init.velocity + d.instantAcceleration * dt;
 	deriv.instantAcceleration = init.force*init.invMass*dt;
@@ -61,5 +90,4 @@ RBDeriv Evaluate(const RBState& init, float dt, const RBDeriv& d){
 }
 
 RigidBody::~RigidBody(){
-	//delete col;
 }

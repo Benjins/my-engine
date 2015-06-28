@@ -2,9 +2,11 @@
 #define RIGIDBODY_H
 
 #include "../ext/3dbasics.h"
+#include "Component.h"
 
 struct SC_Transform;
 struct Collider;
+struct XMLElement;
 
 struct RBState{
 	Vector3 position;
@@ -20,7 +22,7 @@ struct RBDeriv{
 	Vector3 instantAcceleration;
 };
 
-struct RigidBody{
+struct RigidBody : Component{
 	float mass;
 	bool useGravity;
 	bool isKinematic;
@@ -32,6 +34,20 @@ struct RigidBody{
 
 	RBState state;
 	RBDeriv deriv;
+
+	RigidBody(){
+		transform = nullptr;
+		col = nullptr;
+		time = 0;
+		useGravity = false;
+		isKinematic = false;
+		mass = 1;
+		state.invMass = 1/mass;
+	}
+
+	virtual void OnAwake();
+	virtual XMLElement Serialize();
+	virtual void Deserialize(const XMLElement& elem);
 
 	RigidBody(SC_Transform* _transform, Collider* _col, float m_ass = 1.0f);
 

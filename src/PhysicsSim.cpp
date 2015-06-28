@@ -32,7 +32,9 @@ void PhysicsSim::Advance(float dt){
 void PhysicsSim::StepForward(){
 	for(auto iter = dynamicBodies.begin(); iter != dynamicBodies.end(); iter++){
 		RigidBody* rb = *iter;
-		rb->StepForward(timeStep);
+		if(rb->isKinematic){
+			rb->StepForward(timeStep);
+		}
 		for(auto iter2 = staticBoxBodies.begin(); iter2 != staticBoxBodies.end(); iter2++){
 
 			if((*iter)->col == *iter2){
@@ -149,11 +151,7 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 }
 
 PhysicsSim::~PhysicsSim(){
-	for(auto iter = dynamicBodies.begin(); iter != dynamicBodies.end(); iter++){
-		delete (*iter);
-	}
-
-	//We don't actually destroy the static colliders, since they're components, 
+	//We don't actually destroy the static colliders or rigidbodies, since they're components, 
 	//and so the gameobject they're attached to will handle them.
 }
 

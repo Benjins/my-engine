@@ -118,6 +118,228 @@ struct AudioComponent : Component{
 	}
 };
 
+struct CameraControl : Component{
+	Input* input;
+	SC_Transform* camera;
+	PhysicsSim* physics;
+	GuiElement* slider;
+	GuiText* healthBar;
+	AudioComponent* audioComp;
+	float speed;
+	float velocity;
+
+	bool isGrounded;
+	float health;
+
+	float stepDelay;
+	float timeMoving;
+
+	int prevX;
+	int prevY;
+	float xRot;
+	float yRot;
+
+	CameraControl(){
+		speed = 5;
+		prevX = 0;
+		prevY = 0;
+		xRot = 0;
+		yRot = 0;
+		velocity = 0;
+		isGrounded = false;
+		health = 1;
+		timeMoving = 0;
+		stepDelay = 0.6f;
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "CameraControl";
+		elem.attributes.push_back(XMLAttribute("speed",  to_string(speed)));
+		elem.attributes.push_back(XMLAttribute("velocity", to_string(velocity)));
+		elem.attributes.push_back(XMLAttribute("isGrounded", isGrounded ? "T" : "F"));
+		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
+		elem.attributes.push_back(XMLAttribute("stepDelay", to_string(stepDelay)));
+
+		return elem;
+	}
+
+	virtual Component* Clone(){
+		CameraControl* newCam = new CameraControl();
+		newCam->speed = speed;
+		newCam->health = health;
+		newCam->stepDelay = stepDelay;
+
+		return newCam;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+		for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
+			if(iter->name == "speed"){
+				speed = atoi(iter->data.c_str());
+			}
+			else if(iter->name == "health"){
+				health = atof(iter->data.c_str());
+			}
+			else if(iter->name == "velocity"){
+				velocity = atof(iter->data.c_str());
+			}
+			else if(iter->name == "isGrounded"){
+				isGrounded = (iter->data == "T");
+			}
+			else if(iter->name == "stepDelay"){
+				stepDelay = atof(iter->data.c_str());
+			}
+		}
+	}
+
+	virtual void OnAwake(){
+		input = &gameObject->scene->input;
+		camera = gameObject->scene->camera;
+		physics = gameObject->scene->physicsSim;
+		slider = gameObject->scene->guiElements[0];
+		healthBar = static_cast<GuiText*>(gameObject->scene->FindGUIElement("healthText"));
+		audioComp = gameObject->GetComponent<AudioComponent>();
+	}
+
+	virtual void OnUpdate(){
+		float deltaX = input->GetMouseX() - prevX;
+		float deltaY = input->GetMouseY() - prevY;
+	
+		xRot = xRot + deltaX;
+		yRot = yRot + deltaY;
+
+		camera->rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
+
+		prevX = input->GetMouseX();
+		prevY = input->GetMouseY();
+		Vector3 moveVec(0,0,0);
+		if(input->GetKey('w')){
+			moveVec = moveVec + camera->Forward();
+		}
+		if(input->GetKey('s')){
+			moveVec = moveVec + camera->Forward() * -1; 
+		}
+		if(input->GetKey('a')){
+			moveVec = moveVec + camera->Right() * -1;
+		}
+		if(input->GetKey('d')){
+			moveVec = moveVec + camera->Right();
+		}
+		if(input->GetKeyDown(' ') && isGrounded){
+			velocity = 4;
+		}
+
+		//health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
+		health = max(0.0f, min(1.0f, health));
+		GuiSetSliderValue(slider, health);
+		if(healthBar != nullptr){
+			healthBar->text = "Health: " + to_string((int)(health*100));
+		}
+
+		moveVec.y = 0;
+		if(moveVec.MagnitudeSquared() > 0){
+			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+
+			RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), moveVec);
+			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
+				camera->GetParent()->position = camera->GetParent()->position + moveVec;
+			}
+			else if (testHit.hit){
+				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+				Vector3 goodVec = moveVec - badVec;
+				camera->GetParent()->position = camera->GetParent()->position + goodVec;
+			}
+
+			timeMoving += gameObject->scene->deltaTime;
+		}
+		else{
+			timeMoving = 0;
+		}
+
+		float floorHeight = -10;
+		RaycastHit lookDown = physics->Raycast(camera->GetParent()->position, Y_AXIS*-1);
+		if(lookDown.hit){
+			floorHeight = lookDown.worldPos.y;
+		}
+
+		velocity -= gameObject->scene->deltaTime * 5;
+		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
+		if(camera->GetParent()->position.y <= floorHeight + 0.4f){
+			camera->GetParent()->position.y = floorHeight + 0.4f;
+			velocity = 0;
+			isGrounded = true;
+		}
+		else{
+			isGrounded = false;
+		}
+
+		if(timeMoving > 0.8f && isGrounded){
+			audioComp->Play();
+			timeMoving = 0;
+		}
+	}
+
+	virtual ~CameraControl(){}
+};
+
+struct BulletComponent : Component{
+	GameObject* player;
+	float speed;
+	float time;
+	float timeLimit;
+
+	BulletComponent(){
+		speed = 3;
+		timeLimit = 6;
+		time = 0;
+	}
+
+	virtual void OnAwake(){
+		player = gameObject->scene->FindGameObject("mainCam");
+	}
+
+	virtual XMLElement Serialize(){
+		XMLElement elem;
+		elem.name = "BulletComponent";
+		elem.attributes.emplace_back("speed", to_string(speed));
+		return elem;
+	}
+
+	virtual Component* Clone(){
+		BulletComponent* newBullet = new BulletComponent();
+		newBullet->speed = speed;
+		return newBullet;
+	}
+
+	virtual void Deserialize(const XMLElement& elem){
+		for(const XMLAttribute& attr : elem.attributes){
+			if(attr.name == "speed"){
+				speed = atof(attr.data.c_str());
+			}
+		}
+	}
+
+	virtual void OnCollision(Collider* col){
+		if(col->gameObject == player){
+			player->transform.children[0]->gameObject->GetComponent<CameraControl>()->health -= 0.1f;
+		}
+
+		gameObject->material->matName = "";
+		gameObject->scene->RemoveObject(gameObject);
+	}
+
+	virtual void OnUpdate(){
+		gameObject->transform.position = gameObject->transform.position + gameObject->transform.Forward() * gameObject->scene->deltaTime * speed;
+
+		time += gameObject->scene->deltaTime;
+		if(time >= timeLimit){
+			gameObject->material->matName = "";
+			gameObject->scene->RemoveObject(gameObject);
+		}
+	}
+};
+
 struct PathNodeComponent : Component{
 	
 	int nodeId;
@@ -546,8 +768,13 @@ struct EnemyComp : HitComponent{
 	GameObject* player;
 	vector<Vector3> path;
 
+	GameObject* bulletPrefab;
+
 	int health;
 	int maxHealth;
+
+	float reloadTimeCounter;
+	float reloadTime;
 
 	bool pathNeedsUpdate;
 
@@ -556,6 +783,8 @@ struct EnemyComp : HitComponent{
 		health = 5;
 		maxHealth = 5;
 		pathNeedsUpdate = true;
+		reloadTimeCounter = 0;
+		reloadTime = 2 + ((float)(rand() % 500)) / 500;;
 	}
 
 	virtual XMLElement Serialize(){
@@ -615,10 +844,13 @@ struct EnemyComp : HitComponent{
 		physics = gameObject->scene->physicsSim;
 		pathing = &gameObject->scene->pathfinding;
 		player = gameObject->scene->FindGameObject("mainCam");
+		bulletPrefab = gameObject->scene->FindPrefab("bullet");
 	}
 
 	virtual void OnUpdate(){
 		
+		reloadTimeCounter += gameObject->scene->deltaTime;
+
 		Vector3 toPlayer = player->transform.position - gameObject->transform.position;
 		RaycastHit hitPlayer = physics->Raycast(gameObject->transform.position, toPlayer);
 
@@ -692,185 +924,12 @@ struct EnemyComp : HitComponent{
 		else{
 			gameObject->transform.position.y -= 3 * gameObject->scene->deltaTime;
 		}
-	}
-};
 
-struct CameraControl : Component{
-	Input* input;
-	SC_Transform* camera;
-	PhysicsSim* physics;
-	GuiElement* slider;
-	GuiText* healthBar;
-	AudioComponent* audioComp;
-	float speed;
-	float velocity;
-
-	bool isGrounded;
-	float health;
-
-	float stepDelay;
-	float timeMoving;
-
-	int prevX;
-	int prevY;
-	float xRot;
-	float yRot;
-
-	CameraControl(){
-		speed = 5;
-		prevX = 0;
-		prevY = 0;
-		xRot = 0;
-		yRot = 0;
-		velocity = 0;
-		isGrounded = false;
-		health = 1;
-		timeMoving = 0;
-		stepDelay = 0.6f;
-	}
-
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "CameraControl";
-		elem.attributes.push_back(XMLAttribute("speed",  to_string(speed)));
-		elem.attributes.push_back(XMLAttribute("velocity", to_string(velocity)));
-		elem.attributes.push_back(XMLAttribute("isGrounded", isGrounded ? "T" : "F"));
-		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
-		elem.attributes.push_back(XMLAttribute("stepDelay", to_string(stepDelay)));
-
-		return elem;
-	}
-
-	virtual Component* Clone(){
-		CameraControl* newCam = new CameraControl();
-		newCam->speed = speed;
-		newCam->health = health;
-		newCam->stepDelay = stepDelay;
-
-		return newCam;
-	}
-
-	virtual void Deserialize(const XMLElement& elem){
-		for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
-			if(iter->name == "speed"){
-				speed = atoi(iter->data.c_str());
-			}
-			else if(iter->name == "health"){
-				health = atof(iter->data.c_str());
-			}
-			else if(iter->name == "velocity"){
-				velocity = atof(iter->data.c_str());
-			}
-			else if(iter->name == "isGrounded"){
-				isGrounded = (iter->data == "T");
-			}
-			else if(iter->name == "stepDelay"){
-				stepDelay = atof(iter->data.c_str());
-			}
+		if(reloadTimeCounter > reloadTime){
+			reloadTimeCounter = 0;
+			gameObject->scene->Instantiate(bulletPrefab, gameObject->transform.position + gameObject->transform.Forward(), gameObject->transform.rotation);
 		}
 	}
-
-	virtual void OnAwake(){
-		input = &gameObject->scene->input;
-		camera = gameObject->scene->camera;
-		physics = gameObject->scene->physicsSim;
-		slider = gameObject->scene->guiElements[0];
-		healthBar = static_cast<GuiText*>(gameObject->scene->FindGUIElement("healthText"));
-		audioComp = gameObject->GetComponent<AudioComponent>();
-	}
-
-	virtual void OnUpdate(){
-		float deltaX = input->GetMouseX() - prevX;
-		float deltaY = input->GetMouseY() - prevY;
-	
-		xRot = xRot + deltaX;
-		yRot = yRot + deltaY;
-
-		camera->rotation = Quaternion(Y_AXIS, xRot/80) * Quaternion(X_AXIS, yRot/80 - 3);
-
-		prevX = input->GetMouseX();
-		prevY = input->GetMouseY();
-		Vector3 moveVec(0,0,0);
-		if(input->GetKey('w')){
-			moveVec = moveVec + camera->Forward();
-		}
-		if(input->GetKey('s')){
-			moveVec = moveVec + camera->Forward() * -1; 
-		}
-		if(input->GetKey('a')){
-			moveVec = moveVec + camera->Right() * -1;
-		}
-		if(input->GetKey('d')){
-			moveVec = moveVec + camera->Right();
-		}
-		if(input->GetKeyDown(' ') && isGrounded){
-			velocity = 4;
-		}
-
-		if(input->GetKeyUp('b')){
-			GameObject* newEnemy = new GameObject();
-			newEnemy->name = "enemyClone";
-			newEnemy->scene = gameObject->scene;
-			newEnemy->AddMesh("test.obj");
-			newEnemy->AddMaterial("shader","Texture.bmp");
-			newEnemy->AddComponent<BoxCollider>();
-			newEnemy->AddComponent<EnemyComp>();
-			newEnemy->transform.position = Vector3(-2, 1, 5);
-			newEnemy->transform.scale = Vector3(0.3f, 1, 0.3f);
-			gameObject->scene->AddObject(newEnemy);
-		}
-
-		health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
-		health = max(0.0f, min(1.0f, health));
-		GuiSetSliderValue(slider, health);
-		if(healthBar != nullptr){
-			healthBar->text = "Health: " + to_string((int)(health*100));
-		}
-
-		moveVec.y = 0;
-		if(moveVec.MagnitudeSquared() > 0){
-			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
-
-			RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), moveVec);
-			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
-				camera->GetParent()->position = camera->GetParent()->position + moveVec;
-			}
-			else if (testHit.hit){
-				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
-				Vector3 goodVec = moveVec - badVec;
-				camera->GetParent()->position = camera->GetParent()->position + goodVec;
-			}
-
-			timeMoving += gameObject->scene->deltaTime;
-		}
-		else{
-			timeMoving = 0;
-		}
-
-		float floorHeight = -10;
-		RaycastHit lookDown = physics->Raycast(camera->GetParent()->position, Y_AXIS*-1);
-		if(lookDown.hit){
-			floorHeight = lookDown.worldPos.y;
-		}
-
-		velocity -= gameObject->scene->deltaTime * 5;
-		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
-		if(camera->GetParent()->position.y <= floorHeight + 0.4f){
-			camera->GetParent()->position.y = floorHeight + 0.4f;
-			velocity = 0;
-			isGrounded = true;
-		}
-		else{
-			isGrounded = false;
-		}
-
-		if(timeMoving > 0.8f && isGrounded){
-			audioComp->Play();
-			timeMoving = 0;
-		}
-	}
-
-	virtual ~CameraControl(){}
 };
 
 struct OscillateUp : Component{

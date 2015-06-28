@@ -77,9 +77,11 @@ void GameObject::AddNamedMaterial(string matName){
 }
 
 void GameObject::OnUpdate(){
+	//cout << "About to update components." << endl;
 	for(auto iter = components.begin(); iter != components.end(); iter++){
 		(*iter)->OnUpdate();
 	}
+	//cout << "Done updating components." << endl;
 }
 
 void GameObject::OnCollision(Collider* col){

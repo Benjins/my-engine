@@ -5,6 +5,7 @@
 #include "../header/int/Scene.h"
 #include "../header/int/GuiElement.h"
 #include "../header/int/UserComps.h"
+#include "../header/int/RigidBody.h"
 #include "../header/ext/simple-xml.h"
 
 struct FireGun;
@@ -23,6 +24,8 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(AnimationComponent);
 	DEFINE_USER_COMPONENT(PathNodeComponent);
 	DEFINE_USER_COMPONENT(AudioComponent);
+	DEFINE_USER_COMPONENT(RigidBody);
+	DEFINE_USER_COMPONENT(BulletComponent);
 	return nullptr;
 }
 
@@ -194,7 +197,7 @@ void LoadMaterialXML(Scene* scene, XMLElement elem){
 	mat->uvOffset = uvOffset;
 }
 
-void Scene::LoadGameObjectXML(const XMLElement& elem){
+GameObject* Scene::LoadGameObjectXML(const XMLElement& elem){
 	GameObject* go = new GameObject();
 	go->scene = this;
 
@@ -300,7 +303,7 @@ void Scene::LoadGameObjectXML(const XMLElement& elem){
 		}
 	}
 
-	AddObject(go);
+	return go;
 }
 
 void Scene::LoadScene(string fileName){
@@ -318,7 +321,10 @@ void Scene::LoadScene(string fileName){
 				XMLElement res = *iter2;
 
 				if(res.name == "GameObject"){
-					LoadGameObjectXML(res);
+					AddObject(LoadGameObjectXML(res));
+				}
+				else if(res.name == "Prefab"){
+					prefabs.push_back(LoadGameObjectXML(res));
 				}
 				else if(res.name == "Material"){
 					LoadMaterialXML(this, res);

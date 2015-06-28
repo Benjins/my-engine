@@ -8,6 +8,9 @@ testing: src/*.cpp test/testing.cpp
 	$(CXX) -std=c++11 -DTESTING -g -fprofile-arcs -ftest-coverage -Iheader/ext/freetype2 src/*.cpp test/testing.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine-test
 	./build/my-engine-test
 
+engine_debug: src/*.cpp
+	$(CXX) -std=c++11 -g -Iheader/ext/freetype2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine_debug
+
 engine_opt: src/*.cpp
 	$(CXX) -std=c++11 -Iheader/ext/freetype2 -O2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine
 

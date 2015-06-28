@@ -33,11 +33,16 @@ struct Scene{
 	//Vector3 lightDir;
 	vector<GuiElement*> guiElements;
 	vector<Light> lights;
-	
+
 protected:
 	vector<GameObject*> prefabs;
 	vector<GameObject*> objects;
 	vector<DrawCall> drawCalls;
+
+	vector<GameObject*> spawnedObjects;
+	vector<GameObject*> destroyedObjects;
+
+	void DestroyObject(GameObject* obj);
 
 	int prevX;
 	int prevY;
@@ -80,6 +85,7 @@ public:
 	GuiElement* AddGuiElement();
 
 	void RemoveObject(GameObject* obj);
+
 	
 	virtual void Start();
 
@@ -103,12 +109,15 @@ public:
 
 	void RemoveAllObjects();
 
+	GameObject* FindPrefab(const string& name);
+	GameObject* Instantiate(GameObject* obj, Vector3 position, Quaternion rotation = QUAT_IDENTITY);
+
 	void Stop();
 
 	void LoadGuiElement(const XMLElement& elem);
 	void LoadGuiText(const XMLElement& elem);
 
-	void LoadGameObjectXML(const XMLElement& elem);
+	GameObject* LoadGameObjectXML(const XMLElement& elem);
 
 	virtual ~Scene();
 };

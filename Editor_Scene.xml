@@ -16,6 +16,13 @@
     <GuiText name='healthText' fuv='CODE_Bold64.fuv' text='Health: 100' position='-0.600000,0.900000' scale='0.400000,0.400000'/>
     <AudioClip name='cough' fileName='data/coughing.wav'/>
     <AudioClip name='footstep' fileName='data/footstep.wav'/>
+    <Prefab name='bullet'>
+        <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='0.1,0.1,0.1'/>
+        <Material name='floorMat'/>
+        <Mesh source='test.obj'/>
+        <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+        <BulletComponent speed='2'/>
+    </Prefab>
     <GameObject name='myObj'>
         <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <Material name='floorMat'/>
@@ -25,6 +32,7 @@
     <GameObject name='mainCam'>
         <Transform position='0.000000,3.000000,-2.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <BoxCollider position='0.000000,0.000000,0.000000' size='0.200000,0.200000,0.200000'/>
+        <RigidBody isKinematic='F' mass='1'/>
     </GameObject>
     <GameObject name='mainCamSub'>
         <Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
