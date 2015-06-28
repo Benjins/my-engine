@@ -42,6 +42,8 @@ XMLElement RigidBody::Serialize(){
 	elem.name = "Rigidbody";
 	elem.attributes.emplace_back("mass", to_string(mass));
 	elem.attributes.emplace_back("isKinematic", (isKinematic ? "T" : "F"));
+
+	return elem;
 }
 
 void RigidBody::Deserialize(const XMLElement& elem){

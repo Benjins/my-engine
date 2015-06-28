@@ -1,11 +1,17 @@
 #ifndef AUDIOSYSTEM_H
 #define AUDIOSYSTEM_H
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <al.h>
+#include <alc.h>
+#else
 #include <AL/al.h>
 #include <AL/alc.h>
+#endif
 
 #include "../ext/Vector3.h"
 #include <vector>
+#include <string>
 
 #define MAX_CLIP_COUNT 20
 

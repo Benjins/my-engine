@@ -120,6 +120,8 @@ GameObject* Scene::AddObjectAndDescendants(GameObject* obj){
 	for(SC_Transform* child : obj->transform.children){
 		AddObjectAndDescendants(child->gameObject);
 	}
+
+	return obj;
 }
 
 GuiElement* Scene::AddGuiElement(){

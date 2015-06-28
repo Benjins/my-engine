@@ -26,11 +26,12 @@ struct AudioComponent : Component{
 
 	float volume;
 	bool loop;
-	bool autoPlay = true;
+	bool autoPlay;
 
 	AudioComponent(){
 		volume = 1;
 		loop = false;
+		autoPlay = true;
 	}
 
 	virtual Component* Clone(){
@@ -411,6 +412,8 @@ struct AnimationComponent : Component{
 
 		newAnim->loop = loop;
 		newAnim->playAutomatically = playAutomatically;
+
+		return newAnim;
 	}
 
 	virtual XMLElement Serialize(){
