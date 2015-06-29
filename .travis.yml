@@ -21,7 +21,7 @@ env:
 
 before_install:
   - chmod +x scripts/*.sh
-  - sudo ./scripts/travis_setup.sh $CXX
+  - sudo ./scripts/travis_setup.sh $CXX $TRAVIS_OS_NAME
 
 before_script: 
   - cd ${TRAVIS_BUILD_DIR}
