@@ -10,7 +10,7 @@ sudo apt-get install freeglut3-dev glew1.5-dev libfreetype6-dev libopenal-dev ss
 if [ "$1" == "g++" ]; then sudo apt-get install doxygen; fi
 sudo apt-get update -qq
 
-if [ "$2" == "osx" ]; then brew install openal-soft; fi
+if [ "$2" == "osx" ]; then sudo brew install openal-soft; fi
 
 #g++4.8.1
 if [ "$1" == "g++" ]; then sudo apt-get install -qq gcc-4.8 g++-4.8; fi
