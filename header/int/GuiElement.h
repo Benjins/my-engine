@@ -3,8 +3,15 @@
 
 #include "../ext/Vector2.h"
 #include "FontBMPMaker.h"
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <GLUT/glut.h>
+#else
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#endif
+
 #include <string>
 
 using std::string;

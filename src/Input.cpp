@@ -1,5 +1,10 @@
 #include "../header/int/Input.h"
+
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
 #include <GL/freeglut.h>
+#endif
 
 Input::Input(){
 	for(int i = 0; i < 256; i++){
