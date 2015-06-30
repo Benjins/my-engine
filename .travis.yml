@@ -21,7 +21,9 @@ env:
 
 before_install:
   - chmod +x scripts/*.sh
-  - sudo ./scripts/travis_setup.sh $CXX $TRAVIS_OS_NAME
+  - sudo ./scripts/travis_setup.sh $CXX
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install openal-soft; fi
 
 before_script: 
   - cd ${TRAVIS_BUILD_DIR}
