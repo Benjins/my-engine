@@ -4,10 +4,7 @@
 #include "../header/int/Scene.h"
 #include <assert.h>
 
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-#include <float.h>
-#endif 
-
+#include <cfloat>
 
 void Pathfinding::HookUpNodes(float maxDistance /*= 20*/){
 	for(auto iter = nodes.begin(); iter != nodes.end(); iter++){

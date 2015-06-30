@@ -186,7 +186,11 @@ void Scene::Start(){
 
 	running = true;
 	while(running){
+#ifdef __APPLE__
+		glutCheckLoop();
+#else
 		glutMainLoopEvent();
+#endif
 		OnUpdate();
 		physicsSim->Advance(deltaTime);
 

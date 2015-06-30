@@ -11,10 +11,10 @@
 
 #include <sstream>
 #include <iomanip>
+#include <cfloat>
 
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 #include <sys/time.h>
-#include <float.h>
 #endif 
 
 
