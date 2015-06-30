@@ -31,7 +31,8 @@ before_script:
 
 script: 
   - cd ${TRAVIS_BUILD_DIR}
-  - make engine && make editor && make testing
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make engine_mac && make editor_mac && make testing_mac; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then make engine && make editor && make testing; fi
   - if [ "$CXX" == "g++" ]; then make docs; fi
 
 after_success:
