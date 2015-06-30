@@ -25,6 +25,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install openal-soft; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install freetype; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew info freetype; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ls /System/Library/Frameworks; fi
 
 before_script: 
