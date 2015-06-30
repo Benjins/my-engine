@@ -89,7 +89,11 @@ void EditorScene::Start(){
 
 	running = true;
 	while(running){
+#ifdef __APPLE__
+		glutCheckLoop();
+#else
 		glutMainLoopEvent();
+#endif
 
 		EditorUpdate();
 
