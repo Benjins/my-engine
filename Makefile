@@ -9,7 +9,7 @@ testing: src/*.cpp test/testing.cpp
 	./build/my-engine-test
 	
 engine_mac: src/*.cpp
-	$(CXX) -std=c++11 -Iheader/ext/freetype2 src/*.cpp lib/*.a -framework OpenGL -framework GLUT -framework Freetype -framework openal-soft -o ./build/my-engine
+	$(CXX) -std=c++11 -Iheader/ext/freetype2 src/*.cpp lib/*.a -framework OpenGL -framework GLUT -framework FreeType -framework openal-soft -o ./build/my-engine
 
 editor_mac: src/*.cpp
 	$(CXX) -std=c++11 -DEDITOR -Iheader/ext/freetype2 src/*.cpp lib/*.a -framework OpenGL -framework GLUT -framework Freetype -framework openal-soft -o ./build/my-engine-editor
