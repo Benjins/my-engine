@@ -21,7 +21,7 @@ env:
 
 before_install:
   - chmod +x scripts/*.sh
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo ./scripts/travis_setup_linux.sh $CXX;
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo ./scripts/travis_setup_linux.sh $CXX; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then . ./scripts/travis_setup_mac.sh; fi
 
 before_script: 
