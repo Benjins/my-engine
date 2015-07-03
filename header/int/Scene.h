@@ -118,7 +118,7 @@ public:
 	void LoadGuiElement(const XMLElement& elem);
 	void LoadGuiText(const XMLElement& elem);
 
-	GameObject* LoadGameObjectXML(const XMLElement& elem);
+	GameObject* LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvents = true);
 
 	virtual ~Scene();
 };

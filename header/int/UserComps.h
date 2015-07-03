@@ -325,6 +325,9 @@ struct BulletComponent : Component{
 		if(col->gameObject == player){
 			player->transform.children[0]->gameObject->GetComponent<CameraControl>()->health -= 0.1f;
 		}
+		else{
+			cout << "Collision with non-player: '" << col->gameObject->name << "'\n";
+		}
 
 		gameObject->material->matName = "";
 		gameObject->scene->RemoveObject(gameObject);

@@ -197,7 +197,7 @@ void LoadMaterialXML(Scene* scene, XMLElement elem){
 	mat->uvOffset = uvOffset;
 }
 
-GameObject* Scene::LoadGameObjectXML(const XMLElement& elem){
+GameObject* Scene::LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvents){
 	GameObject* go = new GameObject();
 	go->scene = this;
 
@@ -271,7 +271,7 @@ GameObject* Scene::LoadGameObjectXML(const XMLElement& elem){
 			camera = &(go->transform);
 		}
 		else if(child.name == "BoxCollider"){
-			BoxCollider* col = go->AddComponent<BoxCollider>();
+			BoxCollider* col = new BoxCollider();
 			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
 				XMLAttribute attr = *iter2;
 				if(attr.name == "position"){
@@ -281,9 +281,16 @@ GameObject* Scene::LoadGameObjectXML(const XMLElement& elem){
 					col->size = ParseVector3(attr.data);
 				}
 			}
+
+			if(fireAwakeEvents){
+				go->AddComponent(col);
+			}
+			else{
+				go->AddComponentDirect(col);
+			}
 		}
 		else if(child.name == "SphereCollider"){
-			SphereCollider* col = go->AddComponent<SphereCollider>();
+			SphereCollider* col = new SphereCollider();
 			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
 				XMLAttribute attr = *iter2;
 				if(attr.name == "position"){
@@ -293,12 +300,24 @@ GameObject* Scene::LoadGameObjectXML(const XMLElement& elem){
 					col->radius = atof(attr.data.c_str());
 				}
 			}
+
+			if(fireAwakeEvents){
+				go->AddComponent(col);
+			}
+			else{
+				go->AddComponentDirect(col);
+			}
 		}
 		else{
 			Component* userComp = GetUserDefinedComp(iter->name);
 			if(userComp != nullptr){
 				userComp->Deserialize(*iter);
-				go->AddComponent(userComp);
+				if(fireAwakeEvents){
+					go->AddComponent(userComp);
+				}
+				else{
+					go->AddComponentDirect(userComp);
+				}
 			}
 		}
 	}
@@ -324,7 +343,7 @@ void Scene::LoadScene(string fileName){
 					AddObject(LoadGameObjectXML(res));
 				}
 				else if(res.name == "Prefab"){
-					prefabs.push_back(LoadGameObjectXML(res));
+					prefabs.push_back(LoadGameObjectXML(res, false));
 				}
 				else if(res.name == "Material"){
 					LoadMaterialXML(this, res);

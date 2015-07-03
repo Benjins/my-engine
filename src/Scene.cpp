@@ -134,7 +134,7 @@ GuiElement* Scene::AddGuiElement(){
 
 void Scene::RemoveObject(GameObject* obj){
 	if(std::find(destroyedObjects.begin(), destroyedObjects.end(), obj) != destroyedObjects.end()){
-		cout << "\n\nWarning: Tried to remove the same gameobject twice.  Subsequent calls ignored.\n";
+		//cout << "\n\nWarning: Tried to remove the same gameobject twice.  Subsequent calls ignored.\n";
 	}
 	else{
 		destroyedObjects.push_back(obj);
