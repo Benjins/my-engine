@@ -249,7 +249,17 @@ struct CameraControl : Component{
 			else if (testHit.hit){
 				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
 				Vector3 goodVec = moveVec - badVec;
-				camera->GetParent()->position = camera->GetParent()->position + goodVec;
+				if(goodVec.MagnitudeSquared() > 0){
+					RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), goodVec);
+					if(!testHit.hit || testHit.depth > goodVec.Magnitude() + 0.2f){
+						camera->GetParent()->position = camera->GetParent()->position + goodVec;
+					}
+					else if (testHit.hit){
+						badVec = testHit.normal * DotProduct(goodVec, testHit.normal);
+						goodVec = goodVec - badVec;
+						camera->GetParent()->position = camera->GetParent()->position + goodVec;
+					}
+				}
 			}
 
 			timeMoving += gameObject->scene->deltaTime;
