@@ -50,42 +50,44 @@ void EditorScene::Start(){
 	camera = &editorCamera;
 
 	GuiElement* panel = new GuiElement(&resources);
-	panel->position = Vector2(0.9f,0.9f);
-	panel->scale = Vector2(0.25f, 0.2f);
+	panel->name = "gui_editor_panel";
+	panel->position = Vector2(0.85f,0.9f);
+	panel->scale = Vector2(0.3f, 0.2f);
 	panel->tex = new Texture(1,1);
 	RGBApixel pix = {50,50,50,220};
 	panel->tex->SetPixel(0,0,pix);
 	panel->tex->Apply();
 
-	editorGui.push_back(panel);
+	editorGui.elements.push_back(panel);
 	
 	GuiText* posTxt = new GuiText(&resources, "arial_16.fuv");
-	posTxt->position = Vector2(1.55f,-0.8f);
-	posTxt->scale = Vector2(1,1);
+	posTxt->position = Vector2(0.81f, 0.94f);
+	posTxt->scale = Vector2(0.1f, 0.04f);
+	posTxt->textScale = Vector2(1,1);
 	posTxt->text = "Position: ";
 
-	editorGui.push_back(posTxt);
+	editorGui.elements.push_back(posTxt);
 
 	GuiText* meshTxt = new GuiText(&resources, "arial_16.fuv");
-	meshTxt->position = Vector2(1.55f,-0.68f);
-	meshTxt->scale = Vector2(1,1);
+	meshTxt->position = Vector2(0.81f, 0.9f);
+	meshTxt->scale = Vector2(0.1f, 0.04f);
 	meshTxt->text = "Mesh file: ";
 
-	editorGui.push_back(meshTxt);
+	editorGui.elements.push_back(meshTxt);
 
 	GuiText* nameTxt = new GuiText(&resources, "arial_16.fuv");
-	nameTxt->position = Vector2(1.55f,-0.9f);
-	nameTxt->scale = Vector2(1,1);
+	nameTxt->position = Vector2(0.81f, 0.86f);
+	nameTxt->scale = Vector2(0.1f, 0.04f);
 	nameTxt->text = "Name: ";
 
-	editorGui.push_back(nameTxt);
+	editorGui.elements.push_back(nameTxt);
 
 	GuiText* rotTxt = new GuiText(&resources, "arial_16.fuv");
-	rotTxt->position = Vector2(1.55f,-0.74f);
-	rotTxt->scale = Vector2(1,1);
+	rotTxt->position = Vector2(0.81f, 0.82f);
+	rotTxt->scale = Vector2(0.1f, 0.04f);
 	rotTxt->text = "Rotation: ";
 
-	editorGui.push_back(rotTxt);
+	editorGui.elements.push_back(rotTxt);
 
 	running = true;
 	while(running){
@@ -160,6 +162,19 @@ void EditorScene::EditorUpdate(){
 
 	float mouseXNormalized = (input.mouseX -  windowWidth/2) / windowWidth  * 2;
 	float mouseYNormalized = (input.mouseY - windowHeight/2) / windowHeight * 2;
+
+	Vector2 uiMouseLoc = (Vector2(mouseXNormalized, mouseYNormalized) + Vector2(1,1)) / 2;
+	uiMouseLoc.y = 1 - uiMouseLoc.y;
+
+	if(input.GetMouseDown(GLUT_LEFT_BUTTON)){
+		editorGui.OnMouseDown(uiMouseLoc);
+	}
+	else if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
+		editorGui.OnMouseUp(uiMouseLoc);
+	}
+	else if(input.GetMouse(GLUT_LEFT_BUTTON)){
+		editorGui.OnMouseDrag(uiMouseLoc);
+	}
 
 	if(input.GetKeyUp('x')){
 		Stop();
@@ -334,7 +349,7 @@ void EditorScene::EditorUpdate(){
 	
 	if(selectedObj){
 		Vector3 position = selectedObj->transform.position;
-		static_cast<GuiText*>(editorGui[1])->text = "Position: " + ToString(position.x, 4) + ", " + ToString(position.y, 4) + ", " + ToString(position.z, 4);
+		static_cast<GuiText*>(editorGui.elements[1])->text = "Position: " + ToString(position.x, 4) + ", " + ToString(position.y, 4) + ", " + ToString(position.z, 4);
 
 		Vector3 eulerAngles;
 		Vector3 transformedAxes[3] = {selectedObj->transform.Right(), selectedObj->transform.Up(), selectedObj->transform.Forward()};
@@ -342,11 +357,11 @@ void EditorScene::EditorUpdate(){
 		eulerAngles.x = acos(transformedAxes[1].y) * ((transformedAxes[2].z > 0) ? 1 : -1) * rad2deg;
 		eulerAngles.y = acos(transformedAxes[2].z) * ((transformedAxes[0].x > 0) ? 1 : -1) * rad2deg;
 		eulerAngles.z = acos(transformedAxes[0].x) * ((transformedAxes[1].y > 0) ? 1 : -1) * rad2deg;
-		static_cast<GuiText*>(editorGui[4])->text = "Rotation: " + ToString(eulerAngles.x) + ", " + ToString(eulerAngles.y) + ", " + ToString(eulerAngles.z);
+		static_cast<GuiText*>(editorGui.elements[4])->text = "Rotation: " + ToString(eulerAngles.x) + ", " + ToString(eulerAngles.y) + ", " + ToString(eulerAngles.z);
 
-		static_cast<GuiText*>(editorGui[3])->text = "Name: '" + selectedObj->name + "'";
+		static_cast<GuiText*>(editorGui.elements[3])->text = "Name: " + selectedObj->name;
 
-		GuiText* meshTxt = static_cast<GuiText*>(editorGui[2]);
+		GuiText* meshTxt = static_cast<GuiText*>(editorGui.elements[2]);
 		if(selectedObj->mesh != nullptr){
 			meshTxt->text = "Mesh: " + selectedObj->mesh->fileName;
 		}
@@ -355,10 +370,10 @@ void EditorScene::EditorUpdate(){
 		}
 	}
 	else{
-		static_cast<GuiText*>(editorGui[1])->text = "Position:";
-		static_cast<GuiText*>(editorGui[2])->text = "";
-		static_cast<GuiText*>(editorGui[3])->text = "Name:";
-		static_cast<GuiText*>(editorGui[4])->text = "Rotation:";
+		static_cast<GuiText*>(editorGui.elements[1])->text = "Position:";
+		static_cast<GuiText*>(editorGui.elements[2])->text = "";
+		static_cast<GuiText*>(editorGui.elements[3])->text = "Name:";
+		static_cast<GuiText*>(editorGui.elements[4])->text = "Rotation:";
 	}
 
 	for(GameObject* obj : objects){
@@ -431,7 +446,7 @@ void EditorScene::EditorGUI(){
 	glLineWidth(5);
 	glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 0.4f, 0.6f, 0.6f, 1);
 
-	vector<Vector3> path = pathfinding.FindPath(Vector3(-4, 1, 4), Vector3(4, 1, -4));
+	vector<Vector3> path = pathfinding.FindPath(Vector3(-6, 1, 4), Vector3(5, 1, -6));
 	Vector3 prevPos = Vector3(-4, 1, 4);
 	for(auto iter = path.rbegin(); iter != path.rend(); ++iter){
 		Vector3 pos = *iter;
@@ -539,9 +554,7 @@ void EditorScene::EditorGUI(){
 		}
 	}
 
-	for(GuiElement* elem : editorGui){
-		elem->OnGui();
-	}
+	editorGui.RenderGui();
 
 	glEnable(GL_DEPTH);
 }
@@ -571,9 +584,5 @@ static void OnEditorKeyUpFunc(unsigned char key, int x, int y){
 EditorScene::~EditorScene(){
 	for(auto iter = selectionSim.staticBoxBodies.begin(); iter != selectionSim.staticBoxBodies.end(); iter++){
 		delete (*iter);
-	}
-
-	for(GuiElement* elem : editorGui){
-		delete elem;
 	}
 }

@@ -95,7 +95,7 @@ GameObject* Scene::FindGameObject(const string& name){
 }
 
 GuiElement* Scene::FindGUIElement(const string& name){
-	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
+	for(auto iter = guiSystem.elements.begin(); iter != guiSystem.elements.end(); iter++){
 		GuiElement* elem = *iter;
 		if(elem->name == name){
 			return elem;
@@ -127,7 +127,7 @@ GameObject* Scene::AddObjectAndDescendants(GameObject* obj){
 
 GuiElement* Scene::AddGuiElement(){
 	GuiElement* elem = new GuiElement(&resources);
-	guiElements.push_back(elem);
+	guiSystem.elements.push_back(elem);
 
 	return elem;
 }
@@ -313,9 +313,7 @@ void Scene::Render(){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
-		(*iter)->OnGui();
-	}
+	guiSystem.RenderGui();
 }
 
 void Scene::OnMouse(int button, int state, int x, int y){
@@ -367,11 +365,11 @@ void Scene::RemoveAllObjects(){
 
 	objects.clear();
 
-	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
+	for(auto iter = guiSystem.elements.begin(); iter != guiSystem.elements.end(); iter++){
 		delete (*iter);
 	}
 
-	guiElements.clear();
+	guiSystem.elements.clear();
 
 	physicsSim->staticBoxBodies.clear();
 	physicsSim->staticSphereBodies.clear();
@@ -396,10 +394,6 @@ Scene::~Scene(){
 
 	for(GameObject* prefab : prefabs){
 		delete prefab;
-	}
-
-	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
-		delete (*iter);
 	}
 
 	delete physicsSim;

@@ -131,6 +131,7 @@
     <ClCompile Include="src\FontBMPMaker.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\GuiElement.cpp" />
+    <ClCompile Include="src\GuiSystem.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Interval.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="header\int\FontBMPMaker.h" />
     <ClInclude Include="header\int\GameObject.h" />
     <ClInclude Include="header\int\GuiElement.h" />
+    <ClInclude Include="header\int\GuiSystem.h" />
     <ClInclude Include="header\int\Input.h" />
     <ClInclude Include="header\int\Interval.h" />
     <ClInclude Include="header\int\Light.h" />

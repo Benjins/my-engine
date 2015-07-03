@@ -10,11 +10,14 @@
 
 GuiElement::GuiElement(){
 	tex = NULL;
+	parent = nullptr;
+	isVisible = true;
+	isPassive = false;
 	guiProgram = 0;
 	depth = 0;
 	texLoc = 0;
 	position = Vector2(0,0);
-	scale = Vector2(0,0);
+	scale = Vector2(0.2f,0.2f);
 	name = "";
 }
 
@@ -22,6 +25,10 @@ GuiElement::GuiElement(MaterialManager* resources){
 	Material* mat = resources->GetMaterialByName("gui");
 	guiProgram = mat->shaderProgram;
 	texLoc = mat->GetUniformByName("_guiTex");
+	parent = nullptr;
+
+	isVisible = true;
+	isPassive = false;
 
 	name = "";
 	tex = NULL;
@@ -29,6 +36,25 @@ GuiElement::GuiElement(MaterialManager* resources){
 	position = Vector2(0,0);
 	scale = Vector2(0,0);
 }
+
+void GuiElement::SetParent(GuiElement* newParent){
+		if(parent == newParent){
+			return;
+		}
+		if(parent != nullptr){
+			for(auto iter = parent->children.begin(); iter != parent->children.end(); ++iter){
+				if(*iter == this){
+					parent->children.erase(iter);
+					break;
+				}
+			}
+		}
+
+		parent = newParent;
+		if(newParent != nullptr){
+			newParent->children.push_back(this);
+		}
+	}
 
 void GuiElement::OnGui() const{
 	GLint currProgram;
@@ -103,6 +129,7 @@ GuiText::GuiText(MaterialManager* resources, const string& _fuvFileName)
 	: GuiElement()
 	, fuvFileName(_fuvFileName)
 {
+	textScale = Vector2(1,1);
 	text = "";
 	ImportFUV(fuvFileName, fuv);
 
@@ -129,6 +156,7 @@ XMLElement GuiText::Serialize(){
 	elem.attributes.push_back(XMLAttribute("name", name));
 	elem.attributes.push_back(XMLAttribute("fuv", fuvFileName));
 	elem.attributes.push_back(XMLAttribute("text", text));
+	elem.attributes.push_back(XMLAttribute("textScale", EncodeVector2(textScale)));
 	elem.attributes.push_back(XMLAttribute("position", EncodeVector2(position)));
 	elem.attributes.push_back(XMLAttribute("scale", EncodeVector2(scale)));
 
@@ -143,12 +171,15 @@ void GuiText::OnGui() const{
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texObj);
 
-	float sx = 2.0f / glutGet(GLUT_WINDOW_WIDTH) * scale.x;
-	float sy = 2.0f / glutGet(GLUT_WINDOW_HEIGHT) * scale.y; 
+	float sx = 2.0f / glutGet(GLUT_WINDOW_WIDTH)  * textScale.x;
+	float sy = 2.0f / glutGet(GLUT_WINDOW_HEIGHT) * textScale.y; 
 
 	//Left alignement by default
 	float x = position.x - scale.x;
 	float y = position.y;
+
+	x = x * 2 - 1;
+	y = 1 - (y * 2);
 
 	for(int i = 0; i < text.size(); i++){
 		char letter = text[i];

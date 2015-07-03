@@ -7,7 +7,7 @@
 #include "Drawcall.h"
 #include "Input.h"
 #include "ResourceManager.h"
-#include "GuiElement.h"
+#include "GuiSystem.h"
 #include "Pathfinding.h"
 #include "Light.h"
 #include "AudioSystem.h"
@@ -31,7 +31,8 @@ struct Scene{
 	AudioSystem audio;
 
 	//Vector3 lightDir;
-	vector<GuiElement*> guiElements;
+	GuiSystem guiSystem;
+	//vector<GuiElement*> guiElements;
 	vector<Light> lights;
 
 protected:

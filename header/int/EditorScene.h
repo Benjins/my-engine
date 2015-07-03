@@ -20,7 +20,8 @@ struct EditorScene : Scene{
 
 	PhysicsSim selectionSim;
 
-	vector<GuiElement*> editorGui;
+	GuiSystem editorGui;
+	//vector<GuiElement*> editorGui;
 
 	GameObject* selectedObj;
 	int selectedAxis;

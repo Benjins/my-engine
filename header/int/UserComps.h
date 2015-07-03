@@ -198,7 +198,7 @@ struct CameraControl : Component{
 		input = &gameObject->scene->input;
 		camera = gameObject->scene->camera;
 		physics = gameObject->scene->physicsSim;
-		slider = gameObject->scene->guiElements[0];
+		slider = gameObject->scene->guiSystem.elements[0];
 		healthBar = static_cast<GuiText*>(gameObject->scene->FindGUIElement("healthText"));
 		audioComp = gameObject->GetComponent<AudioComponent>();
 	}
@@ -930,7 +930,8 @@ struct EnemyComp : HitComponent{
 
 		if(reloadTimeCounter > reloadTime){
 			reloadTimeCounter = 0;
-			gameObject->scene->Instantiate(bulletPrefab, gameObject->transform.position + gameObject->transform.Forward(), gameObject->transform.rotation);
+			GameObject* instance = gameObject->scene->Instantiate(bulletPrefab, gameObject->transform.position + gameObject->transform.Forward(), gameObject->transform.rotation);
+			//cout << "Instance '" << instance->name << "' was created.\n";
 		}
 	}
 };

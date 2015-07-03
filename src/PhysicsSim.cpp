@@ -35,6 +35,21 @@ void PhysicsSim::StepForward(){
 		if(rb->isKinematic){
 			rb->StepForward(timeStep);
 		}
+		for(auto iter2 = dynamicBodies.begin(); iter2 != dynamicBodies.end(); iter2++){
+			RigidBody* rb2 = *iter2;
+			if(rb == rb2){
+				continue;
+			}
+
+			Collision collision = rb->col->CollisionWith(rb2->col);
+			if(collision.collide){
+				GameObject* obj1 = rb->col->gameObject;
+				GameObject* obj2 = rb2->col->gameObject;
+
+				obj1->OnCollision(rb2->col);
+				obj2->OnCollision(rb->col);
+			}
+		}
 		for(auto iter2 = staticBoxBodies.begin(); iter2 != staticBoxBodies.end(); iter2++){
 
 			if((*iter)->col == *iter2){

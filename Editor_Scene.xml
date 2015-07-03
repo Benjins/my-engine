@@ -13,16 +13,16 @@
     <Material name='worm' shader='shader' texture='Worm_Diff.bmp' bumpMap='Panel_Floor_N.bmp' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
     <Material name='shaderTexture2.bmp' shader='shader' texture='Texture2.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
     <GuiElement name='' width='300' height='1' position='0.100000,0.100000' scale='0.200000,0.020000'/>
-    <GuiText name='healthText' fuv='CODE_Bold64.fuv' text='Health: 100' position='-0.600000,0.900000' scale='0.400000,0.400000'/>
+    <GuiText name='healthText' fuv='CODE_Bold64.fuv' text='Health: 100' textScale='0.400000,0.400000' position='0.100000,0.050000' scale='0.100000,0.100000'/>
     <AudioClip name='cough' fileName='data/coughing.wav'/>
     <AudioClip name='footstep' fileName='data/footstep.wav'/>
-    <Prefab name='bullet'>
-        <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='0.1,0.1,0.1'/>
-        <Material name='floorMat'/>
-        <Mesh source='test.obj'/>
-        <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-        <BulletComponent speed='6'/>
-    </Prefab>
+	<Prefab name='bullet'>
+	    <Transform position='0.12,3,-0.4' rotation='1,0,0,0' scale='0.1,0.1,0.1'/>
+		<Material name='floorMat'/>
+		<Mesh source='test.obj'/>
+		<BoxCollider position='0,0,0' size='1,1,1'/>
+		<BulletComponent speed='6'/>
+	</Prefab>
     <GameObject name='myObj'>
         <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <Material name='floorMat'/>
@@ -32,7 +32,7 @@
     <GameObject name='mainCam'>
         <Transform position='0.000000,3.000000,-2.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <BoxCollider position='0.000000,0.000000,0.000000' size='0.200000,0.200000,0.200000'/>
-        <RigidBody isKinematic='F' mass='1'/>
+		<RigidBody isKinematic='F' mass='1' />
     </GameObject>
     <GameObject name='mainCamSub'>
         <Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
@@ -60,7 +60,7 @@
         <Mesh source='test.obj'/>
     </GameObject>
     <GameObject name='floor'>
-        <Transform position='0.000000,-0.111120,0.618002' rotation='1.000000,0.000000,0.000000,0.000000' scale='3.000000,0.500000,3.000000'/>
+        <Transform position='0.000000,-0.111120,0.618002' rotation='1.000000,0.000000,0.000000,0.000000' scale='5.000000,0.500000,5.000000'/>
         <Material name='floorOwnMat'/>
         <Mesh source='floor.obj'/>
         <BoxCollider position='0.000000,0.000000,0.000000' size='4.000000,1.000000,4.000000'/>
@@ -112,6 +112,30 @@
             <KeyFrame time='2.000000' value='0.906308,0.000000,0.000000,0.422618'/>
         </AnimationComponent>
     </GameObject>
+    <GameObject name='wall_room1'>
+        <Transform position='11.484008,0.618957,-4.677770' rotation='0.881165,0.000000,-0.472809,0.000000' scale='5.000000,1.000000,0.200000'/>
+        <Material name='stairMat'/>
+        <Mesh source='test.obj'/>
+        <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+    </GameObject>
+    <GameObject name='wall_room2'>
+        <Transform position='10.837304,0.618957,2.477410' rotation='0.915875,0.000000,0.401463,0.000000' scale='5.000000,1.000000,0.200000'/>
+        <Material name='stairMat'/>
+        <Mesh source='test.obj'/>
+        <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+    </GameObject>
+    <GameObject name='wall_room3'>
+        <Transform position='5.617823,0.618957,-8.344173' rotation='1.000000,0.000000,0.000000,0.000000' scale='5.000000,1.000000,0.200000'/>
+        <Material name='stairMat'/>
+        <Mesh source='test.obj'/>
+        <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+    </GameObject>
+    <GameObject name='wall_room4'>
+        <Transform position='3.427919,0.618957,-2.023668' rotation='0.831550,0.000000,-0.555449,0.000000' scale='5.000000,1.000000,0.200000'/>
+        <Material name='stairMat'/>
+        <Mesh source='test.obj'/>
+        <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+    </GameObject>
     <GameObject name='stairs1'>
         <Transform position='2.162069,3.618957,6.274128' rotation='0.906308,0.422618,0.000000,0.000000' scale='4.000000,1.000000,1.000000'/>
         <Material name='stairMat'/>
@@ -120,7 +144,7 @@
         <AudioComponent clipName='cough' volume='0.900000' loop='T' autoPlay='F'/>
     </GameObject>
     <GameObject name='stairs2'>
-        <Transform position='4.181658,0.750388,4.000000' rotation='0.906308,0.000000,0.000000,0.422618' scale='2.000000,1.000000,1.000000'/>
+        <Transform position='4.181658,0.750388,10.691010' rotation='0.906308,0.000000,0.000000,0.422618' scale='2.000000,1.000000,1.000000'/>
         <Material name='stairMat'/>
         <Mesh source='test.obj'/>
         <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
@@ -161,11 +185,11 @@
         <PathNodeComponent/>
     </GameObject>
     <GameObject name=''>
-        <Transform position='-4.359842,1.000000,4.116074' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <Transform position='13.107838,1.000000,4.116074' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <PathNodeComponent/>
     </GameObject>
     <GameObject name=''>
-        <Transform position='6.355882,1.000000,2.243626' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <Transform position='8.442717,1.000000,3.437002' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <PathNodeComponent/>
     </GameObject>
     <GameObject name=''>
@@ -173,11 +197,11 @@
         <PathNodeComponent/>
     </GameObject>
     <GameObject name=''>
-        <Transform position='1.472075,1.000000,2.085649' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <Transform position='1.472075,1.000000,1.659251' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <PathNodeComponent/>
     </GameObject>
     <GameObject name=''>
-        <Transform position='-5.502997,1.000000,-5.868004' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <Transform position='-5.502997,1.000000,-7.582002' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <PathNodeComponent/>
     </GameObject>
     <GameObject name=''>
@@ -185,7 +209,39 @@
         <PathNodeComponent/>
     </GameObject>
     <GameObject name=''>
-        <Transform position='6.005924,1.000000,-3.449856' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <Transform position='10.433056,1.000000,-3.449856' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <PathNodeComponent/>
+    </GameObject>
+    <GameObject name=''>
+        <Transform position='7.764320,1.000000,9.251365' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <PathNodeComponent/>
+    </GameObject>
+    <GameObject name=''>
+        <Transform position='0.000000,1.000000,-11.123352' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <PathNodeComponent/>
+    </GameObject>
+    <GameObject name=''>
+        <Transform position='7.486763,1.000000,-10.612253' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <PathNodeComponent/>
+    </GameObject>
+    <GameObject name=''>
+        <Transform position='12.921451,1.000000,-8.408252' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <PathNodeComponent/>
+    </GameObject>
+    <GameObject name=''>
+        <Transform position='16.991035,0.035585,-2.502251' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <PathNodeComponent/>
+    </GameObject>
+    <GameObject name=''>
+        <Transform position='7.358490,1.000000,-6.590945' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <PathNodeComponent/>
+    </GameObject>
+    <GameObject name=''>
+        <Transform position='5.996462,1.000000,-1.947756' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+        <PathNodeComponent/>
+    </GameObject>
+    <GameObject name=''>
+        <Transform position='0.399335,1.000000,-7.144019' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <PathNodeComponent/>
     </GameObject>
 </Scene>

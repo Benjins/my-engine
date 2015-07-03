@@ -390,7 +390,7 @@ void Scene::SaveScene(string fileName){
 		}
 	}
 	
-	for(auto iter = guiElements.begin(); iter != guiElements.end(); iter++){
+	for(auto iter = guiSystem.elements.begin(); iter != guiSystem.elements.end(); iter++){
 		scene.children.push_back((*iter)->Serialize());
 	}
 
@@ -399,6 +399,70 @@ void Scene::SaveScene(string fileName){
 		elem.name = "AudioClip";
 		elem.attributes.emplace_back("name", audio.clips[i].clipName);
 		elem.attributes.emplace_back("fileName", audio.clips[i].clipFileName);
+		scene.children.push_back(elem);
+	}
+
+	for(auto iter = prefabs.begin(); iter != prefabs.end(); iter++){
+		GameObject* obj = *iter;
+		XMLElement elem;
+		elem.name = "Prefab";
+		elem.attributes.push_back(XMLAttribute("name", obj->name));
+
+		XMLElement trans;
+		trans.name = "Transform";
+		SC_Transform* parent = obj->transform.GetParent();
+		if(parent != NULL && parent->gameObject != NULL){
+			trans.attributes.push_back(XMLAttribute("parent", parent->gameObject->name));
+		}
+		trans.attributes.push_back(XMLAttribute("position", EncodeVector3(obj->transform.position)));
+		trans.attributes.push_back(XMLAttribute("rotation", EncodeQuaternion(obj->transform.rotation)));
+		trans.attributes.push_back(XMLAttribute("scale",    EncodeVector3(obj->transform.scale)));
+		elem.children.push_back(trans);
+
+		if(camera == &(obj->transform)){
+			XMLElement cam;
+			cam.name = "Camera";
+			elem.children.push_back(cam);
+		}
+
+		Material* mat = obj->material;
+		if(mat != NULL){
+			XMLElement material;
+			material.name = "Material";
+			material.attributes.push_back(XMLAttribute("name",mat->matName));
+			elem.children.push_back(material);
+		}
+		Model* model = obj->mesh;
+		if(model != NULL){
+			XMLElement mesh;
+			mesh.name = "Mesh";
+			mesh.attributes.push_back(XMLAttribute("source",model->name));
+			elem.children.push_back(mesh);
+		}
+		BoxCollider* col = obj->GetComponent<BoxCollider>();
+		if(col != NULL){
+			XMLElement boxCol;
+			boxCol.name = "BoxCollider";
+			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col->position)));
+			boxCol.attributes.push_back(XMLAttribute("size",EncodeVector3(col->size)));
+			elem.children.push_back(boxCol);
+		}
+		SphereCollider* col2 = obj->GetComponent<SphereCollider>();
+		if(col2 != NULL){
+			XMLElement boxCol;
+			boxCol.name = "SphereCollider";
+			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col2->position)));
+			boxCol.attributes.push_back(XMLAttribute("radius",to_string(col2->radius)));
+			elem.children.push_back(boxCol);
+		}
+
+		for(auto iter = obj->components.begin(); iter != obj->components.end(); iter++){
+			XMLElement newElem = (*iter)->Serialize();
+			if(newElem.name != ""){
+				elem.children.push_back(newElem);
+			}
+		}
+
 		scene.children.push_back(elem);
 	}
 
@@ -502,6 +566,7 @@ void Scene::LoadGuiText(const XMLElement& elem){
 	Vector2 scale;
 	string name;
 	string text;
+	Vector2 textScale;
 
 	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
 		if(iter->name == "fuv"){
@@ -519,6 +584,9 @@ void Scene::LoadGuiText(const XMLElement& elem){
 		else if (iter->name == "text"){
 			text = iter->data;
 		}
+		else if (iter->name == "textScale"){
+			textScale = ParseVector2(iter->data);
+		}
 	}
 
 	GuiText* guiText = new GuiText(&resources, fuv);
@@ -526,6 +594,7 @@ void Scene::LoadGuiText(const XMLElement& elem){
 	guiText->scale = scale;
 	guiText->name = name;
 	guiText->text = text;
+	guiText->textScale = textScale;
 
-	guiElements.push_back(guiText);
+	guiSystem.elements.push_back(guiText);
 }

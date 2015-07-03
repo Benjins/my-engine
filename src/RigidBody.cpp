@@ -39,7 +39,7 @@ void RigidBody::OnAwake(){
 
 XMLElement RigidBody::Serialize(){
 	XMLElement elem;
-	elem.name = "Rigidbody";
+	elem.name = "RigidBody";
 	elem.attributes.emplace_back("mass", to_string(mass));
 	elem.attributes.emplace_back("isKinematic", (isKinematic ? "T" : "F"));
 

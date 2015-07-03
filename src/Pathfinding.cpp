@@ -88,7 +88,10 @@ vector<Vector3> Pathfinding::FindPath(PathNode* source, PathNode* destination){
 			index++;
 		}
 
-		assert(minDistNode != nullptr);
+		if(minDistNode == nullptr){
+			break;
+		}
+		//assert(minDistNode != nullptr);
 
 		if(minDistNode == destination){
 			vector<Vector3> path;
