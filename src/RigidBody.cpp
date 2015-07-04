@@ -92,4 +92,11 @@ RBDeriv Evaluate(const RBState& init, float dt, const RBDeriv& d){
 }
 
 RigidBody::~RigidBody(){
+	PhysicsSim* sim = gameObject->scene->physicsSim;
+	for(auto iter = sim->dynamicBodies.begin(); iter != sim->dynamicBodies.end(); iter++){
+		if(*iter == this){
+			sim->dynamicBodies.erase(iter);
+			break;
+		}
+	}
 }

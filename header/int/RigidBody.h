@@ -45,6 +45,15 @@ struct RigidBody : Component{
 		state.invMass = 1/mass;
 	}
 
+	virtual Component* Clone() override{
+		RigidBody* rb = new RigidBody();
+
+		rb->isKinematic = isKinematic;
+		rb->mass = mass;
+
+		return rb;
+	}
+
 	virtual void OnAwake();
 	virtual XMLElement Serialize();
 	virtual void Deserialize(const XMLElement& elem);

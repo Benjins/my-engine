@@ -282,10 +282,10 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 
 Collision SeparateAxisTheorem(Vector3 axis, Vector3* points1, Vector3* points2){
 	float point1Min = FLT_MAX;
-	float point1Max = FLT_MIN;
+	float point1Max = -FLT_MAX;
 
 	float point2Min = FLT_MAX;
-	float point2Max = FLT_MIN;
+	float point2Max = -FLT_MAX;
 
 	for(int i = 0; i < 8; i++){
 		float projection1 = DotProduct(axis, points1[i]);

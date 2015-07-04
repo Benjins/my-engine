@@ -250,6 +250,7 @@ struct CameraControl : Component{
 				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
 				Vector3 goodVec = moveVec - badVec;
 				if(goodVec.MagnitudeSquared() > 0){
+
 					RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), goodVec);
 					if(!testHit.hit || testHit.depth > goodVec.Magnitude() + 0.2f){
 						camera->GetParent()->position = camera->GetParent()->position + goodVec;
@@ -336,7 +337,7 @@ struct BulletComponent : Component{
 			player->transform.children[0]->gameObject->GetComponent<CameraControl>()->health -= 0.1f;
 		}
 		else{
-			cout << "Collision with non-player: '" << col->gameObject->name << "'\n";
+			//cout << "Collision with non-player: '" << col->gameObject->name << "'\n";
 		}
 
 		gameObject->material->matName = "";
@@ -943,7 +944,9 @@ struct EnemyComp : HitComponent{
 
 		if(reloadTimeCounter > reloadTime){
 			reloadTimeCounter = 0;
-			GameObject* instance = gameObject->scene->Instantiate(bulletPrefab, gameObject->transform.position + gameObject->transform.Forward(), gameObject->transform.rotation);
+			Vector3 spawnPos = gameObject->transform.position + gameObject->transform.Forward();
+			//spawnPos.y = 6.4f;
+			GameObject* instance = gameObject->scene->Instantiate(bulletPrefab, spawnPos, gameObject->transform.rotation);
 			//cout << "Instance '" << instance->name << "' was created.\n";
 		}
 	}

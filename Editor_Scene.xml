@@ -61,10 +61,10 @@
         <Mesh source='test.obj'/>
     </GameObject>
     <GameObject name='floor'>
-        <Transform position='0.000000,-0.111120,0.618002' rotation='1.000000,0.000000,0.000000,0.000000' scale='5.000000,0.500000,5.000000'/>
+        <Transform position='0.000000,-0.111120,0.618002' rotation='1.000000,0.000000,0.000000,0.000000' scale='5.000000,0.100000,5.000000'/>
         <Material name='floorOwnMat'/>
         <Mesh source='floor.obj'/>
-        <BoxCollider position='0.000000,0.000000,0.000000' size='4.000000,1.000000,4.000000'/>
+        <BoxCollider position='0.000000,0.000000,0.000000' size='4.000000,0.100000,4.000000'/>
         <AnimationComponent type='vector2' target='uvOffset' loop='T' autoplay='T'>
             <KeyFrame time='0.000000' value='0.000000,0.000000'/>
             <KeyFrame time='4.000000' value='0.000000,1.000000'/>

@@ -51,9 +51,12 @@ void PhysicsSim::StepForward(){
 			}
 		}
 		for(auto iter2 = staticBoxBodies.begin(); iter2 != staticBoxBodies.end(); iter2++){
-
 			if((*iter)->col == *iter2){
 				continue;
+			}
+
+			if((*iter2)->gameObject->name == "floor" && (*iter)->gameObject->name != "mainCam"){
+				int x = 0;
 			}
 
 			Collision collision = (*iter)->col->CollisionWith(*iter2);
