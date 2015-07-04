@@ -332,7 +332,7 @@ struct BulletComponent : Component{
 		}
 	}
 
-	virtual void OnCollision(Collider* col){
+	virtual void OnCollision(Collider* col){ 
 		if(col->gameObject == player){
 			player->transform.children[0]->gameObject->GetComponent<CameraControl>()->health -= 0.1f;
 		}
