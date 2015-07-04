@@ -60,7 +60,7 @@ void EditorScene::Start(){
 
 	editorGui.elements.push_back(panel);
 	
-	GuiText* posTxt = new GuiText(&resources, "arial_16.fuv");
+	GuiText* posTxt = new GuiText(&resources, "data/arial_16.fuv");
 	posTxt->position = Vector2(0.81f, 0.94f);
 	posTxt->scale = Vector2(0.1f, 0.04f);
 	posTxt->textScale = Vector2(1,1);
@@ -68,26 +68,37 @@ void EditorScene::Start(){
 
 	editorGui.elements.push_back(posTxt);
 
-	GuiText* meshTxt = new GuiText(&resources, "arial_16.fuv");
+	GuiText* meshTxt = new GuiText(&resources, "data/arial_16.fuv");
 	meshTxt->position = Vector2(0.81f, 0.9f);
 	meshTxt->scale = Vector2(0.1f, 0.04f);
 	meshTxt->text = "Mesh file: ";
 
 	editorGui.elements.push_back(meshTxt);
 
-	GuiText* nameTxt = new GuiText(&resources, "arial_16.fuv");
+	GuiText* nameTxt = new GuiText(&resources, "data/arial_16.fuv");
 	nameTxt->position = Vector2(0.81f, 0.86f);
 	nameTxt->scale = Vector2(0.1f, 0.04f);
 	nameTxt->text = "Name: ";
 
 	editorGui.elements.push_back(nameTxt);
 
-	GuiText* rotTxt = new GuiText(&resources, "arial_16.fuv");
+	GuiText* rotTxt = new GuiText(&resources, "data/arial_16.fuv");
 	rotTxt->position = Vector2(0.81f, 0.82f);
 	rotTxt->scale = Vector2(0.1f, 0.04f);
 	rotTxt->text = "Rotation: ";
 
 	editorGui.elements.push_back(rotTxt);
+
+	GuiElement* hierarchyPanel = new GuiElement(&resources);
+	hierarchyPanel->name = "gui_heirarchy_panel";
+	hierarchyPanel->position = Vector2(0.08f,0.5f);
+	hierarchyPanel->scale = Vector2(0.16f, 1.0f);
+	hierarchyPanel->tex = new Texture(1,1);
+	RGBApixel pix2 = {50,50,50,220};
+	hierarchyPanel->tex->SetPixel(0,0,pix2);
+	hierarchyPanel->tex->Apply();
+
+	editorGui.elements.push_back(hierarchyPanel);
 
 	running = true;
 	while(running){

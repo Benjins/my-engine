@@ -340,7 +340,6 @@ struct BulletComponent : Component{
 			//cout << "Collision with non-player: '" << col->gameObject->name << "'\n";
 		}
 
-		//gameObject->material->matName = "";
 		gameObject->scene->RemoveObject(gameObject);
 	}
 
@@ -349,7 +348,6 @@ struct BulletComponent : Component{
 
 		time += gameObject->scene->deltaTime;
 		if(time >= timeLimit){
-			//gameObject->material->matName = "";
 			gameObject->scene->RemoveObject(gameObject);
 		}
 	}
