@@ -10,23 +10,24 @@
 
 struct FireGun;
 
-#define DEFINE_USER_COMPONENT(compName) if(name == #compName){return new compName ();}
+#define DEFINE_USER_COMPONENT(compName) else if(name == #compName){return new compName ();}
 
 Component* GetUserDefinedComp(const string& name){
 	if(name == ""){
 		return nullptr;
 	}
-	DEFINE_USER_COMPONENT(MatChangeOnHit);
-	DEFINE_USER_COMPONENT(FireGun);
-	DEFINE_USER_COMPONENT(EnemyComp);
-	DEFINE_USER_COMPONENT(CameraControl);
-	DEFINE_USER_COMPONENT(LightComponent);
-	DEFINE_USER_COMPONENT(AnimationComponent);
-	DEFINE_USER_COMPONENT(PathNodeComponent);
-	DEFINE_USER_COMPONENT(AudioComponent);
-	DEFINE_USER_COMPONENT(RigidBody);
-	DEFINE_USER_COMPONENT(BulletComponent);
-	return nullptr;
+	DEFINE_USER_COMPONENT(MatChangeOnHit)
+	DEFINE_USER_COMPONENT(FireGun)
+	DEFINE_USER_COMPONENT(EnemyComp)
+	DEFINE_USER_COMPONENT(CameraControl)
+	DEFINE_USER_COMPONENT(LightComponent)
+	DEFINE_USER_COMPONENT(AnimationComponent)
+	DEFINE_USER_COMPONENT(PathNodeComponent)
+	DEFINE_USER_COMPONENT(AudioComponent)
+	DEFINE_USER_COMPONENT(RigidBody)
+	DEFINE_USER_COMPONENT(BulletComponent)
+	DEFINE_USER_COMPONENT(PlayerComponent)
+	DEFINE_USER_COMPONENT(DoorComponent)
 }
 
 string EncodeVector3(Vector3 vec){

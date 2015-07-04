@@ -41,7 +41,7 @@ int main(int argc, char** argv){
 	int retVal = RunAllTests();
 #else
 	
-#define EDITOR
+//#define EDITOR
 
 #if !defined(EDITOR)
 	Scene& x = Scene::getInstance(argc, argv);

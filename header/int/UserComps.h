@@ -19,6 +19,68 @@
 
 using std::cout; using std::endl;
 
+struct DoorComponent : Component{
+	bool isLocked;
+	bool isOpen;
+
+	GameObject* player;
+
+	DoorComponent(){
+		isLocked = false;
+		isOpen = false;
+	}
+
+	virtual XMLElement Serialize() override{
+		XMLElement elem;
+		elem.name = "DoorComponent";
+		elem.attributes.emplace_back("isLocked", (isLocked ? "T" : "F"));
+		elem.attributes.emplace_back("isOpen",   (isOpen   ? "T" : "F"));
+
+		return elem;
+	}
+
+	virtual void Deserialize(const XMLElement& elem) override{
+		for(const XMLAttribute& attr : elem.attributes){
+			if(attr.name == "isLocked"){
+				isLocked = (attr.data == "T");
+			}
+			else if(attr.name == "isOpen"){
+				isOpen = (attr.data == "T");
+			}
+		}
+	}
+
+	virtual void OnAwake() override{
+		player = gameObject->scene->FindGameObject("mainCam");
+	}
+
+	virtual void OnUpdate() override{
+		if(gameObject->scene->input.GetKeyUp('t')){
+			isLocked = !isLocked;
+		}
+
+		if(!isLocked && (gameObject->transform.GlobalPosition() - player->transform.GlobalPosition()).MagnitudeSquared() < 4){
+			isOpen = true;
+		}
+		else{
+			isOpen = false;
+		}
+
+		if(isOpen){
+			gameObject->transform.scale.x = 0.1f;
+		}
+		else{
+			gameObject->transform.scale.x = 1.0f;
+		}
+	}
+};
+
+struct PlayerComponent : Component{
+	//virtual void OnCollision(Collider* col) override{
+		
+	//}
+};
+
 struct AudioComponent : Component{
 	string clipName;
 
