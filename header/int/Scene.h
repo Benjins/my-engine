@@ -29,10 +29,7 @@ struct Scene{
 	MaterialManager resources;
 	Pathfinding pathfinding;
 	AudioSystem audio;
-
-	//Vector3 lightDir;
 	GuiSystem guiSystem;
-	//vector<GuiElement*> guiElements;
 	vector<Light> lights;
 
 protected:
@@ -83,7 +80,6 @@ public:
 
 	GameObject* AddObject(GameObject* obj);
 	GameObject* AddObjectAndDescendants(GameObject* obj);
-	GuiElement* AddGuiElement();
 
 	void RemoveObject(GameObject* obj);
 
@@ -101,8 +97,6 @@ public:
 
 	GameObject* FindGameObject(const string& name);
 
-	GuiElement* FindGUIElement(const string& name);
-
 	void OnMouse(int button, int state, int x, int y);
 	void OnPassiveMouse(int x, int y);
 	void OnKey(unsigned char key, int x, int y);
@@ -114,9 +108,6 @@ public:
 	GameObject* Instantiate(GameObject* obj, Vector3 position, Quaternion rotation = QUAT_IDENTITY);
 
 	void Stop();
-
-	void LoadGuiElement(const XMLElement& elem);
-	void LoadGuiText(const XMLElement& elem);
 
 	GameObject* LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvents = true);
 

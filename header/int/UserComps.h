@@ -199,7 +199,7 @@ struct CameraControl : Component{
 		camera = gameObject->scene->camera;
 		physics = gameObject->scene->physicsSim;
 		slider = gameObject->scene->guiSystem.elements[0];
-		healthBar = static_cast<GuiText*>(gameObject->scene->FindGUIElement("healthText"));
+		healthBar = static_cast<GuiText*>(gameObject->scene->guiSystem.FindGUIElement("healthText"));
 		audioComp = gameObject->GetComponent<AudioComponent>();
 	}
 

@@ -20,6 +20,12 @@ struct GuiSystem{
 
 	void RenderGui();
 
+	GuiElement* FindGUIElement(const string& name);
+
+	GuiElement* AddGuiElement(MaterialManager* resources);
+	void LoadGuiElement(const XMLElement& elem, MaterialManager* resources);
+	void LoadGuiText(const XMLElement& elem, MaterialManager* resources);
+
 	GuiElement* OnMouseDown(const Vector2& hitPoint);
 	GuiElement* OnMouseDrag(const Vector2& hitPoint);
 	GuiElement* OnMouseUp(const Vector2& hitPoint);

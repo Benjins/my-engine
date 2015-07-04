@@ -94,17 +94,6 @@ GameObject* Scene::FindGameObject(const string& name){
 	return NULL;
 }
 
-GuiElement* Scene::FindGUIElement(const string& name){
-	for(auto iter = guiSystem.elements.begin(); iter != guiSystem.elements.end(); iter++){
-		GuiElement* elem = *iter;
-		if(elem->name == name){
-			return elem;
-		}
-	}
-
-	return NULL;
-}
-
 GameObject* Scene::AddObject(GameObject* obj){
 	objects.push_back(obj);
 	obj->scene = this;
@@ -123,13 +112,6 @@ GameObject* Scene::AddObjectAndDescendants(GameObject* obj){
 	}
 
 	return obj;
-}
-
-GuiElement* Scene::AddGuiElement(){
-	GuiElement* elem = new GuiElement(&resources);
-	guiSystem.elements.push_back(elem);
-
-	return elem;
 }
 
 void Scene::RemoveObject(GameObject* obj){
