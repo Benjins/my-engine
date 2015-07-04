@@ -89,6 +89,7 @@ void EditorScene::Start(){
 
 	editorGui.elements.push_back(rotTxt);
 
+	/*
 	GuiElement* hierarchyPanel = new GuiElement(&resources);
 	hierarchyPanel->name = "gui_heirarchy_panel";
 	hierarchyPanel->position = Vector2(0.08f,0.5f);
@@ -99,6 +100,7 @@ void EditorScene::Start(){
 	hierarchyPanel->tex->Apply();
 
 	editorGui.elements.push_back(hierarchyPanel);
+	*/
 
 	running = true;
 	while(running){
@@ -203,6 +205,10 @@ void EditorScene::EditorUpdate(){
 
 	if(input.GetKeyUp('j')){
 		pathfinding.HookUpNodes();
+	}
+
+	if(input.GetKeyUp('f') && selectedObj != nullptr){
+		selectedObj = Instantiate(selectedObj, selectedObj->transform.GlobalPosition() + editorCamera.Right(), selectedObj->transform.TotalRotation());
 	}
 
 	const float speed = 2.0f;
@@ -392,6 +398,16 @@ void EditorScene::EditorUpdate(){
 			comp->OnEditorUpdate();
 		}
 	}
+
+	for(GameObject* obj : spawnedObjects){
+		AddObjectAndDescendants(obj);
+	}
+
+	if(spawnedObjects.size() > 0){
+		RecalculateSelectionSim();
+	}
+
+	spawnedObjects.clear();
 
 	prevX = input.mouseX;
 	prevY = input.mouseY;
