@@ -86,6 +86,16 @@ void PhysicsSim::StepForward(){
 	}
 }
 
+void PhysicsSim::ResetSelectionBoxColliders(){
+	for(BoxCollider* col : staticBoxBodies){
+		//HACK: This entire function.
+		//We free it, because the destructor tries to remove it from the physicsSim.
+		//Sometimes I hate my choices.
+		free(col);
+	}
+	staticBoxBodies.clear();
+}
+
 RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
 	direction.Normalize();
 	RaycastHit finalHit;

@@ -124,8 +124,17 @@ void Scene::RemoveObject(GameObject* obj){
 }
 
 void Scene::DestroyObject(GameObject* obj){
+	//We remove the child from its parent, which causes issue if we do that while iterating over the children list
+	vector<GameObject*> childrenCopy; 
 	for(SC_Transform* child : obj->transform.children){
-		DestroyObject(child->gameObject);
+		childrenCopy.push_back(child->gameObject);
+	}
+
+	//Remove parent's reference to us
+	obj->transform.SetParent(nullptr);
+
+	for(GameObject* child : childrenCopy){
+		DestroyObject(child);
 	}
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){

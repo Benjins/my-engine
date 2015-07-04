@@ -24,6 +24,9 @@ struct PhysicsSim{
 	
 	void Advance(float dt);
 
+	//This should only be used by the editor, since it deletes the colliders
+	void ResetSelectionBoxColliders();
+
 protected:
 	void StepForward();
 

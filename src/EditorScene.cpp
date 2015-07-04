@@ -122,6 +122,8 @@ void EditorScene::Start(){
 }
 
 void EditorScene::RecalculateSelectionSim(){
+	selectionSim.ResetSelectionBoxColliders();
+
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
 		Vector3 maxVert = Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX), minVert = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
 		GameObject* obj = *iter;
@@ -193,6 +195,11 @@ void EditorScene::EditorUpdate(){
 		Stop();
 	}
 
+	if(input.GetKeyUp(127)){
+		RemoveObject(selectedObj);
+		selectedObj = nullptr;
+	}
+	
 	if(input.GetKeyUp('p')){
 		GameObject* obj = new GameObject();
 		obj->scene = this;
@@ -403,11 +410,16 @@ void EditorScene::EditorUpdate(){
 		AddObjectAndDescendants(obj);
 	}
 
-	if(spawnedObjects.size() > 0){
+	for(GameObject* obj : destroyedObjects){
+		DestroyObject(obj);
+	}
+
+	if(spawnedObjects.size() > 0 || destroyedObjects.size() > 0){
 		RecalculateSelectionSim();
 	}
 
 	spawnedObjects.clear();
+	destroyedObjects.clear();
 
 	prevX = input.mouseX;
 	prevY = input.mouseY;
