@@ -13,11 +13,30 @@ PhysicsSim::PhysicsSim(float _deltaTime){
 }
 
 void PhysicsSim::AddStaticCollider(Collider* col){
+	for(auto iter = dynamicBodies.begin(); iter != dynamicBodies.end(); iter++){
+		if((*iter)->col == col){
+			return;
+		}
+	}
 	col->AddToSim(this);
 }
 
 void PhysicsSim::AddRigidBody(RigidBody* rb){
 	dynamicBodies.push_back(rb);
+
+	for(auto iter = staticBoxBodies.begin(); iter != staticBoxBodies.end(); iter++){
+		if(*iter == rb->col){
+			staticBoxBodies.erase(iter);
+			return;
+		}
+	}
+
+	for(auto iter = staticSphereBodies.begin(); iter != staticSphereBodies.end(); iter++){
+		if(*iter == rb->col){
+			staticSphereBodies.erase(iter);
+			return;
+		}
+	}
 }
 
 void PhysicsSim::Advance(float dt){
@@ -35,7 +54,7 @@ void PhysicsSim::StepForward(){
 		if(rb->isKinematic){
 			rb->StepForward(timeStep);
 		}
-		for(auto iter2 = dynamicBodies.begin(); iter2 != dynamicBodies.end(); iter2++){
+		for(auto iter2 = iter; iter2 != dynamicBodies.end(); iter2++){
 			RigidBody* rb2 = *iter2;
 			if(rb == rb2){
 				continue;

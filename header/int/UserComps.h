@@ -335,6 +335,7 @@ struct BulletComponent : Component{
 	virtual void OnCollision(Collider* col){
 		if(col->gameObject == player){
 			player->transform.children[0]->gameObject->GetComponent<CameraControl>()->health -= 0.1f;
+			cout << "Collides with player.\n";
 		}
 		else{
 			//cout << "Collision with non-player: '" << col->gameObject->name << "'\n";
@@ -865,7 +866,6 @@ struct EnemyComp : HitComponent{
 	}
 
 	virtual void OnUpdate(){
-		
 		reloadTimeCounter += gameObject->scene->deltaTime;
 
 		Vector3 toPlayer = player->transform.position - gameObject->transform.position;
@@ -875,8 +875,10 @@ struct EnemyComp : HitComponent{
 			currentTarget = player->transform.position;
 			longTermGoal = currentTarget;
 			pathNeedsUpdate = true;
+			gameObject->material->SetVec4Uniform("_color", Vector4(1, 0.3f, 1, 1.0f));
 		}
 		else{
+			gameObject->material->SetVec4Uniform("_color", Vector4(1, 1, 1, 1.0f));
 			if(pathNeedsUpdate){
 				path = pathing->FindPath(gameObject->transform.position, longTermGoal);
 				pathNeedsUpdate = false;
