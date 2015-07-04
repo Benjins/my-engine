@@ -55,10 +55,6 @@ void PhysicsSim::StepForward(){
 				continue;
 			}
 
-			if((*iter2)->gameObject->name == "floor" && (*iter)->gameObject->name != "mainCam"){
-				int x = 0;
-			}
-
 			Collision collision = (*iter)->col->CollisionWith(*iter2);
 			if(collision.collide){
 				GameObject* obj1 = rb->col->gameObject;
