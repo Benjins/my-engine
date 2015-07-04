@@ -92,6 +92,13 @@ RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
 	finalHit.hit = false;
 	finalHit.depth = FLT_MAX;
 
+	for(auto iter = dynamicBodies.begin(); iter != dynamicBodies.end(); iter++){
+		RaycastHit hit = (*iter)->col->Raycast(origin, direction);
+		if(hit.hit && hit.depth < finalHit.depth){
+			finalHit = hit;
+		}
+	}
+
 	for(auto iter = staticBoxBodies.begin(); iter != staticBoxBodies.end(); iter++){
 		RaycastHit hit = RaycastBox(*iter, origin, direction);
 		if(hit.hit && hit.depth < finalHit.depth){

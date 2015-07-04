@@ -8,6 +8,7 @@ struct BoxCollider;
 struct SphereCollider;
 struct PhysicsSim;
 struct AABB;
+struct RaycastHit;
 
 struct Collision{
 	bool collide;
@@ -21,6 +22,7 @@ struct Collider : Component{
 	virtual Collision CollisionWith(const Collider* col) const;
 	virtual Collision CollisionWith(const BoxCollider* col) const;
 	virtual Collision CollisionWith(const SphereCollider* col) const;
+	virtual RaycastHit Raycast(const Vector3& origin, const Vector3& direction);
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
 
@@ -40,6 +42,7 @@ struct BoxCollider : Collider{
 	virtual Collision CollisionWith(const Collider* col) const;
 	virtual Collision CollisionWith(const BoxCollider* col) const;
 	virtual Collision CollisionWith(const SphereCollider* col) const;
+	virtual RaycastHit Raycast(const Vector3& origin, const Vector3& direction);
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
 
@@ -57,6 +60,7 @@ struct SphereCollider : Collider{
 	virtual Collision CollisionWith(const Collider* col) const;
 	virtual Collision CollisionWith(const BoxCollider* col) const;
 	virtual Collision CollisionWith(const SphereCollider* col) const;
+	virtual RaycastHit Raycast(const Vector3& origin, const Vector3& direction);
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
 

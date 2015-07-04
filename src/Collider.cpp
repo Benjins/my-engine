@@ -5,6 +5,7 @@
 #include "../header/int/Collider.h"
 #include "../header/int/Scene.h"
 #include "../header/int/AABB.h"
+#include "../header/int/RaycastHit.h"
 #include <cfloat>
 
 
@@ -16,6 +17,10 @@ Collision BoxCollider::CollisionWith(const BoxCollider* col) const{
 }
 Collision BoxCollider::CollisionWith(const SphereCollider* col) const{
 	return DetectCollision(col, this);
+}
+
+RaycastHit BoxCollider::Raycast(const Vector3& origin, const Vector3& direction){
+	return RaycastBox(this, origin, direction);
 }
 
 Collider::Collider(){
@@ -76,6 +81,10 @@ Collision SphereCollider::CollisionWith(const BoxCollider* col) const{
 }
 Collision SphereCollider::CollisionWith(const SphereCollider* col) const{
 	return DetectCollision(this, col);
+}
+
+RaycastHit SphereCollider::Raycast(const Vector3& origin, const Vector3& direction){
+	return RaycastSphere(this, origin, direction);
 }
 
 void SphereCollider::AddToSim(PhysicsSim* sim){
@@ -327,7 +336,6 @@ Collision Collider::CollisionWith(const Collider* col) const{Collision x; return
 Collision Collider::CollisionWith(const BoxCollider* col) const{Collision x; return x;}
 Collision Collider::CollisionWith(const SphereCollider* col) const{Collision x; return x;}
 void Collider::AddToSim(PhysicsSim* sim){}
+RaycastHit Collider::Raycast(const Vector3& origin, const Vector3& direction){RaycastHit x; return x;}
 void Collider::OnAwake(){}
-Collider::~Collider(){
-
-}
+Collider::~Collider(){}
