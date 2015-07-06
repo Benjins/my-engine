@@ -906,7 +906,7 @@ struct EnemyComp : HitComponent{
 	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
 		health--;
 		float ratio = ((float)health)/maxHealth;
-		gameObject->material->SetVec4Uniform("_color", Vector4(1.0f - ratio, 0, 0, 1.0));
+		gameObject->material->SetVec4Uniform("_color", Vector4(1.0f - ratio, 0, 0, 1.0f));
 		if(health <= 0){
 			GameObject* newObj = gameObject->Clone();
 			gameObject->material->matName = "";
@@ -922,6 +922,7 @@ struct EnemyComp : HitComponent{
 		pathing = &gameObject->scene->pathfinding;
 		player = gameObject->scene->FindGameObject("mainCam");
 		bulletPrefab = gameObject->scene->FindPrefab("bullet");
+		gameObject->material->SetVec4Uniform("_color", Vector4(0, 0, 0, 1.0f));
 	}
 
 	virtual void OnUpdate(){
