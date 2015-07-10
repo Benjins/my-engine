@@ -82,13 +82,13 @@
       <PreprocessorDefinitions>MEM_CHECK</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\packages\freeglut.2.8.1.15\build\native\include;$(ProjectDir)header\ext;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)nupengl.core.0.0.0.1\build\native\include;$(ProjectDir)header\ext;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;3dbasics.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\packages\OpenAL-Soft.1.16.0\bin\Win64;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)nupengl.core.0.0.0.1\build\native\lib\x64\v120;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
