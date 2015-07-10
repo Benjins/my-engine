@@ -15,7 +15,7 @@ using std::vector;
 struct AudioClip{
 	string clipFileName; 
 	string clipName;
-
+	 
 	ALuint source;
 	ALuint buffer;
 	ALuint frequency;
