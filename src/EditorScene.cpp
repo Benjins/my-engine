@@ -106,19 +106,6 @@ void EditorScene::Start(){
 
 	editorGui.elements.push_back(nameField);
 
-	/*
-	GuiElement* hierarchyPanel = new GuiElement(&resources);
-	hierarchyPanel->name = "gui_heirarchy_panel";
-	hierarchyPanel->position = Vector2(0.08f,0.5f);
-	hierarchyPanel->scale = Vector2(0.16f, 1.0f);
-	hierarchyPanel->tex = new Texture(1,1);
-	RGBApixel pix2 = {50,50,50,220};
-	hierarchyPanel->tex->SetPixel(0,0,pix2);
-	hierarchyPanel->tex->Apply();
-
-	editorGui.elements.push_back(hierarchyPanel);
-	*/
-
 	running = true;
 	while(running){
 #ifdef __APPLE__
