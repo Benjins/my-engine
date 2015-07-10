@@ -1,6 +1,6 @@
 #include "../header/int/PhysicsSim.h"
 #include "../header/int/GameObject.h"
-#include "../header/int/Transform.h"
+#include "../header/int/SCTransform.h"
 #include "../header/int/Mat4.h"
 #include "../header/int/Collider.h"
 #include "../header/int/Scene.h"

@@ -86,9 +86,9 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;3dbasics.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\packages\OpenAL-Soft.1.16.0\bin\Win64;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)packages\nupengl.core.0.0.0.1\build\native\lib\x64\v120;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,17 +110,28 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\OpenAL 1.1 SDK\include\;C:\Users\Benji Snith\Documents\Visual Studio 2012\Projects\my-engine\my-engine\header\ext\freetype2\freetype;C:\Users\Benji Snith\Documents\Visual Studio 2012\Projects\my-engine\my-engine\header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\packages\freeglut.2.8.1.15\build\native\include;$(ProjectDir)header\ext;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64;C:\Users\Benji Snith\Documents\Visual Studio 2012\Projects\my-engine\my-engine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;3dbasics.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)packages\nupengl.core.0.0.0.1\build\native\lib\x64\v120;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="3dbasics\Basis.cpp" />
+    <ClCompile Include="3dbasics\Box.cpp" />
+    <ClCompile Include="3dbasics\Matrix.cpp" />
+    <ClCompile Include="3dbasics\Plane.cpp" />
+    <ClCompile Include="3dbasics\Quaternion.cpp" />
+    <ClCompile Include="3dbasics\Ray.cpp" />
+    <ClCompile Include="3dbasics\Sphere.cpp" />
+    <ClCompile Include="3dbasics\Transform.cpp" />
+    <ClCompile Include="3dbasics\Triangle.cpp" />
+    <ClCompile Include="3dbasics\Vector2.cpp" />
+    <ClCompile Include="3dbasics\Vector3.cpp" />
     <ClCompile Include="src\3DUtilities.cpp" />
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
@@ -145,13 +156,25 @@
     <ClCompile Include="src\RigidBody.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SceneLoading.cpp" />
+    <ClCompile Include="src\SCTransform.cpp" />
     <ClCompile Include="src\simple-xml.cpp" />
     <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Vector4.cpp" />
     <ClCompile Include="test\testing.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="3dbasics\3dbasics.h" />
+    <ClInclude Include="3dbasics\Basis.h" />
+    <ClInclude Include="3dbasics\Box.h" />
+    <ClInclude Include="3dbasics\Matrix.h" />
+    <ClInclude Include="3dbasics\Plane.h" />
+    <ClInclude Include="3dbasics\Quaternion.h" />
+    <ClInclude Include="3dbasics\Ray.h" />
+    <ClInclude Include="3dbasics\Sphere.h" />
+    <ClInclude Include="3dbasics\Transform.h" />
+    <ClInclude Include="3dbasics\Triangle.h" />
+    <ClInclude Include="3dbasics\Vector2.h" />
+    <ClInclude Include="3dbasics\Vector3.h" />
     <ClInclude Include="header\ext\3dbasics.h" />
     <ClInclude Include="header\ext\Basis.h" />
     <ClInclude Include="header\ext\Box.h" />
@@ -169,8 +192,10 @@
     <ClInclude Include="header\ext\Triangle.h" />
     <ClInclude Include="header\ext\Vector2.h" />
     <ClInclude Include="header\ext\Vector3.h" />
+    <ClInclude Include="header\int\3DUtilities.h" />
     <ClInclude Include="header\int\AABB.h" />
     <ClInclude Include="header\int\Animation.h" />
+    <ClInclude Include="header\int\AudioSystem.h" />
     <ClInclude Include="header\int\Collider.h" />
     <ClInclude Include="header\int\Component.h" />
     <ClInclude Include="header\int\Drawcall.h" />
@@ -193,8 +218,8 @@
     <ClInclude Include="header\int\ResourceManager.h" />
     <ClInclude Include="header\int\RigidBody.h" />
     <ClInclude Include="header\int\Scene.h" />
+    <ClInclude Include="header\int\SCTransform.h" />
     <ClInclude Include="header\int\Texture.h" />
-    <ClInclude Include="header\int\Transform.h" />
     <ClInclude Include="header\int\UserComps.h" />
     <ClInclude Include="header\int\Vector4.h" />
     <ClInclude Include="test\testing.h" />
