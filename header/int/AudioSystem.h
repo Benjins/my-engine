@@ -13,7 +13,7 @@
 using std::vector;
 
 struct AudioClip{
-	string clipFileName;
+	string clipFileName; 
 	string clipName;
 
 	ALuint source;
