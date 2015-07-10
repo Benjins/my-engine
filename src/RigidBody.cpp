@@ -1,5 +1,5 @@
 #include "../header/int/RigidBody.h"
-#include "../header/int/Transform.h"
+#include "../header/int/SCTransform.h"
 #include "../header/int/Collider.h"
 #include "../header/int/GameObject.h"
 #include "../header/int/Scene.h"

@@ -60,8 +60,11 @@ GuiElement* GuiSystem::OnMouseUp(const Vector2& hitPoint){
 	}
 
 	for(GuiElement* elem : elements){
-		if(elem != mouseDownElement && elem->WasHit(hitPoint)){
-			//elem->OnMouseUp(hitPoint);
+		if(elem->WasHit(hitPoint)){
+			if(elem != mouseDownElement){
+				elem->OnMouseUp(hitPoint);
+			}
+
 			mouseDownElement = nullptr;
 			selectedElem = elem;
 			return elem;

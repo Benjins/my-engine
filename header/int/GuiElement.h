@@ -51,24 +51,16 @@ public:
 
 	void SetParent(GuiElement* newParent);
 
+	virtual void EndOfFrame(){}
+
+	virtual void OnKey(unsigned char key){}
+
 	virtual void OnMouseDown(const Vector2& hitPoint){
-		if(tex != nullptr){
-			for(int i = 0; i < tex->width * tex->height; i++){
-				tex->pixelData[i].Red *= 2;
-			}
-
-			tex->Apply();
-		}
 	}
+
 	virtual void OnMouseUp(const Vector2& hitPoint){
-		if(tex != nullptr){
-			for(int i = 0; i < tex->width * tex->height; i++){
-				tex->pixelData[i].Red /= 2;
-			}
-
-			tex->Apply();
-		}
 	}
+
 	virtual void OnMouseDrag(const Vector2& hitPoint){}
 	virtual void OnClicked(const Vector2& hitPoint){}
 
@@ -108,6 +100,82 @@ struct GuiText : GuiElement{
 	virtual XMLElement Serialize();
 
 	virtual ~GuiText();
+};
+
+struct GuiTextField : GuiText{
+	GuiTextField(MaterialManager* resources, const string& _fuvFileName)
+		: GuiText(resources, _fuvFileName){
+		tex = new Texture(1,1);
+		RGBApixel col = {20,20,20,20};
+		tex->SetPixel(0,0,col);
+		tex->Apply();
+	}
+
+	virtual void OnGui() const{
+		GuiElement::OnGui();
+		GuiText::OnGui();
+	}
+
+	virtual void OnKey(unsigned char key){
+		if(key == '\n' || key == '\r'){
+			//deselect ourselves?
+		}
+		else if(key == '\b'){
+			text.pop_back();
+		}
+		else if(key == '\t'){
+			text.append("  ");
+		}
+		else{
+			text += (char)key;
+		}
+	}
+};
+
+struct GuiButton : GuiText{
+	bool toggleOnClick;
+	bool isClicked;
+	bool isDown;
+	
+	GuiButton(MaterialManager* resources, const string& _fuvFileName)
+		: GuiText(resources, _fuvFileName){
+		tex = new Texture(1,1);
+		RGBApixel col = {20,20,20,20};
+		tex->SetPixel(0,0,col);
+		tex->Apply();
+
+		toggleOnClick = false;
+		isDown = false;
+		isClicked = false;
+	}
+
+	virtual void OnGui() const{
+		GuiElement::OnGui();
+		GuiText::OnGui();
+	}
+
+	virtual void EndOfFrame(){
+		isClicked = false;
+		if(!toggleOnClick){
+			isDown = false;
+		}
+	}
+
+	virtual void OnMouseDown(const Vector2& hitPoint){
+		GuiElement::OnMouseDown(hitPoint);
+	}
+
+	virtual void OnMouseUp(const Vector2& hitPoint){
+		GuiElement::OnMouseUp(hitPoint);
+
+		isClicked = true;
+
+		if(toggleOnClick){
+			isDown = !isDown;
+		}
+	}
+
+	virtual ~GuiButton(){}
 };
 
 void GuiSetSliderValue(GuiElement* elem, float value);

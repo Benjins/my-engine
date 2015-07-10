@@ -89,18 +89,22 @@ void EditorScene::Start(){
 
 	editorGui.elements.push_back(rotTxt);
 
-	/*
-	GuiElement* hierarchyPanel = new GuiElement(&resources);
-	hierarchyPanel->name = "gui_heirarchy_panel";
-	hierarchyPanel->position = Vector2(0.08f,0.5f);
-	hierarchyPanel->scale = Vector2(0.16f, 1.0f);
-	hierarchyPanel->tex = new Texture(1,1);
-	RGBApixel pix2 = {50,50,50,220};
-	hierarchyPanel->tex->SetPixel(0,0,pix2);
-	hierarchyPanel->tex->Apply();
+	GuiButton* globalButton = new GuiButton(&resources, "data/arial_16.fuv");
+	globalButton->name = "globalButton";
+	globalButton->position = Vector2(0.5f, 0.95f);
+	globalButton->scale = Vector2(0.1f, 0.04f);
+	globalButton->text = "Global";
+	globalButton->toggleOnClick = true;
 
-	editorGui.elements.push_back(hierarchyPanel);
-	*/
+	editorGui.elements.push_back(globalButton);
+
+	GuiTextField* nameField = new GuiTextField(&resources, "data/arial_16.fuv");
+	nameField->name = "nameField";
+	nameField->position = Vector2(0.3f, 0.95f);
+	nameField->scale = Vector2(0.1f, 0.04f);
+	nameField->text = "...";
+
+	editorGui.elements.push_back(nameField);
 
 	running = true;
 	while(running){
@@ -117,6 +121,8 @@ void EditorScene::Start(){
 		glutSwapBuffers();
 		glutPostRedisplay();
 
+		//These should be order-independent, just setting local states.
+		editorGui.EndOfFrame();
 		input.EndFrame();
 	}
 }
@@ -181,14 +187,15 @@ void EditorScene::EditorUpdate(){
 	Vector2 uiMouseLoc = (Vector2(mouseXNormalized, mouseYNormalized) + Vector2(1,1)) / 2;
 	uiMouseLoc.y = 1 - uiMouseLoc.y;
 
+	GuiElement* hitElement = nullptr, *downElem=nullptr, *upElem=nullptr, *dragElem=nullptr;
 	if(input.GetMouseDown(GLUT_LEFT_BUTTON)){
-		editorGui.OnMouseDown(uiMouseLoc);
+		hitElement = downElem = editorGui.OnMouseDown(uiMouseLoc);
 	}
 	else if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
-		editorGui.OnMouseUp(uiMouseLoc);
+		hitElement = upElem = editorGui.OnMouseUp(uiMouseLoc);
 	}
 	else if(input.GetMouse(GLUT_LEFT_BUTTON)){
-		editorGui.OnMouseDrag(uiMouseLoc);
+		hitElement = dragElem = editorGui.OnMouseDrag(uiMouseLoc);
 	}
 
 	if(input.GetKeyUp('x')){
@@ -243,6 +250,12 @@ void EditorScene::EditorUpdate(){
 		globalManipulator = !globalManipulator;
 	}
 
+	GuiButton* globalButton = static_cast<GuiButton*>(editorGui.FindGUIElement("globalButton"));
+	if(globalButton->isClicked){
+		globalManipulator = !globalManipulator;
+		globalButton->text = globalManipulator ? "Global" : "Local";
+	}
+
 	if(input.GetKeyUp('o')){
 		camera = sceneCamera;
 		SaveScene("Editor_Scene.xml");
@@ -265,110 +278,112 @@ void EditorScene::EditorUpdate(){
 	if(input.GetKeyUp('r')){
 		transformMode = TransformMode::Rotation;
 	}
+	
+	if(hitElement == nullptr){
+		Vector3 mouseWorldPos = editorCamera.position;
+		mouseWorldPos = mouseWorldPos - (editorCamera.Up()    * mouseYNormalized);
+		mouseWorldPos = mouseWorldPos + (editorCamera.Right() * mouseXNormalized * (windowWidth/windowHeight));
+		mouseWorldPos = mouseWorldPos + (editorCamera.Forward() * 1.2f);
 
-	Vector3 mouseWorldPos = editorCamera.position;
-	mouseWorldPos = mouseWorldPos - (editorCamera.Up()    * mouseYNormalized);
-	mouseWorldPos = mouseWorldPos + (editorCamera.Right() * mouseXNormalized * (windowWidth/windowHeight));
-	mouseWorldPos = mouseWorldPos + (editorCamera.Forward() * 1.2f);
+		Vector3 rayDirection = mouseWorldPos - editorCamera.position;
 
-	Vector3 rayDirection = mouseWorldPos - editorCamera.position;
+		if(input.GetMouseDown(GLUT_LEFT_BUTTON)){
+			if(selectedObj != nullptr){
+				Vector3 cameraToObj = selectedObj->transform.GlobalPosition() - editorCamera.position;
+				float projectionAmount = DotProduct(cameraToObj, rayDirection)/DotProduct(rayDirection, rayDirection);
+				Vector3 projectedCenter = rayDirection * projectionAmount;
 
-	if(input.GetMouseDown(GLUT_LEFT_BUTTON)){
-		if(selectedObj != nullptr){
+				Vector3 orthoPart = projectedCenter - cameraToObj;
+				if(orthoPart.MagnitudeSquared() < 1){
+					Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
+					Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
+					Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
+
+					float xBit = DotProduct(orthoPart, rightVector);
+					float yBit = DotProduct(orthoPart, upVector);
+					float zBit = DotProduct(orthoPart, forwardVector);
+
+					if(transformMode == TransformMode::Translation){
+						if(xBit > yBit && xBit > zBit){
+							selectedAxis = 0;
+						}
+						else if(yBit > xBit && yBit > zBit){
+							selectedAxis = 1;
+						}
+						else if(zBit > yBit && zBit > xBit){
+							selectedAxis = 2;
+						}
+					}
+					else if(transformMode == TransformMode::Rotation){
+						xBit = abs(xBit);
+						yBit = abs(yBit);
+						zBit = abs(zBit);
+						printf("xBit: %f yBit: %f zBit: %f\n", xBit, yBit, zBit);
+						if(xBit < yBit && xBit < zBit){
+							selectedAxis = 0;
+						}
+						else if(yBit < xBit && yBit < zBit){
+							selectedAxis = 1;
+						}
+						else if(zBit < yBit && zBit < xBit){
+							selectedAxis = 2;
+						}
+					}
+				}
+			}
+		}
+
+		if(input.GetMouse(GLUT_LEFT_BUTTON) && selectedObj != nullptr && selectedAxis >= 0){
+			float deltaX = prevX - input.mouseX;
+			float deltaY = prevY - input.mouseY;
+
+			Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
+			Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
+			Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
+
+			const Vector3 axes[3] = {rightVector, upVector, forwardVector};
+			Vector3 axis = axes[selectedAxis];
+
 			Vector3 cameraToObj = selectedObj->transform.GlobalPosition() - editorCamera.position;
 			float projectionAmount = DotProduct(cameraToObj, rayDirection)/DotProduct(rayDirection, rayDirection);
 			Vector3 projectedCenter = rayDirection * projectionAmount;
-
 			Vector3 orthoPart = projectedCenter - cameraToObj;
-			if(orthoPart.MagnitudeSquared() < 1){
-				Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
-				Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
-				Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
 
-				float xBit = DotProduct(orthoPart, rightVector);
-				float yBit = DotProduct(orthoPart, upVector);
-				float zBit = DotProduct(orthoPart, forwardVector);
-
-				if(transformMode == TransformMode::Translation){
-					if(xBit > yBit && xBit > zBit){
-						selectedAxis = 0;
-					}
-					else if(yBit > xBit && yBit > zBit){
-						selectedAxis = 1;
-					}
-					else if(zBit > yBit && zBit > xBit){
-						selectedAxis = 2;
-					}
+			if(transformMode == TransformMode::Translation){
+				float amount = DotProduct(orthoPart, axis);
+				Vector3 delta = axis * amount;
+				if(globalManipulator){
+					//delta = selectedObj->transform.GlobalToLocal(delta);
 				}
-				else if(transformMode == TransformMode::Rotation){
-					xBit = abs(xBit);
-					yBit = abs(yBit);
-					zBit = abs(zBit);
-					printf("xBit: %f yBit: %f zBit: %f\n", xBit, yBit, zBit);
-					if(xBit < yBit && xBit < zBit){
-						selectedAxis = 0;
-					}
-					else if(yBit < xBit && yBit < zBit){
-						selectedAxis = 1;
-					}
-					else if(zBit < yBit && zBit < xBit){
-						selectedAxis = 2;
-					}
-				}
+				selectedObj->transform.position = selectedObj->transform.position + delta;
+			}
+			else if(transformMode == TransformMode::Rotation){
+				float amount = DotProduct(orthoPart, axes[(selectedAxis + 1) % 3]) * DotProduct(orthoPart, axes[(selectedAxis + 2) % 3]);
+				//float currentAmount = Rotate(axis, selectedObj->transform.rotation)
+				selectedObj->transform.rotation = Quaternion(axis, amount) * selectedObj->transform.rotation;
 			}
 		}
-	}
 
-	if(input.GetMouse(GLUT_LEFT_BUTTON) && selectedObj != nullptr && selectedAxis >= 0){
-		float deltaX = prevX - input.mouseX;
-		float deltaY = prevY - input.mouseY;
+		if(input.GetMouse(GLUT_RIGHT_BUTTON)){
+			float deltaX = prevX - input.mouseX;
+			float deltaY = prevY - input.mouseY;
 
-		Vector3 rightVector   = globalManipulator ?  X_AXIS : selectedObj->transform.Right();
-		Vector3 upVector      = globalManipulator ?  Y_AXIS : selectedObj->transform.Up();
-		Vector3 forwardVector = globalManipulator ?  Z_AXIS : selectedObj->transform.Forward();
+			xRot += deltaY/90;
+			yRot += deltaX/90;
 
-		const Vector3 axes[3] = {rightVector, upVector, forwardVector};
-		Vector3 axis = axes[selectedAxis];
-
-		Vector3 cameraToObj = selectedObj->transform.GlobalPosition() - editorCamera.position;
-		float projectionAmount = DotProduct(cameraToObj, rayDirection)/DotProduct(rayDirection, rayDirection);
-		Vector3 projectedCenter = rayDirection * projectionAmount;
-		Vector3 orthoPart = projectedCenter - cameraToObj;
-
-		if(transformMode == TransformMode::Translation){
-			float amount = DotProduct(orthoPart, axis);
-			Vector3 delta = axis * amount;
-			if(globalManipulator){
-				//delta = selectedObj->transform.GlobalToLocal(delta);
+			editorCamera.rotation =  Quaternion(Y_AXIS, yRot) * Quaternion(X_AXIS, xRot);
+		}
+		else if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
+			RaycastHit testHit = selectionSim.Raycast(editorCamera.position, rayDirection);
+			if(testHit.hit){
+				selectedObj = testHit.col->gameObject;
 			}
-			selectedObj->transform.position = selectedObj->transform.position + delta;
-		}
-		else if(transformMode == TransformMode::Rotation){
-			float amount = DotProduct(orthoPart, axes[(selectedAxis + 1) % 3]) * DotProduct(orthoPart, axes[(selectedAxis + 2) % 3]);
-			//float currentAmount = Rotate(axis, selectedObj->transform.rotation)
-			selectedObj->transform.rotation = Quaternion(axis, amount) * selectedObj->transform.rotation;
-		}
-	}
+			else{
+				selectedObj = nullptr;
+			}
 
-	if(input.GetMouse(GLUT_RIGHT_BUTTON)){
-		float deltaX = prevX - input.mouseX;
-		float deltaY = prevY - input.mouseY;
-
-		xRot += deltaY/90;
-		yRot += deltaX/90;
-
-		editorCamera.rotation =  Quaternion(Y_AXIS, yRot) * Quaternion(X_AXIS, xRot);
-	}
-	else if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
-		RaycastHit testHit = selectionSim.Raycast(editorCamera.position, rayDirection);
-		if(testHit.hit){
-			selectedObj = testHit.col->gameObject;
+			selectedAxis = -1;
 		}
-		else{
-			selectedObj = nullptr;
-		}
-
-		selectedAxis = -1;
 	}
 	
 	if(selectedObj){
@@ -613,11 +628,15 @@ static void OnEditorPassiveMouseFunc(int x, int y){
 }
 
 static void OnEditorKeyFunc(unsigned char key, int x, int y){
-	EditorScene::getInstance().OnKey(key, x, y);
+	if(!EditorScene::getInstance().editorGui.OnKey(key)){
+		EditorScene::getInstance().OnKey(key, x, y);
+	}
 }
 
 static void OnEditorKeyUpFunc(unsigned char key, int x, int y){
-	EditorScene::getInstance().OnKeyUp(key, x, y);
+	if(EditorScene::getInstance().editorGui.selectedElem == nullptr){
+		EditorScene::getInstance().OnKeyUp(key, x, y);
+	}
 }
 
 EditorScene::~EditorScene(){
