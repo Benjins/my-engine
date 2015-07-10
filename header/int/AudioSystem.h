@@ -11,7 +11,7 @@
 #define MAX_CLIP_COUNT 20
 
 using std::vector;
-
+ 
 struct AudioClip{
 	string clipFileName; 
 	string clipName;
