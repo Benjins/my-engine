@@ -82,13 +82,13 @@
       <PreprocessorDefinitions>MEM_CHECK</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\OpenAL 1.1 SDK\include\;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)header\ext;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;3dbasics.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Program Files (x86)\OpenAL 1.1 SDK\libs\Win64;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\packages\OpenAL-Soft.1.16.0\bin\Win64;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
