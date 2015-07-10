@@ -30,6 +30,12 @@ struct GuiSystem{
 	GuiElement* OnMouseDrag(const Vector2& hitPoint);
 	GuiElement* OnMouseUp(const Vector2& hitPoint);
 
+	void EndOfFrame(){
+		for(GuiElement* elem : elements){
+			elem->EndOfFrame();
+		}
+	}
+
 	~GuiSystem(){
 		mouseDownElement = nullptr;
 

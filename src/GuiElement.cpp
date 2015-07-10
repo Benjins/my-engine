@@ -175,7 +175,7 @@ void GuiText::OnGui() const{
 	float sy = 2.0f / glutGet(GLUT_WINDOW_HEIGHT) * textScale.y; 
 
 	//Left alignement by default
-	float x = position.x - scale.x;
+	float x = position.x - scale.x/2;
 	float y = position.y;
 
 	x = x * 2 - 1;
