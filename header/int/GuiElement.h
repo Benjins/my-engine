@@ -121,7 +121,8 @@ struct GuiTextField : GuiText{
 			//deselect ourselves?
 		}
 		else if(key == '\b'){
-			text.pop_back();
+			//std::string.pop_back() would be preferable, but it seems clang lacks support for it
+			text = text.substr(0, text.size()-1);
 		}
 		else if(key == '\t'){
 			text.append("  ");
