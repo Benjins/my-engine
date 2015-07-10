@@ -53,6 +53,8 @@ public:
 
 	virtual void EndOfFrame(){}
 
+	virtual void OnKey(unsigned char key){}
+
 	virtual void OnMouseDown(const Vector2& hitPoint){
 	}
 
@@ -100,6 +102,36 @@ struct GuiText : GuiElement{
 	virtual ~GuiText();
 };
 
+struct GuiTextField : GuiText{
+	GuiTextField(MaterialManager* resources, const string& _fuvFileName)
+		: GuiText(resources, _fuvFileName){
+		tex = new Texture(1,1);
+		RGBApixel col = {20,20,20,20};
+		tex->SetPixel(0,0,col);
+		tex->Apply();
+	}
+
+	virtual void OnGui() const{
+		GuiElement::OnGui();
+		GuiText::OnGui();
+	}
+
+	virtual void OnKey(unsigned char key){
+		if(key == '\n' || key == '\r'){
+			//deselect ourselves?
+		}
+		else if(key == '\b'){
+			text.pop_back();
+		}
+		else if(key == '\t'){
+			text.append("  ");
+		}
+		else{
+			text += (char)key;
+		}
+	}
+};
+
 struct GuiButton : GuiText{
 	bool toggleOnClick;
 	bool isClicked;
@@ -110,7 +142,7 @@ struct GuiButton : GuiText{
 		tex = new Texture(1,1);
 		RGBApixel col = {20,20,20,20};
 		tex->SetPixel(0,0,col);
-		tex->Bind(GL_TEXTURE0);
+		tex->Apply();
 
 		toggleOnClick = false;
 		isDown = false;

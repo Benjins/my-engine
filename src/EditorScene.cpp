@@ -98,6 +98,14 @@ void EditorScene::Start(){
 
 	editorGui.elements.push_back(globalButton);
 
+	GuiTextField* nameField = new GuiTextField(&resources, "data/arial_16.fuv");
+	nameField->name = "nameField";
+	nameField->position = Vector2(0.3f, 0.95f);
+	nameField->scale = Vector2(0.1f, 0.04f);
+	nameField->text = "...";
+
+	editorGui.elements.push_back(nameField);
+
 	/*
 	GuiElement* hierarchyPanel = new GuiElement(&resources);
 	hierarchyPanel->name = "gui_heirarchy_panel";
@@ -633,11 +641,15 @@ static void OnEditorPassiveMouseFunc(int x, int y){
 }
 
 static void OnEditorKeyFunc(unsigned char key, int x, int y){
-	EditorScene::getInstance().OnKey(key, x, y);
+	if(!EditorScene::getInstance().editorGui.OnKey(key)){
+		EditorScene::getInstance().OnKey(key, x, y);
+	}
 }
 
 static void OnEditorKeyUpFunc(unsigned char key, int x, int y){
-	EditorScene::getInstance().OnKeyUp(key, x, y);
+	if(EditorScene::getInstance().editorGui.selectedElem == nullptr){
+		EditorScene::getInstance().OnKeyUp(key, x, y);
+	}
 }
 
 EditorScene::~EditorScene(){

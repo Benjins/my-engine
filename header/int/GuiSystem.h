@@ -30,6 +30,17 @@ struct GuiSystem{
 	GuiElement* OnMouseDrag(const Vector2& hitPoint);
 	GuiElement* OnMouseUp(const Vector2& hitPoint);
 
+	//Returns true if we capture the keystroke
+	bool OnKey(unsigned char key){
+		if(selectedElem != nullptr){
+			selectedElem->OnKey(key);
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
 	void EndOfFrame(){
 		for(GuiElement* elem : elements){
 			elem->EndOfFrame();
