@@ -82,13 +82,12 @@
       <PreprocessorDefinitions>MEM_CHECK</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <AdditionalIncludeDirectories>$(ProjectDir)nupengl.core.0.0.0.1\build\native\include;$(ProjectDir)header\ext;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\projects\my-engine\nupengl.core.0.0.0.1\build\native\include;$(ProjectDir)header\ext;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;3dbasics.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)nupengl.core.0.0.0.1\build\native\lib\x64\v120;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem> <AdditionalLibraryDirectories>$(ProjectDir)C:\projects\my-engine\nupengl.core.0.0.0.1\build\native\lib\x64\v120;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
