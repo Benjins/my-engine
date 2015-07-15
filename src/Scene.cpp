@@ -7,6 +7,7 @@
 #include "../header/int/RigidBody.h"
 #include "../header/int/Collider.h"
 #include "../header/int/PhysicsSim.h"
+#include "../header/int/Armature.h"
 #include "../header/int/FontBMPMaker.h"
 #include "../header/ext/simple-xml.h"
 #include <time.h>
@@ -36,6 +37,27 @@ Scene::Scene(int argc, char** argv){
 	physicsSim = new PhysicsSim();
 	input = Input();
 	pathfinding.scene = this;
+	testArmature = new Armature();
+
+	BoneTransform* root = testArmature->AddBone(nullptr);
+	root->name = "root";
+
+	BoneTransform* chest = testArmature->AddBone(root);
+	chest->name = "chest";
+	chest->position = Vector3(0,1,0);
+	chest->rotation = Quaternion(X_AXIS, 0.12f);
+
+	BoneTransform* leg = testArmature->AddBone(root);
+	leg->name = "leg";
+	leg->position = Vector3(0.1f,-0.4f,0);
+
+	BoneTransform* arm = testArmature->AddBone(chest);
+	arm->name = "arm";
+	arm->position = Vector3(0.4f,-0.04f,0);
+
+	BoneTransform* hand = testArmature->AddBone(arm);
+	hand->name = "hand";
+	hand->position = Vector3(0.3f,-0.14f,0);
 
 	myRandom = default_random_engine(time(NULL));
 
@@ -183,6 +205,10 @@ void Scene::Start(){
 		glutMainLoopEvent();
 #endif
 		OnUpdate();
+
+		BoneTransform* arm = testArmature->GetBoneByName("arm");
+		arm->rotation = arm->rotation * Quaternion(Z_AXIS, 0.01f);
+
 		physicsSim->Advance(deltaTime);
 
 		Render();
@@ -300,6 +326,13 @@ void Scene::Render(){
 	//Gui and gizmos stuff 
 	glDisable(GL_DEPTH_TEST);
 
+	Material* vertCol = resources.GetMaterialByName("color");
+	glUseProgram(vertCol->shaderProgram);
+	glUniformMatrix4fv(vertCol->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
+	glUniformMatrix4fv(vertCol->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
+	glUniform4f(vertCol->GetUniformByName("_color"), 1, 1, 1, 1);
+	testArmature->DebugRender();
+
 	//Gui stuff
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -388,6 +421,8 @@ Scene::~Scene(){
 	}
 
 	delete physicsSim;
+
+	delete testArmature;
 }
 
 static void RenderScene(){

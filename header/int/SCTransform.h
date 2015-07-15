@@ -19,7 +19,7 @@ struct SC_Transform{
 
 	vector<SC_Transform*> children;
 
-private:
+protected:
 	SC_Transform* parent;
 
 public:

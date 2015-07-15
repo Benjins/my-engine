@@ -19,6 +19,7 @@ using std::list;
 struct RigidBody;
 struct PhysicsSim;
 struct XMLElement;
+struct Armature;
 
 struct Scene{
 	SC_Transform* camera;
@@ -31,6 +32,8 @@ struct Scene{
 	AudioSystem audio;
 	GuiSystem guiSystem;
 	vector<Light> lights;
+
+	Armature* testArmature;
 
 protected:
 	vector<GameObject*> prefabs;

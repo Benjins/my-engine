@@ -90,7 +90,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
-	  <AdditionalLibraryDirectories>$(ProjectDir)packages\nupengl.core.0.0.0.1\build\native\lib\x64\v120;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)packages\nupengl.core.0.0.0.1\build\native\lib\x64\v120;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -114,13 +114,13 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-	  <AdditionalIncludeDirectories>$(ProjectDir)..\packages\freeglut.2.8.1.15\build\native\include;$(ProjectDir)header\ext;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\packages\freeglut.2.8.1.15\build\native\include;$(ProjectDir)header\ext;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-     <AdditionalLibraryDirectories>$(ProjectDir)packages\nupengl.core.0.0.0.1\build\native\lib\x64\v120;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)packages\nupengl.core.0.0.0.1\build\native\lib\x64\v120;$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glew32.lib;freeglut.lib;freetype255d.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -138,6 +138,7 @@
     <ClCompile Include="3dbasics\Vector3.cpp" />
     <ClCompile Include="src\3DUtilities.cpp" />
     <ClCompile Include="src\AABB.cpp" />
+    <ClCompile Include="src\Armature.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
     <ClCompile Include="src\Collider.cpp" />
     <ClCompile Include="src\Component.cpp" />
@@ -199,7 +200,9 @@
     <ClInclude Include="header\int\3DUtilities.h" />
     <ClInclude Include="header\int\AABB.h" />
     <ClInclude Include="header\int\Animation.h" />
+    <ClInclude Include="header\int\Armature.h" />
     <ClInclude Include="header\int\AudioSystem.h" />
+    <ClInclude Include="header\int\BoneTransform.h" />
     <ClInclude Include="header\int\Collider.h" />
     <ClInclude Include="header\int\Component.h" />
     <ClInclude Include="header\int\Drawcall.h" />
