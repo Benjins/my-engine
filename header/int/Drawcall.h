@@ -17,6 +17,9 @@ struct DrawCall{
 	GLuint tangents;
 	GLuint colors;
 	GLuint uvs;
+	GLuint boneWeights;
+	GLuint boneIndices;
+	GLuint boneCount;
 	
 	int vertCount;
 	

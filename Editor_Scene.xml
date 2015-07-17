@@ -2,6 +2,7 @@
     <Material name='gui' shader='data/gui' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
     <Material name='color' shader='data/col' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
     <Material name='myMat' shader='data/shader' texture='data/Texture.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+	<Material name='myMat-arm' shader='data/armature_shader' texture='data/Texture.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
     <Material name='myMat2' shader='data/shader' texture='data/Texture.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
     <Material name='floorOwnMat' shader='data/shader' texture='data/grass-dirt.bmp' bumpMap='data/grass-dirt-norm.bmp' uvScale='5.000000,5.000000' uvOffset='0.000000,0.000000'/>
     <Material name='floorMat' shader='data/shader' texture='data/grass-dirt.bmp' bumpMap='data/grass-dirt-norm.bmp' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
@@ -25,6 +26,11 @@
         <BulletComponent speed='6.000000'/>
         <RigidBody mass='0.100000' isKinematic='F'/>
     </Prefab>
+	<GameObject name='test2-obj'>
+	     <Transform position='3.20000,1.000000,-4.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.800000,0.800000,0.800000'/>
+		 <Material name='myMat-arm'/>
+		 <Mesh source='data/test_2.obj'/>
+	</GameObject>
     <GameObject name='myObj'>
         <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <Material name='floorMat'/>

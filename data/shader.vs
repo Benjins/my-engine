@@ -1,9 +1,9 @@
 #version 130
 
-attribute vec3 Position;
-attribute vec2 UV;
-attribute vec3 _normal;
-attribute vec3 _tangent;
+in vec3 Position;
+in vec2 UV;
+in vec3 _normal;
+in vec3 _tangent;
 
 out vec2 uv_coord;
 out vec3 normal;

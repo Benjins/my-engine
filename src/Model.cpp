@@ -1,4 +1,5 @@
 #include "../header/int/Model.h"
+#include "../header/int/Scene.h"
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
@@ -21,10 +22,12 @@ Face::Face(int _v0, int _v1, int _v2){
 Vertex::Vertex(void){
 	position = Vector3(0,0,0);
 	color = Vector3(0,0,0);
+	numBones = 0;
 }
 
 Vertex::Vertex(Vector3 _position){
 	position = _position;
+	numBones = 0;
 }
 
 Model::Model(){
@@ -32,6 +35,7 @@ Model::Model(){
 	fileName="";
 	vertices = vector<Vertex>();
 	faces = vector<Face>();
+	armature = nullptr;
 }
 
 int Model::GLVertexCount() const{
@@ -41,6 +45,8 @@ int Model::GLVertexCount() const{
 Model::Model(const Model& model){
 	name = model.name;
 	fileName = model.fileName;
+
+	armature = model.armature;
 
 	//Copy the vertices
 	vertices.resize(model.vertices.size());
@@ -60,6 +66,8 @@ Model::Model(string fileName){
 	this->fileName="";
 	vertices = vector<Vertex>();
 	faces = vector<Face>();
+
+	armature = nullptr;
 
 	ImportFromOBJ(fileName);
 }
@@ -182,6 +190,17 @@ void Model::ImportFromOBJ(string fileName){
 
 	CalculateNormals();
 	CalculateTangents();
+
+	if(fileName == "data/test_2.obj"){
+		cout << "\nFaking armature info.\n";
+		for(int i = 0; i < vertices.size(); i++){
+			vertices[i].AddBone(i % 2, 0.5f);
+			vertices[i].AddBone(i % 3, 0.5f);
+		}
+
+		armature = Scene::getInstance().testArmature;
+		cout << "Adding armature, it's " << (armature == nullptr ? "null" : "not null") << endl;
+	}
 }
 
 Vertex ParseVertexLine(string line){

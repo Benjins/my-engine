@@ -8,6 +8,10 @@
 
 using std::vector; using std::string;
 
+struct Armature;
+
+#define MAX_BONES_PER_VERT 4
+
 struct Face{
 	int v0;
 	int v1;
@@ -27,8 +31,23 @@ struct Vertex{
 	Vector3 normal;
 	Vector3 tangent;
 	//Vector3 uv;
+
+	float boneWeights[MAX_BONES_PER_VERT];
+	int boneIndices[MAX_BONES_PER_VERT];
+	short numBones;
+
+	void AddBone(int index, float weight){
+		if(numBones < MAX_BONES_PER_VERT){
+			boneWeights[numBones] = weight;
+			boneIndices[numBones] = index;
+			numBones++;
+		}
+		else{
+			cout << "\n\nError: Too many bones added to vertex, max is " << MAX_BONES_PER_VERT << ". The rest will be discarded.\n";
+		}
+	}
 	
-	Vertex(void);
+	Vertex();
 	Vertex(Vector3 _position);
 };
 
@@ -38,6 +57,8 @@ struct Model{
 
 	string name;
 	string fileName;
+
+	Armature* armature;
 	
 	Model(void);
 	Model(const Model& model);

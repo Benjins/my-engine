@@ -240,14 +240,10 @@ void Scene::OnUpdate(){
 	//cout << "Scene::Update(): " << deltaTime * 1000 << " ms.\n";
 	//cout << "Camera is at: " << camera->GlobalPosition().x << ", " << camera->GlobalPosition().y << ", " << camera->GlobalPosition().z << endl;
 
-	GameObject* parent = (*objects.begin());
-
 	clock_t before = clock();
 	//GuiSetSliderValue(guiElements[0], (1+sin(float(currTime)/divisor))/2);
 	clock_t after = clock();
 	double sliderTime = ((double)after - before)/CLOCKS_PER_SEC;
-
-	parent->transform.rotation = parent->transform.rotation * Quaternion(Y_AXIS, deltaTime/3);
 
 	audio.SetListenerPos(camera->GlobalPosition());
 
