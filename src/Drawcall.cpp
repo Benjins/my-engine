@@ -166,7 +166,7 @@ void DrawCall::Draw() const{
 		GLenum erro1 = glGetError();
 
 		GLuint armatureUniformLoc = glGetUniformLocation(material->shaderProgram, "_armatureMatrices");
-		glUniformMatrix4fv(armatureUniformLoc, 1, GL_TRUE, &(boneMatrices[0].m[0][0]));
+		glUniformMatrix4fv(armatureUniformLoc, boneMatrices.size(), GL_TRUE, &(boneMatrices[0].m[0][0]));
 		float uniformData[MAX_BONE_COUNT * 16];
 
 		GLenum erro  = glGetError();

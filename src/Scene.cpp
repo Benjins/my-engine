@@ -309,6 +309,7 @@ void Scene::Render(){
 	}
 
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
+		glUseProgram(iter->obj->material->shaderProgram);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 
