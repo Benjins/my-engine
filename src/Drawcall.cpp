@@ -167,27 +167,6 @@ void DrawCall::Draw() const{
 
 		GLuint armatureUniformLoc = glGetUniformLocation(material->shaderProgram, "_armatureMatrices");
 		glUniformMatrix4fv(armatureUniformLoc, boneMatrices.size(), GL_TRUE, &(boneMatrices[0].m[0][0]));
-		float uniformData[MAX_BONE_COUNT * 16];
-
-		GLenum erro  = glGetError();
-
-		glGetUniformfv(material->shaderProgram, armatureUniformLoc, uniformData);
-		GLenum erro22  = glGetError();
-		GLenum erro2  = glGetError();
-
-		char uniformActiveName[256];
-		int leng=0, sizeE;
-		GLenum typeE;
-		
-		glGetActiveUniform(material->shaderProgram,
- 		armatureUniformLoc,
- 		256,
- 		&leng,
- 		&sizeE,
- 		&typeE,
- 		uniformActiveName);
-
-		int x = 0;
 	}
 
 	if(material->mainTexture != nullptr){

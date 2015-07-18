@@ -206,8 +206,8 @@ void Scene::Start(){
 #endif
 		OnUpdate();
 
-		BoneTransform* arm = testArmature->GetBoneByName("arm");
-		arm->rotation = arm->rotation * Quaternion(Z_AXIS, 0.01f);
+		BoneTransform* leg = testArmature->GetBoneByName("leg");
+		leg->rotation = leg->rotation * Quaternion(Z_AXIS, 0.01f);
 
 		physicsSim->Advance(deltaTime);
 
