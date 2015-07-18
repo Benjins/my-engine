@@ -1,27 +1,31 @@
 /*
 Author: Benji Smith
-Licensed under MIT License. See simple-xml_LICENSE.txt for details
+Licensed under MIT License. See License.txt for details
 */
-#ifndef SIMPLEXML_H
-#define SIMPLEXML_H
+
+#ifndef SIMPLE_XML_H
+#define SIMPLE_XML_H
 
 #include <vector>
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <map>
 
 using std::string; using std::vector; using std::ifstream;
 using std::cout; using std::endl; using std::ofstream;
+using std::map;
 
-#define MAX_STACK_SIZE 1024
+#define MAX_STACK_SIZE 8192
 
 template<typename T>
 struct Stack{
-	T values[MAX_STACK_SIZE];
+	T* values;//[MAX_STACK_SIZE];
 	int count;
 
 	Stack(){
 		count = 0;
+		values = new T[MAX_STACK_SIZE];
 	}
 
 	void Push(const T& newValue){ 
@@ -37,13 +41,27 @@ struct Stack{
 	T& Top(){
 		return values[count-1];
 	}
+
+	~Stack(){
+		delete[] values;
+	}
 };
 
 struct XMLAttribute{
 	string name;
 	string data;
 
-	XMLAttribute(string _name="", string _data="");
+	XMLAttribute()
+	: name(), data(){
+	}
+
+	XMLAttribute(const string& _name, const string& _data)
+		: name(_name), data(_data){
+	}
+
+	XMLAttribute(const string&& _name, const string&& _data)
+		: name(_name), data(_data){	
+	}
 
 	void Print() const{
 		cout << name << ":" << data;
@@ -57,11 +75,22 @@ struct XMLAttribute{
 struct XMLElement{
 	string name;
 	vector<XMLAttribute> attributes;
+	map<string, string> attributeMap;
 	vector<XMLElement> children;
+
+	void AddAttribute(const string& name, const string& data){
+		attributes.emplace_back(name, data);
+		attributeMap.insert(std::make_pair(name, data));
+	}
+
+	void AddAttribute(const string&& name, const string&& data){
+		attributes.emplace_back(name, data);
+		attributeMap.insert(std::make_pair(name, data));
+	}
 
 	void Print() const;
 
-	string SaveElement(int depth = 0);
+	string SaveElement(string tabbing = "");
 };
 
 struct XMLDocument{
@@ -73,7 +102,7 @@ struct XMLDocument{
 
 vector<string> Tokenize(const string& document);
 
-XMLDocument ParseTokens(vector<string> tokens);
+XMLDocument ParseTokens(vector<string>& tokens);
 
 void SaveXMLDoc(XMLDocument& doc, string fileName);
 

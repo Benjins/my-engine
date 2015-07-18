@@ -1,11 +1,14 @@
 #include "../header/int/Model.h"
 #include "../header/int/Scene.h"
+#include "../header/ext/simple-xml.h"
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
+#include <sstream>
+#include <map>
 #include <time.h>
 
-using std::ifstream; using std::cerr; using std::cout; using std::endl;
+using std::ifstream; using std::cerr; using std::cout; using std::endl; using std::map;
 
 Face::Face(void){
 	v0 = v1 = v2 = -1;
@@ -69,7 +72,16 @@ Model::Model(string fileName){
 
 	armature = nullptr;
 
-	ImportFromOBJ(fileName);
+	string fileExt = fileName.substr(fileName.length() - 4, 4);
+	if(fileExt == ".obj"){
+		ImportFromOBJ(fileName);
+	}
+	else if(fileExt == ".dae"){
+		ImportFromCollada(fileName);
+	}
+	else{
+		cout << "\n\nErorr: unrecognised file format for file: '" << fileName << "'\n";
+	}
 }
 
 void Model::CalculateNormals(){
@@ -154,7 +166,7 @@ void Model::CalculateTangents(){
 	}
 }
 
-void Model::ImportFromOBJ(string fileName){
+void Model::ImportFromOBJ(const string& fileName){
 	ifstream importer;
 	importer.open(fileName);
 	if(!importer.good()){
@@ -201,6 +213,189 @@ void Model::ImportFromOBJ(string fileName){
 		armature = Scene::getInstance().testArmature;
 		cout << "Adding armature, it's " << (armature == nullptr ? "null" : "not null") << endl;
 	}
+}
+
+void ParseColladaSourceElement(const XMLElement& element, map<string, vector<float>>& sources){
+	string id = element.attributeMap.find("id")->second;
+	
+	const XMLElement& floatArray = element.children[0];
+	int count = atoi(floatArray.attributeMap.find("count")->second.c_str());
+
+	if(floatArray.children.size() != 1){
+		cout << "\n\nError: the element with name '" << element.name << "' either has an extra tag, or is missing its data.\n";
+		return;
+	}
+
+	const XMLElement& plainTextInfo = floatArray.children[0];
+	
+	if(plainTextInfo.name != "__plaintext__" || plainTextInfo.attributes.size() != 1){
+		cout << "\n\nError: the element with name '" << element.name << "' is missing its data.\n";
+		return;
+	}
+
+	const string& floatDataStr = plainTextInfo.attributes[0].data;
+	vector<float> floatData;
+	floatData.reserve(count);
+	stringstream floatConversion;
+	floatConversion << floatDataStr;
+
+	if(count <= 0){
+		cout << "\n\nError: the element with name '" << element.name << "' has an improper count: '" << count << "'.\n";
+		return; 
+	}
+
+	for(int i = 0; i < count; i++){
+		float datum=0;
+		floatConversion >> datum;
+		floatData.push_back(datum);
+	}
+
+	sources.insert(std::make_pair(id, floatData));
+}
+
+void Model::ImportFromCollada(const string& fileName){
+
+	this->fileName = fileName;
+	this->name = fileName;
+
+	XMLDocument colladaDoc;
+	LoadXMLDoc(colladaDoc, fileName);
+
+	if(colladaDoc.contents.size() != 1){
+		cout << "\n\nError: File '" << fileName << "' is not a properly formatted COLLADA file.\n";
+		return;
+	}
+
+	const XMLElement& colladaElem = colladaDoc.contents[0];
+
+	for(const XMLElement& colladaChild : colladaElem.children){
+		if(colladaChild.name == "library_geometries"){
+			if(colladaChild.children.size() != 1 || colladaChild.children[0].children.size() != 1){
+				cout << "\n\nError: File '" << fileName << "' has an invalid number of geometries or meshes: " << colladaChild.children.size() << ".\n";
+				return;
+			}
+
+			const XMLElement& mesh = colladaChild.children[0].children[0];
+
+			map<string, vector<float>> sources;
+
+			for(const XMLElement& meshChild : mesh.children){
+				if(meshChild.name == "source"){
+					ParseColladaSourceElement(meshChild, sources);
+				}
+				else if(meshChild.name == "vertices"){
+					if(meshChild.children.size() == 0){
+						cout << "\n\nError: File '" << fileName << "' has a mesh with an improperly formatted 'vertices' tag.";
+						return;
+					}
+					
+					const XMLElement& vertInput = meshChild.children[0];
+
+					if(vertInput.name != "input" || vertInput.attributes.size() != 2){
+						cout << "\n\nError: File '" << fileName << "' has a mesh with an improperly formatted 'vertices' tag.";
+						return;
+					}
+
+					//TODO: some thigns do this out of order.  Like UV's.
+					if(vertInput.attributeMap.find("semantic")->second != "POSITION"){
+						cout << "\n\nError: File '" << fileName << "' has a mesh with vertices with an improperly formatted 'input' tag.";
+						return;
+					}
+
+					const string& vertPosSourceName= vertInput.attributeMap.find("source")->second;
+
+					if(vertPosSourceName.size() == 0 || vertPosSourceName[0] != '#'){
+						cout << "\n\nError: File '" << fileName << "' has an 'input' tag with a badly formatted source link.";
+						return;
+					}
+
+					string vertPosLinkName = vertPosSourceName.substr(1);
+					auto vertSource = sources.find(vertPosLinkName);
+					if(vertSource == sources.end()){
+						cout << "\n\nError: File '" << fileName << "' has an 'input' tag with an incorrect source link.";
+						return;
+					}
+
+					const vector<float>& vertData = vertSource->second;
+					vertices.resize(vertData.size() / 3);
+					for(int i = 0; i < vertices.size(); i++){
+						Vertex v;
+						v.position = Vector3(vertData[3*i], vertData[3*i+1], vertData[3*i+2]);
+						vertices[i] = v;
+					}
+				}
+				else if(meshChild.name == "polylist"){
+					auto iter = meshChild.attributeMap.find("count");
+					if(iter == meshChild.attributeMap.end()){
+						cout << "\n\nError: count does not exist.\n";
+					}
+
+					int count = atoi(iter->second.c_str());
+					vector<int> vCounts;
+					vCounts.resize(count);
+
+					int vertOffset=0;
+					int vertAttrCount=0;
+					for(const auto& input : meshChild.children){
+						if(input.name == "input"){
+							vertAttrCount++;
+						}
+
+						auto iter = input.attributeMap.find("semantic");
+						if(iter != input.attributeMap.end() && iter->second == "VERTEX"){
+							vertOffset = atoi(input.attributeMap.find("offset")->second.c_str());
+						}
+						else if(input.name == "vcount"){
+							const string& vCountData = input.children[0].attributeMap.find("val")->second;
+							stringstream vCount;
+							vCount << vCountData;
+							for(int i = 0; i < count; i++){
+								vCount >> vCounts[i];
+							}
+						}
+						else if(input.name == "p"){
+							const string& polyDataStr = input.children[0].attributes[0].data;
+							stringstream polyData;
+							polyData << polyDataStr;
+							int index = 0;
+
+							vector<int> polyDataBuffer;
+							for(int i = 0; i < vCounts.size(); i++){
+								int vCount = vCounts[i];
+								polyDataBuffer.resize(vCount * vertAttrCount);
+								for(int i = 0; i < vCount * vertAttrCount; i++){
+									polyData >> polyDataBuffer[i];
+								}
+
+								int posIndices[3];
+								for(int i = 0; i < 3; i++){
+									posIndices[i] = polyDataBuffer[vertAttrCount * i + vertOffset];
+								}
+
+								Face face;
+								face.v0 = posIndices[0];
+								face.v1 = posIndices[1];
+								face.v2 = posIndices[2];
+								faces.push_back(face);
+
+								index += vCount * vertAttrCount;
+							}
+						}
+					}
+				}
+			}
+
+		}
+		else if(colladaChild.name == "library_controllers"){
+
+		}
+		//else if(colladaChild.name == "library_visual_scenes"){
+		//}
+	}
+
+	CalculateNormals();
+	CalculateTangents();
+
 }
 
 Vertex ParseVertexLine(string line){

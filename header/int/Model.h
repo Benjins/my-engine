@@ -66,7 +66,8 @@ struct Model{
 	
 	int GLVertexCount() const;
 	
-	void ImportFromOBJ(string fileName);
+	void ImportFromOBJ(const string& fileName);
+	void ImportFromCollada(const string& fileName);
 
 	void CalculateNormals();
 	void CalculateTangents();

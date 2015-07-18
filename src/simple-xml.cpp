@@ -1,14 +1,10 @@
 /*
 Author: Benji Smith
-Licensed under MIT License. See ../header/ext/simple-xml_LICENSE.txt for details
+Licensed under MIT License. See License.txt for details
 */
 
-#include "../header/ext/simple-xml.h"
 
-XMLAttribute::XMLAttribute(string _name, string _data){
-	name = _name;
-	data = _data;
-}
+#include "simple-xml.h"
 
 void XMLElement::Print() const{
 	cout << name << " ";
@@ -22,13 +18,8 @@ void XMLElement::Print() const{
 	}
 }
 
-string XMLElement::SaveElement(int depth/* = 0*/){
-	string tabDepth = "";
-	for(int i = 0; i < depth; i++){
-		tabDepth += "    ";
-	}
-
-	string save = tabDepth + "<" + name;
+string XMLElement::SaveElement(string tabbing){
+	string save = tabbing + "<" + name;
 	for(auto iter = attributes.begin(); iter != attributes.end(); iter++){
 		save = save + " " + iter->ToString(); 
 	}
@@ -41,11 +32,11 @@ string XMLElement::SaveElement(int depth/* = 0*/){
 		save += ">\n";
 			
 		for(auto iter = children.begin(); iter != children.end(); iter++){
-			save += iter->SaveElement(depth + 1);
+			save += (iter->SaveElement(tabbing + "  "));
 			save += "\n";
 		}
 
-		save = save + tabDepth + "</" + name + ">";
+		save = save + (tabbing + "</" + name + ">");
 		return save;
 	}
 }
@@ -62,6 +53,7 @@ vector<string> Tokenize(const string& document){
 	vector<string> tokens;
 	string memoryString = "";
 	bool inString = false;
+	bool inTag=false;
 
 	for(int i = 0; i < document.size(); i++){
 		char character = document[i];
@@ -70,6 +62,13 @@ vector<string> Tokenize(const string& document){
 			memoryString += character;
 		}
 		else if(character == '<' || character == '>' || character == '/' || character == '='){
+			if(character == '<'){
+				inTag = true;
+			}
+			else if(character == '>'){
+				inTag = false;
+				//cout << "inTag false.\n";
+			}
 			if(memoryString != ""){
 				tokens.push_back(memoryString);
 				memoryString = "";
@@ -79,18 +78,30 @@ vector<string> Tokenize(const string& document){
 			tokens.push_back(str);
 		}
 		else if(character == '\'' || character == '"'){
-			if(memoryString != "" || inString){
+			if(!inTag){
+				memoryString += character;
+				inString = !inString;
+			}
+			else if(memoryString != "" || inString){
 				tokens.push_back(memoryString);
 				memoryString = "";
 			}
-			string str = "-";
-			str[0] = character;
-			//tokens.push_back(str);
-
 			inString = !inString;
 		}
 		else if(character == ' ' || character == '\n' ||  character == '\t' || character == '\r'){
-			if(memoryString != ""){
+			if(character == ' ' && !inTag){
+				bool justWhitespace = true;
+				for(int i = 0; i < memoryString.size(); i++){
+					if(memoryString[i] != ' '){
+						justWhitespace = false;
+						break;
+					}
+				}
+				if(!justWhitespace){
+					memoryString += character;
+				}
+			}
+			else if(memoryString != ""){
 				tokens.push_back(memoryString);
 				memoryString = "";
 			}
@@ -103,16 +114,18 @@ vector<string> Tokenize(const string& document){
 	return tokens;
 }
 
-XMLDocument ParseTokens(vector<string> tokens){
+XMLDocument ParseTokens(vector<string>& tokens){
 	XMLDocument doc;
 
 	Stack<string> tokenStack;
 	Stack<XMLElement> elementStack;
+	bool inTag = false;
 
 	for(auto iter = tokens.begin(); iter != tokens.end(); iter++){
 		string token = *iter;
 		//cout << "Parsing token: |" << token << "|" << endl;
 		if(token == "<"){
+			inTag = true;
 			tokenStack.Push(token);
 		}
 		else if(token == "/"){
@@ -134,6 +147,7 @@ XMLDocument ParseTokens(vector<string> tokens){
 			}
 		}
 		else if(token == ">"){
+			inTag = false;
 			bool startList = true;
 			if(tokenStack.Top() == "/"){
 				startList = false;
@@ -154,7 +168,7 @@ XMLDocument ParseTokens(vector<string> tokens){
 				}
 				else{
 					attr.name = currToken;
-					elementStack.Top().attributes.push_back(attr);
+					elementStack.Top().AddAttribute(std::move(attr.name), std::move(attr.data));
 					attr.data = attr.name = "";
 					gotData = false;
 				}
@@ -172,7 +186,19 @@ XMLDocument ParseTokens(vector<string> tokens){
 			}
 		}
 		else{
-			if(tokenStack.Top() == "<"){
+			if(!inTag){
+				XMLElement elem;
+				elem.name = "__plaintext__";
+				elem.AddAttribute("val", std::move(token));
+				if(elementStack.count == 0){
+					doc.contents.push_back(elem);
+				}
+				else{
+					elementStack.Top().children.push_back(elem);
+				}
+				continue;
+			}
+			else if(tokenStack.Top() == "<"){
 				XMLElement elem;
 				elem.name = token;
 				//cout << "Pushing to element stack: " << token << endl;
@@ -188,7 +214,7 @@ XMLDocument ParseTokens(vector<string> tokens){
 
 void SaveXMLDoc(XMLDocument& doc, string fileName){
 	ofstream fileOut;
-	fileOut.open(fileName.c_str(), ofstream::out);
+	fileOut.open(fileName.c_str());
 
 	if(!fileOut.good()){
 		cout << "Failed to open file " << fileName << " for saving.\n";
@@ -198,7 +224,7 @@ void SaveXMLDoc(XMLDocument& doc, string fileName){
 	string docContents = "";
 
 	for(auto iter = doc.contents.begin(); iter != doc.contents.end(); iter++){
-		docContents += iter->SaveElement(0);
+		docContents += iter->SaveElement();
 		docContents += "\n";
 	}
 
@@ -224,5 +250,8 @@ void LoadXMLDoc(XMLDocument& doc, string fileName){
 	}
 
 	vector<string> tokens = Tokenize(fileContents);
+	for(auto iter = tokens.begin(); iter != tokens.end(); iter++){
+		//cout << "|" << *iter << "|\n";
+	}
 	doc = ParseTokens(tokens);
 }
