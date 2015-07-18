@@ -29,7 +29,6 @@ void main()
 	vec2 uvPos = UV;
 	mat4 boneMatrix = mat4(0.0);
 	
-	//int _boneCount = 2;//  min(2, max(0, boneCount));
 	for(int i = 0; i < boneCount; i++){
 		mat4 singleBoneMat = _armatureMatrices[boneIndices[i]] * boneWeights[i];
 		boneMatrix += singleBoneMat;
