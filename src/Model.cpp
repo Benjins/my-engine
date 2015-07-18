@@ -1,5 +1,6 @@
 #include "../header/int/Model.h"
 #include "../header/int/Scene.h"
+#include "../header/int/Armature.h"
 #include "../header/ext/simple-xml.h"
 #include <fstream>
 #include <iostream>
@@ -80,8 +81,12 @@ Model::Model(string fileName){
 		ImportFromCollada(fileName);
 	}
 	else{
-		cout << "\n\nErorr: unrecognised file format for file: '" << fileName << "'\n";
+		cout << "\n\nError: unrecognised file format for file: '" << fileName << "'\n";
 	}
+}
+
+Model::~Model(){
+	delete armature;
 }
 
 void Model::CalculateNormals(){
@@ -213,6 +218,44 @@ void Model::ImportFromOBJ(const string& fileName){
 		armature = Scene::getInstance().testArmature;
 		cout << "Adding armature, it's " << (armature == nullptr ? "null" : "not null") << endl;
 	}
+}
+
+void ParseColladaSourceElement(const XMLElement& element, map<string, vector<string>>& sources){
+	string id = element.attributeMap.find("id")->second;
+	
+	const XMLElement& floatArray = element.children[0];
+	int count = atoi(floatArray.attributeMap.find("count")->second.c_str());
+
+	if(floatArray.children.size() != 1){
+		cout << "\n\nError: the element with name '" << element.name << "' either has an extra tag, or is missing its data.\n";
+		return;
+	}
+
+	const XMLElement& plainTextInfo = floatArray.children[0];
+	
+	if(plainTextInfo.name != "__plaintext__" || plainTextInfo.attributes.size() != 1){
+		cout << "\n\nError: the element with name '" << element.name << "' is missing its data.\n";
+		return;
+	}
+
+	const string& floatDataStr = plainTextInfo.attributes[0].data;
+	vector<string> nameData;
+	nameData.reserve(count);
+	stringstream floatConversion;
+	floatConversion << floatDataStr;
+
+	if(count <= 0){
+		cout << "\n\nError: the element with name '" << element.name << "' has an improper count: '" << count << "'.\n";
+		return; 
+	}
+
+	for(int i = 0; i < count; i++){
+		string datum;
+		floatConversion >> datum;
+		nameData.push_back(datum);
+	}
+
+	sources.insert(std::make_pair(id, nameData));
 }
 
 void ParseColladaSourceElement(const XMLElement& element, map<string, vector<float>>& sources){
@@ -375,9 +418,9 @@ void Model::ImportFromCollada(const string& fileName){
 
 								int posIndices[3];
 								int uvIndices[3];
-								for(int i = 0; i < 3; i++){
-									posIndices[i] = polyDataBuffer[vertAttrCount * i + vertOffset];
-									uvIndices[i] = polyDataBuffer[vertAttrCount * i + uvOffset];
+								for(int j = 0; j < 3; j++){
+									posIndices[j] = polyDataBuffer[vertAttrCount * j + vertOffset];
+									uvIndices[j]  = polyDataBuffer[vertAttrCount * j + uvOffset];
 								}
 
 								Face face;
@@ -400,10 +443,102 @@ void Model::ImportFromCollada(const string& fileName){
 
 		}
 		else if(colladaChild.name == "library_controllers"){
+			if(colladaChild.children.size() == 0 || colladaChild.children[0].children.size() == 0){
+				cout << "\n\nError: Collada File '" << fileName << "' has an improperly formatted controller.\n";
+				break;
+			}
 
+			armature = new Armature();
+			
+			const XMLElement& skinElem = colladaChild.children[0].children[0];
+			map<string, vector<float>> sources;
+			map<string, vector<string>> nameSources;
+
+			for(const XMLElement& source: skinElem.children){
+				if(source.name == "source" && source.children.size() > 0){
+					if(source.children[0].name == "Name_array"){
+						ParseColladaSourceElement(source, nameSources);
+						const vector<string>& boneNames = nameSources.find(source.attributeMap.find("id")->second)->second;
+						for(const string& boneName : boneNames){
+							BoneTransform* bone = armature->AddBone(nullptr);
+							bone->name= boneName;
+						}
+					}
+					else if(source.children[0].name == "float_array"){
+						ParseColladaSourceElement(source, sources);
+					}
+				}
+				else if(source.name == "vertex_weights"){
+					int count = atoi(source.attributeMap.find("count")->second.c_str());
+					vector<int> vCounts;
+					vCounts.resize(count);
+
+					vector<float>* weightsArray=nullptr;
+
+					int inputCount=0;
+					int jointOffset=0;
+					int weightOffset=0;
+					for(const XMLElement& skinChild : source.children){
+						if(skinChild.name == "input"){
+							auto iter = skinChild.attributeMap.find("semantic");
+							if(iter->second == "JOINT"){
+								jointOffset = atoi(skinChild.attributeMap.find("offset")->second.c_str());
+								inputCount++;
+							}
+							else if(iter->second == "WEIGHT"){
+								weightOffset = atoi(skinChild.attributeMap.find("offset")->second.c_str());
+								const string& sourceLink = skinChild.attributeMap.find("source")->second;
+								weightsArray = &(sources.find(sourceLink.substr(1))->second);
+								inputCount++;
+							}
+						}
+						else if(skinChild.name == "vcount"){
+							const string& plaintextVal = skinChild.children[0].attributeMap.find("val")->second;
+							stringstream vCountParser;
+							vCountParser << plaintextVal;
+							for(int i = 0; i < vCounts.size(); i++){
+								vCountParser >> vCounts[i];
+							}
+						}
+						else if(skinChild.name == "v"){
+							const string& plaintextVal = skinChild.children[0].attributeMap.find("val")->second;
+							stringstream indexBuferParser;
+							indexBuferParser << plaintextVal;
+
+							int index = 0;
+							for(int i = 0; i < vCounts.size(); i++){
+								int vCount = vCounts[i];
+
+								vector<int> indicesBufer;
+								indicesBufer.resize(vCount * inputCount);
+
+								for(int j = 0; j < indicesBufer.size(); j++){
+									indexBuferParser >> indicesBufer[j];
+								}
+
+								if(vCount > 4){
+									cout << "\nError: COLLADA file '" << fileName << "' has more than 4 bones per vertex.  There's a limit of 4.\n";
+								}
+
+								for(int j = 0; j < vCount && j < 4; j++){
+									int boneIndexBufferIndex = (j*inputCount) + jointOffset;
+									vertices[i].boneIndices[j] = indicesBufer[boneIndexBufferIndex];
+
+									int boneWeightIndex = (j*inputCount) + weightOffset;
+									vertices[i].boneWeights[j] = weightsArray->at(boneWeightIndex);
+								}
+
+								vertices[i].numBones = vCount;
+
+								index += inputCount * vCount;
+							}
+						}
+					}
+
+					int yy = 0;
+				}
+			}
 		}
-		//else if(colladaChild.name == "library_visual_scenes"){
-		//}
 	}
 
 	CalculateNormals();

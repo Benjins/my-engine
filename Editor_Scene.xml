@@ -28,7 +28,7 @@
     </Prefab>
 	<GameObject name='test2-obj'>
 	     <Transform position='3.20000,1.000000,-4.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.800000,0.800000,0.800000'/>
-		 <Material name='myMat2'/>
+		 <Material name='myMat-arm'/>
 		 <Mesh source='data/box_arma.dae'/>
 	</GameObject>
     <GameObject name='myObj'>

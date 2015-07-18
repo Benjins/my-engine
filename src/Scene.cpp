@@ -37,6 +37,7 @@ Scene::Scene(int argc, char** argv){
 	physicsSim = new PhysicsSim();
 	input = Input();
 	pathfinding.scene = this;
+	/*
 	testArmature = new Armature();
 
 	BoneTransform* root = testArmature->AddBone(nullptr);
@@ -58,6 +59,7 @@ Scene::Scene(int argc, char** argv){
 	BoneTransform* hand = testArmature->AddBone(arm);
 	hand->name = "hand";
 	hand->position = Vector3(0.3f,-0.14f,0);
+	*/
 
 	myRandom = default_random_engine(time(NULL));
 
@@ -206,8 +208,8 @@ void Scene::Start(){
 #endif
 		OnUpdate();
 
-		BoneTransform* leg = testArmature->GetBoneByName("leg");
-		leg->rotation = leg->rotation * Quaternion(Z_AXIS, 0.01f);
+		//BoneTransform* leg = testArmature->GetBoneByName("leg");
+		//leg->rotation = leg->rotation * Quaternion(Z_AXIS, 0.01f);
 
 		physicsSim->Advance(deltaTime);
 
@@ -251,6 +253,9 @@ void Scene::OnUpdate(){
 		//cout << "Updating object at position: " << (size_t)(*iter) << endl;
 		(*iter)->OnUpdate();
 	}
+
+	SC_Transform* trans = FindGameObject("test2-obj")->mesh->armature->GetBoneByName("Bone");
+	trans->rotation = trans->rotation * Quaternion(X_AXIS, 0.02);
 
 	for(GameObject* obj : spawnedObjects){
 		AddObjectAndDescendants(obj);
@@ -328,7 +333,7 @@ void Scene::Render(){
 	glUniformMatrix4fv(vertCol->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 	glUniformMatrix4fv(vertCol->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
 	glUniform4f(vertCol->GetUniformByName("_color"), 1, 1, 1, 1);
-	testArmature->DebugRender();
+	//testArmature->DebugRender();
 
 	//Gui stuff
 	glEnable(GL_BLEND);
@@ -419,7 +424,7 @@ Scene::~Scene(){
 
 	delete physicsSim;
 
-	delete testArmature;
+	//delete testArmature;
 }
 
 static void RenderScene(){

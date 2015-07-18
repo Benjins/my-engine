@@ -63,6 +63,8 @@ struct Model{
 	Model(void);
 	Model(const Model& model);
 	Model(string fileName);
+
+	~Model();
 	
 	int GLVertexCount() const;
 	
