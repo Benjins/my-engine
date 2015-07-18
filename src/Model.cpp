@@ -335,15 +335,21 @@ void Model::ImportFromCollada(const string& fileName){
 					vCounts.resize(count);
 
 					int vertOffset=0;
+					int uvOffset=0;
 					int vertAttrCount=0;
+					vector<float>* uvArray=nullptr;
 					for(const auto& input : meshChild.children){
 						if(input.name == "input"){
 							vertAttrCount++;
 						}
 
-						auto iter = input.attributeMap.find("semantic");
-						if(iter != input.attributeMap.end() && iter->second == "VERTEX"){
+						auto semantic = input.attributeMap.find("semantic");
+						if(semantic != input.attributeMap.end() && semantic->second == "VERTEX"){
 							vertOffset = atoi(input.attributeMap.find("offset")->second.c_str());
+						}
+						else if(semantic != input.attributeMap.end() && semantic->second == "TEXCOORD"){
+							uvOffset = atoi(input.attributeMap.find("offset")->second.c_str());
+							uvArray = &(sources.find(input.attributeMap.find("source")->second.substr(1))->second);
 						}
 						else if(input.name == "vcount"){
 							const string& vCountData = input.children[0].attributeMap.find("val")->second;
@@ -368,14 +374,21 @@ void Model::ImportFromCollada(const string& fileName){
 								}
 
 								int posIndices[3];
+								int uvIndices[3];
 								for(int i = 0; i < 3; i++){
 									posIndices[i] = polyDataBuffer[vertAttrCount * i + vertOffset];
+									uvIndices[i] = polyDataBuffer[vertAttrCount * i + uvOffset];
 								}
 
 								Face face;
 								face.v0 = posIndices[0];
 								face.v1 = posIndices[1];
 								face.v2 = posIndices[2];
+								if(uvArray != nullptr){
+									face.uv0 = Vector2(uvArray->at(2*uvIndices[0]),uvArray->at(2*uvIndices[0]+1));
+									face.uv1 = Vector2(uvArray->at(2*uvIndices[1]),uvArray->at(2*uvIndices[1]+1));
+									face.uv2 = Vector2(uvArray->at(2*uvIndices[2]),uvArray->at(2*uvIndices[2]+1));
+								}
 								faces.push_back(face);
 
 								index += vCount * vertAttrCount;
