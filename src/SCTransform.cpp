@@ -52,6 +52,12 @@ void SC_Transform::SetParent(SC_Transform* _parent){
 		}
 	}
 
+	if(_parent == this){
+		cout << "\n\nWarning: Trying to set a transform's parent to itself\n";
+		int x = *((int*)0);
+		return;
+	}
+
 	parent = _parent;
 
 	if(parent == NULL){
@@ -76,6 +82,11 @@ SC_Transform* SC_Transform::GetParent() const{
 }
 
 Mat4x4 SC_Transform::LocalToGlobalMatrix() const{
+	if(parent == this){
+		cout << "\n\nWarning: Trying to set a transform's parent to itself\n";
+		int x = *((int*)0);
+	}
+
 	Mat4x4 transMat;
 
 	Mat4x4 linMat;
@@ -101,6 +112,11 @@ Mat4x4 SC_Transform::LocalToGlobalMatrix() const{
 }
 
 Mat4x4 SC_Transform::GlobalToLocalMatrix() const{
+	if(parent == this){
+		cout << "\n\nWarning: Trying to set a transform's parent to itself\n";
+		int x = *((int*)0);
+	}
+
 	Mat4x4 transMat;
 
 	Mat4x4 linMat;
@@ -197,6 +213,11 @@ Vector3 SC_Transform::GlobalToLocal(const Vector3& global) const{
 }
 
 Vector3 SC_Transform::LocalToGlobal(const Vector3& local) const{
+	if(parent == this){
+		cout << "\n\nWarning: Trying to set a transform's parent to itself\n";
+		int x = *((int*)0);
+	}
+
     Vector3 globalVec = local;
 
 	globalVec = globalVec.Scaled(Vector3(1/scale.x, 1/scale.y, 1/scale.z));

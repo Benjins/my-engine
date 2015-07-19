@@ -54,15 +54,28 @@ vector<string> Tokenize(const string& document){
 	string memoryString = "";
 	bool inString = false;
 	bool inTag=false;
+	bool inComment = false;
 
 	for(int i = 0; i < document.size(); i++){
 		char character = document[i];
 
+		if(inComment){
+			if(character == '?' && i < document.size() - 1 && document[i+1] == '>'){
+				inComment = false;
+				i++;
+			}
+
+			continue;
+		}
 		if(inString && character != '\''  && character != '"'){
 			memoryString += character;
 		}
 		else if(character == '<' || character == '>' || character == '/' || character == '='){
 			if(character == '<'){
+				if(i < document.size() - 1 && document[i+1] == '?'){
+					inComment = true;
+					continue;
+				}
 				inTag = true;
 			}
 			else if(character == '>'){

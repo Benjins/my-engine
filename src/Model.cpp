@@ -1,6 +1,8 @@
 #include "../header/int/Model.h"
 #include "../header/int/Scene.h"
 #include "../header/int/Armature.h"
+#include "../header/int/Mat4.h"
+#include "../header/int/Vector4.h"
 #include "../header/ext/simple-xml.h"
 #include <fstream>
 #include <iostream>
@@ -539,11 +541,96 @@ void Model::ImportFromCollada(const string& fileName){
 				}
 			}
 		}
+		else if(colladaChild.name == "library_visual_scenes"){
+			if(colladaChild.children.size() != 1){
+				cout << "\n\nError: file '" << fileName << "' has the wrong number of visual scenes.\n";
+				continue;
+			}
+			const XMLElement& visualScene = colladaChild.children[0];
+
+			const XMLElement* searchStack[MAX_BONE_COUNT];
+			int searchCount = 0;
+			searchStack[searchCount++] = &(visualScene.children[0]);
+			while(searchCount > 0){
+				const XMLElement* node = searchStack[--searchCount];
+				for(const XMLElement& child : node->children){
+					if(child.name == "matrix"){
+						const string& matrixPlaintext = child.children[0].attributeMap.find("val")->second;
+						stringstream matrixParser;
+						matrixParser << matrixPlaintext;
+						BoneTransform* bone = armature->GetBoneByName(node->attributeMap.find("id")->second);
+
+						Mat4x4 mat;
+						for(int x = 0; x < 4; x++){
+							for(int y = 0; y < 4; y++){
+								matrixParser >> mat.m[x][y];
+							}
+						}
+
+						//Get quaternion from matrix
+						Vector4 rotX = mat * Vector4(X_AXIS, 0);
+						Vector3 rotatedX = Vector3(rotX.w, rotX.x, rotX.y).Normalized();
+
+						Vector3 firstAxis = CrossProduct(X_AXIS, rotatedX);
+						float firstAxisMag = firstAxis.Magnitude();
+						float angle = asinf(firstAxisMag);
+						angle *= (firstAxis.z > 0 ? 1 : -1);
+
+						Quaternion initialQuat;
+						if(angle > FLT_MIN || angle < -FLT_MIN){
+							initialQuat = Quaternion(firstAxis, angle);
+						}
+						Vector3 transformedY = Rotate(Y_AXIS, initialQuat);
+						Vector4 rotY = mat * Vector4(Y_AXIS, 0);
+						Vector3 fullyRotatedY = Vector3(rotY.w, rotY.x, rotY.y).Normalized();
+
+						Vector3 secondAxis = CrossProduct(transformedY, fullyRotatedY);
+						float secondAxisMag = firstAxis.Magnitude();
+						float secondAngle = asinf(secondAxisMag);
+						secondAngle *= (secondAxis.x > 0 ? 1 : -1);
+
+						Quaternion secondQuat;
+						if(secondAngle > FLT_MIN || secondAngle < -FLT_MIN){
+							secondQuat = Quaternion(secondAxis, secondAngle);
+						}
+
+						Quaternion finalQuat = initialQuat * secondQuat;
+						bone->position = mat * Vector3(0,0,0);
+						bone->rotation = finalQuat;
+					}
+					else if(child.name == "node"){
+						for(const XMLElement& grandChild : child.children){
+							if(grandChild.name == "node"){
+								BoneTransform* boneParent = armature->GetBoneByName(child.attributeMap.find("id")->second);
+								BoneTransform* bone = armature->GetBoneByName(grandChild.attributeMap.find("id")->second);
+								bone->SetParent(boneParent);
+							}
+						}
+
+						searchStack[searchCount++] = &child;
+					}
+				}
+			}
+		}
+	}
+
+	BoneTransform* root = &armature->bones[0];
+	for(SC_Transform* child : root->children){
+		BoneTransform* boneChild = static_cast<BoneTransform*>(child);
+
+		for(SC_Transform* grandChild : boneChild->children){
+			BoneTransform* boneGrandChild = static_cast<BoneTransform*>(grandChild);
+			int qqq = 0;
+		}
 	}
 
 	CalculateNormals();
 	CalculateTangents();
 
+
+	if(armature != nullptr){
+		Scene::getInstance().testArmature = armature;
+	}
 }
 
 Vertex ParseVertexLine(string line){

@@ -31,9 +31,18 @@ void Armature::DebugRender(){
 		for(int i = 0; i < boneCount; i++){
 			if(bones[i].GetBoneParent() != nullptr){
 				Vector3 pos = bones[i].GlobalPosition();
+				Vector3 forward = pos + bones[i].Forward();
+				Vector3 up = pos + bones[i].Up();
+				Vector3 right = pos + bones[i].Right();
+
 				glVertex3f(pos.x, pos.y, pos.z);
-				Vector3 parentPos = bones[i].GetBoneParent()->GlobalPosition();
-				glVertex3f(parentPos.x, parentPos.y, parentPos.z);
+				glVertex3f(forward.x, forward.y, forward.z);
+
+				glVertex3f(pos.x, pos.y, pos.z);
+				glVertex3f(up.x, up.y, up.z);
+
+				glVertex3f(pos.x, pos.y, pos.z);
+				glVertex3f(right.x, right.y, right.z);
 			}
 		}
 	}

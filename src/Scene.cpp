@@ -254,7 +254,7 @@ void Scene::OnUpdate(){
 		(*iter)->OnUpdate();
 	}
 
-	SC_Transform* trans = FindGameObject("test2-obj")->mesh->armature->GetBoneByName("Bone");
+	SC_Transform* trans = FindGameObject("test2-obj")->mesh->armature->GetBoneByName("Bone_001");
 	trans->rotation = trans->rotation * Quaternion(X_AXIS, 0.02);
 
 	for(GameObject* obj : spawnedObjects){
@@ -328,12 +328,14 @@ void Scene::Render(){
 	//Gui and gizmos stuff 
 	glDisable(GL_DEPTH_TEST);
 
-	Material* vertCol = resources.GetMaterialByName("color");
-	glUseProgram(vertCol->shaderProgram);
-	glUniformMatrix4fv(vertCol->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
-	glUniformMatrix4fv(vertCol->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
-	glUniform4f(vertCol->GetUniformByName("_color"), 1, 1, 1, 1);
-	//testArmature->DebugRender();
+	if(testArmature != nullptr){
+		Material* vertCol = resources.GetMaterialByName("color");
+		glUseProgram(vertCol->shaderProgram);
+		glUniformMatrix4fv(vertCol->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
+		glUniformMatrix4fv(vertCol->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
+		glUniform4f(vertCol->GetUniformByName("_color"), 1, 1, 1, 1);
+		testArmature->DebugRender();
+	}
 
 	//Gui stuff
 	glEnable(GL_BLEND);
