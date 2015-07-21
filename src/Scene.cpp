@@ -254,8 +254,10 @@ void Scene::OnUpdate(){
 		(*iter)->OnUpdate();
 	}
 
-	SC_Transform* trans = FindGameObject("test2-obj")->mesh->armature->GetBoneByName("Bone_001");
-	trans->rotation = trans->rotation * Quaternion(X_AXIS, 0.02);
+	SC_Transform* trans = FindGameObject("test2-obj")->mesh->armature->GetBoneByName("Bone_002");
+	if(trans != nullptr){
+		trans->rotation = trans->rotation * Quaternion(Y_AXIS, 0.02);
+	}
 
 	for(GameObject* obj : spawnedObjects){
 		AddObjectAndDescendants(obj);
@@ -333,7 +335,7 @@ void Scene::Render(){
 		glUseProgram(vertCol->shaderProgram);
 		glUniformMatrix4fv(vertCol->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
 		glUniformMatrix4fv(vertCol->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
-		glUniform4f(vertCol->GetUniformByName("_color"), 1, 1, 1, 1);
+		glUniform4f(vertCol->GetUniformByName("_color"), 1, 0, 1, 1);
 		testArmature->DebugRender();
 	}
 

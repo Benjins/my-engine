@@ -17,7 +17,10 @@ struct Mat4x4{
 
 	Vector4 GetColumn(int index) const;
 	Vector4 GetRow(int index) const;
+
+	float GetDeterminant() const;
 	Mat4x4 GetTranspose() const;
+	Mat4x4 GetInverse() const;
 
 	void SetRow(int index, const Vector4& value);
 	void SetColumn(int index, const Vector4& value);

@@ -8,12 +8,13 @@
 
 using std::vector; using std::string;
 
-struct Mat4x4;
+struct Mat4x4; struct Model;
 
-#define MAX_BONE_COUNT 16
+#define MAX_BONE_COUNT 32
 
 struct Armature{
 	BoneTransform bones[MAX_BONE_COUNT];
+	Model* model;
 	int boneCount;
 
 	Armature()

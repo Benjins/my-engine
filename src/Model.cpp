@@ -313,6 +313,8 @@ void Model::ImportFromCollada(const string& fileName){
 
 	const XMLElement& colladaElem = colladaDoc.contents[0];
 
+	vector<Mat4x4> invBindPoses;
+
 	for(const XMLElement& colladaChild : colladaElem.children){
 		if(colladaChild.name == "library_geometries"){
 			if(colladaChild.children.size() != 1 || colladaChild.children[0].children.size() != 1){
@@ -470,6 +472,20 @@ void Model::ImportFromCollada(const string& fileName){
 						ParseColladaSourceElement(source, sources);
 					}
 				}
+				else if(source.name == "joints"){
+					for(const XMLElement& input : source.children){
+						if(input.attributeMap.find("semantic")->second == "INV_BIND_MATRIX"){
+							const string sourceLink = input.attributeMap.find("source")->second;
+
+							const vector<float>& invBindData = sources.find(sourceLink.substr(1))->second;
+
+							invBindPoses.resize(invBindData.size() / 16);
+							for(int i = 0; i < invBindPoses.size(); i++){
+								memcpy(invBindPoses[i].m, &(invBindData.data()[16 * i]), 16*sizeof(float));
+							}
+						}
+					}
+				}
 				else if(source.name == "vertex_weights"){
 					int count = atoi(source.attributeMap.find("count")->second.c_str());
 					vector<int> vCounts;
@@ -567,10 +583,41 @@ void Model::ImportFromCollada(const string& fileName){
 							}
 						}
 
+						size_t boneIdx = ((size_t)bone - (size_t)armature->bones) / sizeof(BoneTransform);
+
+						Mat4x4 conv;
+						conv.SetRow(0, Vector4(1, 0,  0, 0));
+						conv.SetRow(1, Vector4(0, 0, -1, 0));
+						conv.SetRow(2, Vector4(0, 1,  0, 0));
+						conv.SetRow(3, Vector4(0, 0,  0, 1));
+
+						Mat4x4 revConv;
+						revConv.SetRow(0, Vector4(1,  0, 0, 0));
+						revConv.SetRow(1, Vector4(0,  0, 1, 0));
+						revConv.SetRow(2, Vector4(0, -1, 0, 0));
+						revConv.SetRow(3, Vector4(0,  0, 0, 1));
+
+						//mat = conv * mat * revConv;
+						//mat = conv * mat * invBindPoses[boneIdx].GetInverse() * revConv;
+						mat = mat * invBindPoses[boneIdx];//.GetInverse();
+
 						//Get quaternion from matrix
 						Vector4 rotX = mat * Vector4(X_AXIS, 0);
 						Vector3 rotatedX = Vector3(rotX.w, rotX.x, rotX.y).Normalized();
 
+						Vector4 rotY = mat * Vector4(Y_AXIS, 0);
+						Vector3 rotatedY = Vector3(rotY.w, rotY.x, rotY.y).Normalized();
+
+						float w1 = rotatedX.x;
+						Vector3 vec1 = CrossProduct(X_AXIS, rotatedX);
+
+						float w2 = rotatedY.y;
+						Vector3 vec2 = CrossProduct(Y_AXIS, rotatedY);
+
+						Quaternion initialQuat = Quaternion(w1, vec1.x, vec1.y, vec1.z).Normalized();
+						Quaternion secondQuat  = Quaternion(w2, vec2.x, vec2.y, vec2.z).Normalized();
+
+						/*
 						Vector3 firstAxis = CrossProduct(X_AXIS, rotatedX);
 						float firstAxisMag = firstAxis.Magnitude();
 						float angle = asinf(firstAxisMag);
@@ -593,7 +640,7 @@ void Model::ImportFromCollada(const string& fileName){
 						if(secondAngle > FLT_MIN || secondAngle < -FLT_MIN){
 							secondQuat = Quaternion(secondAxis, secondAngle);
 						}
-
+						*/
 						Quaternion finalQuat = initialQuat * secondQuat;
 						bone->position = mat * Vector3(0,0,0);
 						bone->rotation = finalQuat;
@@ -623,6 +670,8 @@ void Model::ImportFromCollada(const string& fileName){
 			int qqq = 0;
 		}
 	}
+
+	armature->model = this;
 
 	CalculateNormals();
 	CalculateTangents();

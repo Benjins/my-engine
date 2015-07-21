@@ -1,7 +1,7 @@
 #version 130
 
 #define MAX_BONES_PER_VERT 4
-#define MAX_BONE_COUNT 16
+#define MAX_BONE_COUNT 32
 
 in vec3 Position;
 in vec2 UV;

@@ -69,6 +69,36 @@ Mat4x4 Mat4x4::GetTranspose() const{
 	return transpose;
 }
 
+float Mat4x4::GetDeterminant() const{
+	return 0;
+}
+
+//NOTE: this makes the asusmption that the bottom row is [0,0,0,1],
+//as it is in most cases
+Mat4x4 Mat4x4::GetInverse() const{
+	float ulDet = m[0][0] * ( m[1][1] * m[2][2] - m[1][2] * m[2][1] )
+				- m[0][1] * ( m[1][0] * m[2][2] - m[1][2] * m[2][0] )
+				+ m[0][2] * ( m[1][0] * m[2][1] - m[1][1] * m[2][0] );
+
+    Mat4x4 res;
+    res.m[0][0] = ( m[1][1] * m[2][2] - m[1][2] * m[2][1] ) / ulDet;
+    res.m[1][0] = ( m[1][2] * m[2][0] - m[1][0] * m[2][2] ) / ulDet;
+    res.m[2][0] = ( m[1][0] * m[2][1] - m[1][1] * m[2][0] ) / ulDet;
+ 
+    res.m[0][1] = ( m[0][2] * m[2][1] - m[0][1] * m[2][2] ) / ulDet;
+    res.m[1][1] = ( m[0][0] * m[2][2] - m[0][2] * m[2][0] ) / ulDet;
+    res.m[2][1] = ( m[0][1] * m[2][0] - m[0][0] * m[2][1] ) / ulDet;
+
+    res.m[0][2] = ( m[0][1] * m[1][2] - m[0][2] * m[1][1] ) / ulDet;
+    res.m[1][2] = ( m[0][2] * m[1][0] - m[0][0] * m[1][2] ) / ulDet;
+    res.m[2][2] = ( m[0][0] * m[1][1] - m[0][1] * m[1][0] ) / ulDet;
+
+	Vector3 trans = (*this * Vector3()) * -1;
+	res.SetColumn(3, Vector4(trans.x, trans.y, trans.z, 1));
+
+    return res;
+}
+
 void Mat4x4::SetRow(int index, const Vector4& value){
 	m[index][0] = value.w;
 	m[index][1] = value.x;

@@ -27,8 +27,8 @@
         <RigidBody mass='0.100000' isKinematic='F'/>
     </Prefab>
 	<GameObject name='test2-obj'>
-	     <Transform position='0.20000,1.000000,-1.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.800000,0.800000,0.800000'/>
-		 <Material name='myMat-arm'/>
+	     <Transform position='0,5,0' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.800000,0.800000,0.800000'/>
+		 <Material name='myMat2'/>
 		 <Mesh source='data/Worm.dae'/>
 	</GameObject>
     <GameObject name='myObj'>
@@ -157,6 +157,7 @@
         <Mesh source='data/test.obj'/>
         <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
     </GameObject>
+	<?
     <GameObject name='enemy1'>
         <Transform position='-3.000000,0.800000,2.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.300000,1.000000,0.300000'/>
         <Material name='enemyMat'/>
@@ -176,6 +177,7 @@
         <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
         <EnemyComp speed='1.000000' health='12' maxHalth='5'/>
     </GameObject>
+	?>
     <GameObject name=''>
         <Transform position='0.000000,1.000000,-1.383788' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
         <PathNodeComponent/>

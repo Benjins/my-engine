@@ -153,7 +153,7 @@ void DrawCall::Draw() const{
 	if(obj->mesh->armature != nullptr){
 		glEnableVertexAttribArray(4);
 		glBindBuffer(GL_ARRAY_BUFFER, boneIndices);
-		glVertexAttribIPointerEXT(4, 4, GL_INT, 0, 0);
+		glVertexAttribIPointer(4, 4, GL_INT, 0, 0);
 
 		glEnableVertexAttribArray(5);
 		glBindBuffer(GL_ARRAY_BUFFER, boneWeights);
@@ -161,7 +161,7 @@ void DrawCall::Draw() const{
 
 		glEnableVertexAttribArray(6);
 		glBindBuffer(GL_ARRAY_BUFFER, boneCount);
-		glVertexAttribIPointerEXT(6, 1, GL_INT, 0, 0);
+		glVertexAttribIPointer(6, 1, GL_INT, 0, 0);
 
 		GLenum erro1 = glGetError();
 

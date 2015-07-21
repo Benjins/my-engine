@@ -41,6 +41,7 @@ void GameObject::AddMesh(string fileName){
 		delete[] mesh;
 	}
 	mesh = new Model(fileName);
+	mesh->gameObject = this;
 }
 
 GameObject* GameObject::Clone() const{

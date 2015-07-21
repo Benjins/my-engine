@@ -8,7 +8,7 @@
 
 using std::vector; using std::string;
 
-struct Armature;
+struct Armature; struct GameObject;
 
 #define MAX_BONES_PER_VERT 4
 
@@ -59,6 +59,8 @@ struct Model{
 	string fileName;
 
 	Armature* armature;
+
+	GameObject* gameObject;
 	
 	Model(void);
 	Model(const Model& model);
