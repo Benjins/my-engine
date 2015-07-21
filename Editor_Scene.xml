@@ -27,7 +27,7 @@
         <RigidBody mass='0.100000' isKinematic='F'/>
     </Prefab>
 	<GameObject name='test2-obj'>
-	     <Transform position='0,5,0' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.800000,0.800000,0.800000'/>
+	     <Transform position='2,2,0' rotation='0.7071067811865476,-0.7071067811865476,0,0.000000' scale='0.800000,0.800000,0.800000'/>
 		 <Material name='myMat2'/>
 		 <Mesh source='data/Worm.dae'/>
 	</GameObject>

@@ -599,22 +599,21 @@ void Model::ImportFromCollada(const string& fileName){
 
 						//mat = conv * mat * revConv;
 						//mat = conv * mat * invBindPoses[boneIdx].GetInverse() * revConv;
-						mat = mat * invBindPoses[boneIdx];//.GetInverse();
+						//mat = mat * invBindPoses[boneIdx];//.GetInverse();
 
 						//Get quaternion from matrix
 						Vector4 rotX = mat * Vector4(X_AXIS, 0);
 						Vector3 rotatedX = Vector3(rotX.w, rotX.x, rotX.y).Normalized();
 
-						Vector4 rotY = mat * Vector4(Y_AXIS, 0);
-						Vector3 rotatedY = Vector3(rotY.w, rotY.x, rotY.y).Normalized();
-
 						float w1 = rotatedX.x;
 						Vector3 vec1 = CrossProduct(X_AXIS, rotatedX);
+						Quaternion initialQuat = Quaternion(w1, vec1.x, vec1.y, vec1.z).Normalized();
+
+						Vector4 rotY = mat * Vector4(Rotate(Y_AXIS, initialQuat), 0);
+						Vector3 rotatedY = Vector3(rotY.w, rotY.x, rotY.y).Normalized();
 
 						float w2 = rotatedY.y;
-						Vector3 vec2 = CrossProduct(Y_AXIS, rotatedY);
-
-						Quaternion initialQuat = Quaternion(w1, vec1.x, vec1.y, vec1.z).Normalized();
+						Vector3 vec2 = CrossProduct(Y_AXIS, rotatedY);		
 						Quaternion secondQuat  = Quaternion(w2, vec2.x, vec2.y, vec2.z).Normalized();
 
 						/*
