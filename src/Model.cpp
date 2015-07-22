@@ -599,7 +599,7 @@ void Model::ImportFromCollada(const string& fileName){
 
 						//mat = conv * mat * revConv;
 						//mat = conv * mat * invBindPoses[boneIdx].GetInverse() * revConv;
-						//mat = mat * invBindPoses[boneIdx];//.GetInverse();
+						mat = invBindPoses[boneIdx].GetInverse();
 
 						//Get quaternion from matrix
 						Vector4 rotX = mat * Vector4(X_AXIS, 0);

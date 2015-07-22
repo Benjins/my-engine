@@ -21,10 +21,18 @@ BoneTransform* Armature::AddBone(BoneTransform* parent){
 }
 
 void Armature::GetBoneMatrices(vector<Mat4x4>& outMatrices){
+	SC_Transform trans;
+	trans.rotation = Quaternion(X_AXIS, -3.14159265f/2);
+	trans.position = Vector3(0,0,-0.3091092f);
+
+	//bones[0].SetParent(&trans);
+
 	outMatrices.resize(boneCount);
 	for(int i = 0; i < boneCount; i++){
 		outMatrices[i] = bones[i].LocalToGlobalMatrix();
 	}
+
+	//bones[0].SetParent(nullptr);
 }
 
 void Armature::DebugRender(){
@@ -34,6 +42,11 @@ void Armature::DebugRender(){
 
 	glLineWidth(4);
 
+	SC_Transform trans;
+	trans.rotation = Quaternion(X_AXIS, -3.14159265f/2);
+	trans.position = Vector3(0,0,-0.3091092f);
+
+	//trans.SetParent(&model->gameObject->transform);
 	bones[0].SetParent(&model->gameObject->transform);
 
 	Vector3 objPos = model->gameObject->transform.GlobalPosition();
@@ -86,6 +99,7 @@ void Armature::DebugRender(){
 	
 
 	bones[0].SetParent(nullptr);
+	trans.SetParent(nullptr);
 }
 
 BoneTransform* Armature::GetBoneByName(const string& name){

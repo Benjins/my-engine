@@ -254,7 +254,7 @@ void Scene::OnUpdate(){
 		(*iter)->OnUpdate();
 	}
 
-	SC_Transform* trans = FindGameObject("test2-obj")->mesh->armature->GetBoneByName("Bone_002");
+	SC_Transform* trans = FindGameObject("test2-obj")->mesh->armature->GetBoneByName("Bone");
 	if(trans != nullptr){
 		trans->rotation = trans->rotation * Quaternion(Y_AXIS, 0.02);
 	}

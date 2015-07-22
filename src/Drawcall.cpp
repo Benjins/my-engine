@@ -165,8 +165,10 @@ void DrawCall::Draw() const{
 
 		GLenum erro1 = glGetError();
 
-		GLuint armatureUniformLoc = glGetUniformLocation(material->shaderProgram, "_armatureMatrices");
+		GLint armatureUniformLoc = glGetUniformLocation(material->shaderProgram, "_armatureMatrices");
 		glUniformMatrix4fv(armatureUniformLoc, boneMatrices.size(), GL_TRUE, &(boneMatrices[0].m[0][0]));
+
+		erro1 = glGetError();
 	}
 
 	if(material->mainTexture != nullptr){

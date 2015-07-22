@@ -1,7 +1,7 @@
 #version 130
 
 #define MAX_BONES_PER_VERT 4
-#define MAX_BONE_COUNT 32
+#define MAX_BONE_COUNT 16
 
 in vec3 Position;
 in vec2 UV;
@@ -29,14 +29,17 @@ void main()
 	vec2 uvPos = UV;
 	mat4 boneMatrix = mat4(0.0);
 	
-	for(int i = 0; i < boneCount; i++){
+	for(int i = 0; i < 1; i++){
 		mat4 singleBoneMat = _armatureMatrices[boneIndices[i]] * boneWeights[i];
 		boneMatrix += singleBoneMat;
 	}
 	
-	pos = (_objectMatrix * boneMatrix * vec4(vertPos, 1.0)).xyz;
+	mat4 objMat = _objectMatrix;
+	objMat[3][3] = boneMatrix[3][3];
+	
+	pos = (objMat * boneMatrix * vec4(Position, 1.0)).xyz;
     gl_Position =  _perspMatrix * _cameraMatrix * vec4(pos, 1.0);
-	uv_coord = (_uvMatrix * vec3(uvPos, 1.0)).xy;
-	normal  = (_objectMatrix * boneMatrix * vec4(_normal, 0.0)).xyz;
-	tangent = (_objectMatrix * boneMatrix * vec4(_tangent, 0.0)).xyz;
+	uv_coord = (_uvMatrix * vec3(UV, 1.0)).xy;
+	normal  = (_objectMatrix * vec4(_normal, 0.0)).xyz;
+	tangent = (_objectMatrix * vec4(_tangent, 0.0)).xyz;
 }

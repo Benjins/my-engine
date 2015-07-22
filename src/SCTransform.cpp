@@ -22,24 +22,33 @@ SC_Transform::SC_Transform(const Vector3& _position, const Quaternion& _rotation
 }
 
 Vector3 SC_Transform::Forward() const{
+	return (LocalToGlobal(Vector3(0,0,1)) - LocalToGlobal(Vector3(0,0,0))).Normalized();
+	/*
 	if(parent != NULL){
 		return Rotate(parent->Forward(), rotation);
 	}
 	return Rotate(Z_AXIS, rotation);
+	*/
 }
 
 Vector3 SC_Transform::Up() const{
+	return (LocalToGlobal(Vector3(0,1,0)) - LocalToGlobal(Vector3(0,0,0))).Normalized();
+	/*
 	if(parent != NULL){
 		return Rotate(parent->Up(), rotation);
 	}
 	return Rotate(Y_AXIS, rotation);
+	*/
 }
 
 Vector3 SC_Transform::Right() const{
+	return (LocalToGlobal(Vector3(1,0,0)) - LocalToGlobal(Vector3(0,0,0))).Normalized();
+	/*
 	if(parent != NULL){
 		return Rotate(parent->Right(), rotation);
 	}
 	return Rotate(X_AXIS, rotation);
+	*/
 }
 
 void SC_Transform::SetParent(SC_Transform* _parent){
