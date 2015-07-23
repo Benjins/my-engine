@@ -13,6 +13,10 @@
 #include <GL/glut.h>
 #endif
 
+#include <algorithm>
+
+using std::max;
+
 DrawCall::DrawCall(GameObject* _obj){
 	obj = _obj;
 	int size = static_cast<int>(_obj->mesh->faces.size() * 3);
@@ -50,9 +54,9 @@ DrawCall::DrawCall(GameObject* _obj){
 		uvCoords.push_back(face.uv0);
 
 		if(_obj->mesh->armature != nullptr){
-			boneCountsData.push_back(vert2.numBones);
-			boneCountsData.push_back(vert1.numBones);
-			boneCountsData.push_back(vert0.numBones);
+			boneCountsData.push_back(min((int)vert2.numBones, 4));
+			boneCountsData.push_back(min((int)vert1.numBones, 4));
+			boneCountsData.push_back(min((int)vert0.numBones, 4));
 
 			for(int i = 0; i < MAX_BONES_PER_VERT; i++){
 				boneIndicesData.push_back(vert2.boneIndices[i]);
@@ -157,7 +161,7 @@ void DrawCall::Draw() const{
 
 		glEnableVertexAttribArray(5);
 		glBindBuffer(GL_ARRAY_BUFFER, boneWeights);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_TRUE, 0, 0);
 
 		glEnableVertexAttribArray(6);
 		glBindBuffer(GL_ARRAY_BUFFER, boneCount);

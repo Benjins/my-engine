@@ -1,7 +1,6 @@
 #version 130
 
-#define MAX_BONES_PER_VERT 4
-#define MAX_BONE_COUNT 16
+#define MAX_BONE_COUNT 32
 
 in vec3 Position;
 in vec2 UV;
@@ -29,7 +28,7 @@ void main()
 	vec2 uvPos = UV;
 	mat4 boneMatrix = mat4(0.0);
 	
-	for(int i = 0; i < 1; i++){
+	for(int i = 0; i < boneCount; i++){
 		mat4 singleBoneMat = _armatureMatrices[boneIndices[i]] * boneWeights[i];
 		boneMatrix += singleBoneMat;
 	}

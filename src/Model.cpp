@@ -538,12 +538,18 @@ void Model::ImportFromCollada(const string& fileName){
 									cout << "\nError: COLLADA file '" << fileName << "' has more than 4 bones per vertex.  There's a limit of 4.\n";
 								}
 
-								for(int j = 0; j < vCount && j < 4; j++){
-									int boneIndexBufferIndex = (j*inputCount) + jointOffset;
-									vertices[i].boneIndices[j] = indicesBufer[boneIndexBufferIndex];
+								for(int j = 0; j < 4; j++){
+									if(j < vCount){
+										int boneIndexBufferIndex = (j*inputCount) + jointOffset;
+										vertices[i].boneIndices[j] = indicesBufer[boneIndexBufferIndex];
 
-									int boneWeightIndex = (j*inputCount) + weightOffset;
-									vertices[i].boneWeights[j] = weightsArray->at(boneWeightIndex);
+										int boneWeightIndexIndex = (j*inputCount) + weightOffset;
+										int boneWeightIndex = indicesBufer[boneWeightIndexIndex];
+										vertices[i].boneWeights[j] = weightsArray->at(boneWeightIndex);
+									}
+									else{
+										vertices[i].boneWeights[j] = 0;
+									}
 								}
 
 								vertices[i].numBones = vCount;
@@ -599,7 +605,8 @@ void Model::ImportFromCollada(const string& fileName){
 
 						//mat = conv * mat * revConv;
 						//mat = conv * mat * invBindPoses[boneIdx].GetInverse() * revConv;
-						mat = invBindPoses[boneIdx].GetInverse();
+						//mat = invBindPoses[boneIdx].GetInverse();
+						armature->bindPoses[boneIdx] = invBindPoses[boneIdx];
 
 						//Get quaternion from matrix
 						Vector4 rotX = mat * Vector4(X_AXIS, 0);

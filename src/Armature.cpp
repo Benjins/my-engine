@@ -1,7 +1,7 @@
 #include "../header/int/Armature.h"
-#include "../header/int/Mat4.h"
 #include "../header/int/GameObject.h"
 #include "../header/int/Model.h"
+#include "../header/int/Vector4.h"
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -25,14 +25,12 @@ void Armature::GetBoneMatrices(vector<Mat4x4>& outMatrices){
 	trans.rotation = Quaternion(X_AXIS, -3.14159265f/2);
 	trans.position = Vector3(0,0,-0.3091092f);
 
-	//bones[0].SetParent(&trans);
-
 	outMatrices.resize(boneCount);
 	for(int i = 0; i < boneCount; i++){
-		outMatrices[i] = bones[i].LocalToGlobalMatrix();
+		Mat4x4 localToGlobal = bones[i].LocalToGlobalMatrix();
+		//localToGlobal.SetColumn(3, Vector4(bones[i].position, 1));
+		outMatrices[i] =  localToGlobal * bindPoses[i];
 	}
-
-	//bones[0].SetParent(nullptr);
 }
 
 void Armature::DebugRender(){
@@ -72,11 +70,21 @@ void Armature::DebugRender(){
 	glVertex3f(objRight.x, objRight.y, objRight.z);
 	glEnd();
 
+	vector<Mat4x4> boneMats;
+	GetBoneMatrices(boneMats);
+
 	for(int i = 0; i < boneCount; i++){
-		Vector3 pos = bones[i].GlobalPosition();
-		Vector3 forward = pos + bones[i].Forward() * 0.5f;
-		Vector3 up = pos + bones[i].Up() * 0.5f;
-		Vector3 right = pos + bones[i].Right() * 0.5f;
+		Vector4 pos4 = boneMats[i] * Vector4(0,0,0,1);
+		Vector3 pos = Vector3(pos4.w, pos4.x, pos4.y);
+
+		Vector4 for4 = boneMats[i] * Vector4(0,0,1,0);
+		Vector3 forward = pos + Vector3(for4.w, for4.x, for4.y);
+
+		Vector4 up4 = boneMats[i] * Vector4(0,1,0,0);
+		Vector3 up = pos + Vector3(up4.w, up4.x, up4.y);
+
+		Vector4 right4 = boneMats[i] * Vector4(1,0,0,0);
+		Vector3 right = pos + Vector3(right4.w, right4.x, right4.y);
 
 		glUniform4f(colorLoc, 0, 0, 1, 1);
 		glBegin(GL_LINES);
