@@ -313,6 +313,19 @@ void Model::ImportFromCollada(const string& fileName){
 
 	const XMLElement& colladaElem = colladaDoc.contents[0];
 
+	Mat4x4 conv;
+	conv.SetRow(0, Vector4(1, 0,  0, 0));
+	conv.SetRow(1, Vector4(0, 0,  1, 0));
+	conv.SetRow(2, Vector4(0, -1,  0, 0));
+	conv.SetRow(3, Vector4(0, 0,  0, 1));
+
+	Mat4x4 revConv;
+	revConv.SetRow(0, Vector4(1,  0, 0, 0));
+	revConv.SetRow(1, Vector4(0,  0, -1, 0));
+	revConv.SetRow(2, Vector4(0, 1, 0, 0));
+	revConv.SetRow(3, Vector4(0,  0, 0, 1));
+
+	//is this needed
 	vector<Mat4x4> invBindPoses;
 
 	for(const XMLElement& colladaChild : colladaElem.children){
@@ -367,7 +380,7 @@ void Model::ImportFromCollada(const string& fileName){
 					vertices.resize(vertData.size() / 3);
 					for(int i = 0; i < vertices.size(); i++){
 						Vertex v;
-						v.position = Vector3(vertData[3*i], vertData[3*i+1], vertData[3*i+2]);
+						v.position =  conv * Vector3(vertData[3*i], vertData[3*i+1], vertData[3*i+2]);
 						vertices[i] = v;
 					}
 				}
@@ -447,7 +460,11 @@ void Model::ImportFromCollada(const string& fileName){
 
 		}
 		else if(colladaChild.name == "library_controllers"){
-			if(colladaChild.children.size() == 0 || colladaChild.children[0].children.size() == 0){
+			if(colladaChild.children.size() == 0){
+				break;
+			}
+
+			if(colladaChild.children[0].children.size() == 0){
 				cout << "\n\nError: Collada File '" << fileName << "' has an improperly formatted controller.\n";
 				break;
 			}
@@ -591,74 +608,46 @@ void Model::ImportFromCollada(const string& fileName){
 
 						size_t boneIdx = ((size_t)bone - (size_t)armature->bones) / sizeof(BoneTransform);
 
-						Mat4x4 conv;
-						conv.SetRow(0, Vector4(1, 0,  0, 0));
-						conv.SetRow(1, Vector4(0, 0, -1, 0));
-						conv.SetRow(2, Vector4(0, 1,  0, 0));
-						conv.SetRow(3, Vector4(0, 0,  0, 1));
-
-						Mat4x4 revConv;
-						revConv.SetRow(0, Vector4(1,  0, 0, 0));
-						revConv.SetRow(1, Vector4(0,  0, 1, 0));
-						revConv.SetRow(2, Vector4(0, -1, 0, 0));
-						revConv.SetRow(3, Vector4(0,  0, 0, 1));
-
-						//mat = conv * mat * revConv;
-						//mat = conv * mat * invBindPoses[boneIdx].GetInverse() * revConv;
-						//mat = invBindPoses[boneIdx].GetInverse();
-						armature->bindPoses[boneIdx] = invBindPoses[boneIdx];
+						mat = conv * mat * revConv;
+						armature->bindPoses[boneIdx] = conv * invBindPoses[boneIdx] * revConv;
 
 						//Get quaternion from matrix
 						Vector4 rotX = mat * Vector4(X_AXIS, 0);
 						Vector3 rotatedX = Vector3(rotX.w, rotX.x, rotX.y).Normalized();
-
-						float w1 = rotatedX.x;
+						
 						Vector3 vec1 = CrossProduct(X_AXIS, rotatedX);
+						float sinAngle1 = vec1.Magnitude();
+						float angle1 = asinf(sinAngle1);
+						float halfAngle1 = angle1/2;
+						float cosHalfAngle1 = cosf(halfAngle1);
+						float sinHalfAngle1 = sinf(halfAngle1);
+						vec1 = vec1.Normalized() / sinHalfAngle1;
+						float w1 = cosHalfAngle1;
 						Quaternion initialQuat = Quaternion(w1, vec1.x, vec1.y, vec1.z).Normalized();
 
 						Vector4 rotY = mat * Vector4(Rotate(Y_AXIS, initialQuat), 0);
 						Vector3 rotatedY = Vector3(rotY.w, rotY.x, rotY.y).Normalized();
 
-						float w2 = rotatedY.y;
-						Vector3 vec2 = CrossProduct(Y_AXIS, rotatedY);		
+						Vector3 vec2 = CrossProduct(Y_AXIS, rotatedY);
+						float sinAngle2 = vec2.Magnitude();
+						float angle2 = asinf(sinAngle2);
+						float halfAngle2 = angle2/2;
+						float cosHalfAngle2 = cosf(halfAngle2);
+						float sinHalfAngle2 = sinf(halfAngle2);
+						vec2 = vec2.Normalized() / sinHalfAngle2;
+						float w2 = cosHalfAngle2;
 						Quaternion secondQuat  = Quaternion(w2, vec2.x, vec2.y, vec2.z).Normalized();
 
-						/*
-						Vector3 firstAxis = CrossProduct(X_AXIS, rotatedX);
-						float firstAxisMag = firstAxis.Magnitude();
-						float angle = asinf(firstAxisMag);
-						angle *= (firstAxis.z > 0 ? 1 : -1);
-
-						Quaternion initialQuat;
-						if(angle > FLT_MIN || angle < -FLT_MIN){
-							initialQuat = Quaternion(firstAxis, angle);
-						}
-						Vector3 transformedY = Rotate(Y_AXIS, initialQuat);
-						Vector4 rotY = mat * Vector4(Y_AXIS, 0);
-						Vector3 fullyRotatedY = Vector3(rotY.w, rotY.x, rotY.y).Normalized();
-
-						Vector3 secondAxis = CrossProduct(transformedY, fullyRotatedY);
-						float secondAxisMag = firstAxis.Magnitude();
-						float secondAngle = asinf(secondAxisMag);
-						secondAngle *= (secondAxis.x > 0 ? 1 : -1);
-
-						Quaternion secondQuat;
-						if(secondAngle > FLT_MIN || secondAngle < -FLT_MIN){
-							secondQuat = Quaternion(secondAxis, secondAngle);
-						}
-						*/
-						Quaternion finalQuat = initialQuat * secondQuat;
+						Quaternion finalQuat = secondQuat * initialQuat;
 						bone->position = mat * Vector3(0,0,0);
 						bone->rotation = finalQuat;
+
 					}
 					else if(child.name == "node"){
-						for(const XMLElement& grandChild : child.children){
-							if(grandChild.name == "node"){
-								BoneTransform* boneParent = armature->GetBoneByName(child.attributeMap.find("id")->second);
-								BoneTransform* bone = armature->GetBoneByName(grandChild.attributeMap.find("id")->second);
-								bone->SetParent(boneParent);
-							}
-						}
+						BoneTransform* boneChild = armature->GetBoneByName(child.attributeMap.find("id")->second);
+						BoneTransform* boneParent = armature->GetBoneByName(node->attributeMap.find("id")->second);
+
+						boneChild->SetParent(boneParent);
 
 						searchStack[searchCount++] = &child;
 					}
@@ -668,16 +657,20 @@ void Model::ImportFromCollada(const string& fileName){
 	}
 
 	BoneTransform* root = &armature->bones[0];
-	for(SC_Transform* child : root->children){
-		BoneTransform* boneChild = static_cast<BoneTransform*>(child);
+	if(root != nullptr){
+		for(SC_Transform* child : root->children){
+			BoneTransform* boneChild = static_cast<BoneTransform*>(child);
 
-		for(SC_Transform* grandChild : boneChild->children){
-			BoneTransform* boneGrandChild = static_cast<BoneTransform*>(grandChild);
-			int qqq = 0;
+			for(SC_Transform* grandChild : boneChild->children){
+				BoneTransform* boneGrandChild = static_cast<BoneTransform*>(grandChild);
+				int qqq = 0;
+			}
 		}
 	}
 
-	armature->model = this;
+	if(armature != nullptr){
+		armature->model = this;
+	}
 
 	CalculateNormals();
 	CalculateTangents();

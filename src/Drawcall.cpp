@@ -25,8 +25,8 @@ DrawCall::DrawCall(GameObject* _obj){
 	vector<Vector3> Normals;
 	vector<Vector2> uvCoords;
 	vector<Vector3> tangentData;
-	vector<int> boneCountsData;
-	vector<int> boneIndicesData;
+	vector<float> boneCountsData;
+	vector<float> boneIndicesData;
 	vector<float> boneWeightsData;
 
     for(int i = 0; i < _obj->mesh->faces.size(); i++){
@@ -157,7 +157,7 @@ void DrawCall::Draw() const{
 	if(obj->mesh->armature != nullptr){
 		glEnableVertexAttribArray(4);
 		glBindBuffer(GL_ARRAY_BUFFER, boneIndices);
-		glVertexAttribIPointer(4, 4, GL_INT, 0, 0);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE,  0, 0);
 
 		glEnableVertexAttribArray(5);
 		glBindBuffer(GL_ARRAY_BUFFER, boneWeights);
@@ -165,7 +165,7 @@ void DrawCall::Draw() const{
 
 		glEnableVertexAttribArray(6);
 		glBindBuffer(GL_ARRAY_BUFFER, boneCount);
-		glVertexAttribIPointer(6, 1, GL_INT, 0, 0);
+		glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE,  0, 0);
 
 		GLenum erro1 = glGetError();
 

@@ -30,6 +30,7 @@ void Armature::GetBoneMatrices(vector<Mat4x4>& outMatrices){
 		Mat4x4 localToGlobal = bones[i].LocalToGlobalMatrix();
 		//localToGlobal.SetColumn(3, Vector4(bones[i].position, 1));
 		outMatrices[i] =  localToGlobal * bindPoses[i];
+		int xy = 0;
 	}
 }
 
@@ -46,29 +47,6 @@ void Armature::DebugRender(){
 
 	//trans.SetParent(&model->gameObject->transform);
 	bones[0].SetParent(&model->gameObject->transform);
-
-	Vector3 objPos = model->gameObject->transform.GlobalPosition();
-	Vector3 objForward = objPos + model->gameObject->transform.Forward();
-	Vector3 objUp = objPos + model->gameObject->transform.Up();
-	Vector3 objRight = objPos + model->gameObject->transform.Right();
-
-	glUniform4f(colorLoc, 0, 0, 1, 1);
-	glBegin(GL_LINES);
-	glVertex3f(objPos.x, objPos.y, objPos.z);
-	glVertex3f(objForward.x, objForward.y, objForward.z);
-	glEnd();
-
-	glUniform4f(colorLoc, 0, 1, 0, 1);
-	glBegin(GL_LINES);
-	glVertex3f(objPos.x, objPos.y, objPos.z);
-	glVertex3f(objUp.x, objUp.y, objUp.z);
-	glEnd();
-
-	glUniform4f(colorLoc, 1, 0, 0, 1);
-	glBegin(GL_LINES);
-	glVertex3f(objPos.x, objPos.y, objPos.z);
-	glVertex3f(objRight.x, objRight.y, objRight.z);
-	glEnd();
 
 	vector<Mat4x4> boneMats;
 	GetBoneMatrices(boneMats);

@@ -6,9 +6,9 @@ in vec3 Position;
 in vec2 UV;
 in vec3 _normal;
 in vec3 _tangent;
-in ivec4 boneIndices;
+in vec4 boneIndices;
 in vec4 boneWeights;
-in int boneCount;
+in float boneCount;
 
 out vec2 uv_coord;
 out vec3 normal;
@@ -28,8 +28,8 @@ void main()
 	vec2 uvPos = UV;
 	mat4 boneMatrix = mat4(0.0);
 	
-	for(int i = 0; i < boneCount; i++){
-		mat4 singleBoneMat = _armatureMatrices[boneIndices[i]] * boneWeights[i];
+	for(int i = 0; i < int(boneCount + 0.5); i++){
+		mat4 singleBoneMat = _armatureMatrices[int(boneIndices[i] + 0.5)] * boneWeights[i];
 		boneMatrix += singleBoneMat;
 	}
 	

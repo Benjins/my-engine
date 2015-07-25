@@ -42,5 +42,5 @@ void main()
 		}
 	}
 	
-	FragColor = color * lighting;
+	FragColor = color;// * lighting;
 }
