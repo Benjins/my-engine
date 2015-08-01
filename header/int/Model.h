@@ -8,7 +8,7 @@
 
 using std::vector; using std::string;
 
-struct Armature; struct GameObject;
+struct Armature; struct GameObject; struct Quaternion; struct Mat4x4;
 
 #define MAX_BONES_PER_VERT 4
 
@@ -84,5 +84,7 @@ Vector2 ParseUVLine(string line);
 Face ParseFaceLine(string line, const vector<Vector2>& uvs);
 
 vector<string> SplitStringByDelimiter(string searchIn, string delimiter);
+
+Quaternion MatrixToQuaternion(const Mat4x4& mat);
 
 #endif

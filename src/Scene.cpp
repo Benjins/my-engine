@@ -208,8 +208,8 @@ void Scene::Start(){
 #endif
 		OnUpdate();
 
-		//BoneTransform* leg = testArmature->GetBoneByName("leg");
-		//leg->rotation = leg->rotation * Quaternion(Z_AXIS, 0.01f);
+		BoneTransform* leg = testArmature->GetBoneByName("Bone_002");
+		leg->rotation = leg->rotation * Quaternion(Z_AXIS, 0.01f);
 
 		physicsSim->Advance(deltaTime);
 
@@ -258,7 +258,7 @@ void Scene::OnUpdate(){
 	if(transObj != nullptr){
 		SC_Transform* trans = transObj->mesh->armature->GetBoneByName("Bone");
 		if(trans != nullptr){
-			trans->rotation = trans->rotation * Quaternion(Y_AXIS, 0.02);
+			//trans->rotation = trans->rotation * Quaternion(Y_AXIS, 0.02);
 		}
 	}
 
@@ -297,7 +297,7 @@ void Scene::OnPostLoad(){
 
 void Scene::Render(){
 	float aspectRatio = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
-	float fieldOfView = 80;
+	float fieldOfView = 90;
 	float nearZ = 0.01;
 	float farZ = 1000;
 	                                                                    

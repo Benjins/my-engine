@@ -316,13 +316,13 @@ void Model::ImportFromCollada(const string& fileName){
 	Mat4x4 conv;
 	conv.SetRow(0, Vector4(1, 0,  0, 0));
 	conv.SetRow(1, Vector4(0, 0,  1, 0));
-	conv.SetRow(2, Vector4(0, -1,  0, 0));
+	conv.SetRow(2, Vector4(0, 1,  0, 0));
 	conv.SetRow(3, Vector4(0, 0,  0, 1));
 
 	Mat4x4 revConv;
 	revConv.SetRow(0, Vector4(1,  0, 0, 0));
-	revConv.SetRow(1, Vector4(0,  0, -1, 0));
-	revConv.SetRow(2, Vector4(0, 1, 0, 0));
+	revConv.SetRow(1, Vector4(0,  0, 1, 0));
+	revConv.SetRow(2, Vector4(0,  1, 0, 0));
 	revConv.SetRow(3, Vector4(0,  0, 0, 1));
 
 	//is this needed
@@ -608,37 +608,51 @@ void Model::ImportFromCollada(const string& fileName){
 
 						size_t boneIdx = ((size_t)bone - (size_t)armature->bones) / sizeof(BoneTransform);
 
-						mat = conv * mat * revConv;
-						armature->bindPoses[boneIdx] = conv * invBindPoses[boneIdx] * revConv;
+						mat = revConv * mat * conv;
 
+						armature->bindPoses[boneIdx] = revConv * invBindPoses[boneIdx] * conv;// revConv * invBindPoses[boneIdx] * conv;
+
+						/*
 						//Get quaternion from matrix
 						Vector4 rotX = mat * Vector4(X_AXIS, 0);
 						Vector3 rotatedX = Vector3(rotX.w, rotX.x, rotX.y).Normalized();
 						
-						Vector3 vec1 = CrossProduct(X_AXIS, rotatedX);
-						float sinAngle1 = vec1.Magnitude();
-						float angle1 = asinf(sinAngle1);
-						float halfAngle1 = angle1/2;
-						float cosHalfAngle1 = cosf(halfAngle1);
-						float sinHalfAngle1 = sinf(halfAngle1);
-						vec1 = vec1.Normalized() / sinHalfAngle1;
-						float w1 = cosHalfAngle1;
-						Quaternion initialQuat = Quaternion(w1, vec1.x, vec1.y, vec1.z).Normalized();
+						Quaternion initialQuat;
 
-						Vector4 rotY = mat * Vector4(Rotate(Y_AXIS, initialQuat), 0);
+						if(rotatedX !=  X_AXIS){
+							Vector3 vec1 = CrossProduct(X_AXIS, rotatedX);
+							float sinAngle1 = vec1.Magnitude();
+							float angle1 = asinf(sinAngle1);
+							float halfAngle1 = angle1/2;
+							float cosHalfAngle1 = cosf(halfAngle1);
+							float sinHalfAngle1 = sinf(halfAngle1);
+							vec1 = vec1.Normalized() / sinHalfAngle1;
+							float w1 = cosHalfAngle1;
+							initialQuat = Quaternion(w1, vec1.x, vec1.y, vec1.z).Normalized();
+						}
+
+						Vector3 stepyY = Rotate(Y_AXIS, initialQuat);
+						Vector4 rotY = mat * Vector4(stepyY, 0);
 						Vector3 rotatedY = Vector3(rotY.w, rotY.x, rotY.y).Normalized();
 
-						Vector3 vec2 = CrossProduct(Y_AXIS, rotatedY);
-						float sinAngle2 = vec2.Magnitude();
-						float angle2 = asinf(sinAngle2);
-						float halfAngle2 = angle2/2;
-						float cosHalfAngle2 = cosf(halfAngle2);
-						float sinHalfAngle2 = sinf(halfAngle2);
-						vec2 = vec2.Normalized() / sinHalfAngle2;
-						float w2 = cosHalfAngle2;
-						Quaternion secondQuat  = Quaternion(w2, vec2.x, vec2.y, vec2.z).Normalized();
+						Quaternion secondQuat;
+						if(rotatedY != stepyY && rotatedY != stepyY * -1){
+							Vector3 vec2 = CrossProduct(stepyY, rotatedY);
+							float sinAngle2 = vec2.Magnitude();
+							float angle2 = asinf(max(min(sinAngle2,1.0f),-1.0f));
+							float halfAngle2 = angle2/2;
+							float cosHalfAngle2 = cosf(halfAngle2);
+							float sinHalfAngle2 = sinf(halfAngle2);
+							vec2 = vec2.Normalized() / sinHalfAngle2;
+							float w2 = cosHalfAngle2;
+							secondQuat  = Quaternion(w2, vec2.x, vec2.y, vec2.z).Normalized();
+						}
 
-						Quaternion finalQuat = secondQuat * initialQuat;
+						Quaternion finalQuatConj = initialQuat * secondQuat;
+						Quaternion finalQuat = (secondQuat * initialQuat).Conjugate();
+						*/
+
+						Quaternion finalQuat = MatrixToQuaternion(mat);
 						bone->position = mat * Vector3(0,0,0);
 						bone->rotation = finalQuat;
 
@@ -652,18 +666,6 @@ void Model::ImportFromCollada(const string& fileName){
 						searchStack[searchCount++] = &child;
 					}
 				}
-			}
-		}
-	}
-
-	BoneTransform* root = &armature->bones[0];
-	if(root != nullptr){
-		for(SC_Transform* child : root->children){
-			BoneTransform* boneChild = static_cast<BoneTransform*>(child);
-
-			for(SC_Transform* grandChild : boneChild->children){
-				BoneTransform* boneGrandChild = static_cast<BoneTransform*>(grandChild);
-				int qqq = 0;
 			}
 		}
 	}
@@ -748,4 +750,61 @@ vector<string> SplitStringByDelimiter(string searchIn, string delimiter){
 	}
 
 	return splits;
+}
+
+#define SIGN(x) ((x) >= 0 ? 1 : -1)
+
+Quaternion MatrixToQuaternion(const Mat4x4& matrix){
+
+	float r11 = matrix.m[0][0];
+	float r12 = matrix.m[0][1];
+	float r13 = matrix.m[0][2];
+
+	float r21 = matrix.m[1][0];
+	float r22 = matrix.m[1][1];
+	float r23 = matrix.m[1][2];
+
+	float r31 = matrix.m[2][0];
+	float r32 = matrix.m[2][1];
+	float r33 = matrix.m[2][2];
+
+	float q0 = ( r11 + r22 + r33 + 1.0f) / 4.0f;
+	float q1 = ( r11 - r22 - r33 + 1.0f) / 4.0f;
+	float q2 = (-r11 + r22 - r33 + 1.0f) / 4.0f;
+	float q3 = (-r11 - r22 + r33 + 1.0f) / 4.0f;
+
+	if(q0 < 0.0f) q0 = 0.0f;
+	if(q1 < 0.0f) q1 = 0.0f;
+	if(q2 < 0.0f) q2 = 0.0f;
+	if(q3 < 0.0f) q3 = 0.0f;
+	q0 = sqrt(q0);
+	q1 = sqrt(q1);
+	q2 = sqrt(q2);
+	q3 = sqrt(q3);
+	if(q0 >= q1 && q0 >= q2 && q0 >= q3) {
+		q0 *= +1.0f;
+		q1 *= SIGN(r32 - r23);
+		q2 *= SIGN(r13 - r31);
+		q3 *= SIGN(r21 - r12);
+	} else if(q1 >= q0 && q1 >= q2 && q1 >= q3) {
+		q0 *= SIGN(r32 - r23);
+		q1 *= +1.0f;
+		q2 *= SIGN(r21 + r12);
+		q3 *= SIGN(r13 + r31);
+	} else if(q2 >= q0 && q2 >= q1 && q2 >= q3) {
+		q0 *= SIGN(r13 - r31);
+		q1 *= SIGN(r21 + r12);
+		q2 *= +1.0f;
+		q3 *= SIGN(r32 + r23);
+	} else if(q3 >= q0 && q3 >= q1 && q3 >= q2) {
+		q0 *= SIGN(r21 - r12);
+		q1 *= SIGN(r31 + r13);
+		q2 *= SIGN(r32 + r23);
+		q3 *= +1.0f;
+	} else {
+		printf("coding error\n");
+	}
+
+	return Quaternion(q0,q1,q2,q3).Normalized();
+
 }
