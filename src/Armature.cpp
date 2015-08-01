@@ -24,8 +24,7 @@ void Armature::GetBoneMatrices(vector<Mat4x4>& outMatrices){
 	outMatrices.resize(boneCount);
 	for(int i = 0; i < boneCount; i++){
 		Mat4x4 localToGlobal = bones[i].LocalToGlobalMatrix();
-		outMatrices[i] =  localToGlobal * bindPoses[i];//.GetInverse();
-		int xy = 0;
+		outMatrices[i] =  localToGlobal * bindPoses[i];
 	}
 }
 

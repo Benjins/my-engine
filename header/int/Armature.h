@@ -2,7 +2,7 @@
 #define ARMATURE_H
 
 #include "BoneTransform.h"
-#include "../header/int/Mat4.h"
+#include "Mat4.h"
 
 #include <vector>
 #include <string>
