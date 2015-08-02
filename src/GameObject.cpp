@@ -1,6 +1,7 @@
 #include "../header/int/GameObject.h"
 #include "../header/int/Component.h"
 #include "../header/int/Model.h"
+#include "../header/int/Armature.h"
 #include "../header/int/Material.h"
 #include "../header/int/Collider.h"
 #include "../header/int/Scene.h"
@@ -82,6 +83,14 @@ void GameObject::OnUpdate(){
 	for(auto iter = components.begin(); iter != components.end(); iter++){
 		(*iter)->OnUpdate();
 	}
+
+	if(mesh != nullptr){
+		Armature* armature = mesh->armature;
+		if(armature != nullptr){
+			armature->Update(scene->deltaTime);
+		}
+	}
+
 	//cout << "Done updating components." << endl;
 }
 

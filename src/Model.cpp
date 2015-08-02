@@ -328,6 +328,8 @@ void Model::ImportFromCollada(const string& fileName){
 	//is this needed
 	vector<Mat4x4> invBindPoses;
 
+	const XMLElement* animLibrary = nullptr;
+
 	for(const XMLElement& colladaChild : colladaElem.children){
 		if(colladaChild.name == "library_geometries"){
 			if(colladaChild.children.size() != 1 || colladaChild.children[0].children.size() != 1){
@@ -469,7 +471,9 @@ void Model::ImportFromCollada(const string& fileName){
 				break;
 			}
 
-			armature = new Armature();
+			if(armature == nullptr){
+				armature = new Armature();
+			}
 			
 			const XMLElement& skinElem = colladaChild.children[0].children[0];
 			map<string, vector<float>> sources;
@@ -580,6 +584,13 @@ void Model::ImportFromCollada(const string& fileName){
 				}
 			}
 		}
+		if(colladaChild.name == "library_animations"){
+			if(armature == nullptr){
+				armature = new Armature();
+			}
+
+			animLibrary = &colladaChild;
+		}
 		else if(colladaChild.name == "library_visual_scenes"){
 			if(colladaChild.children.size() != 1){
 				cout << "\n\nError: file '" << fileName << "' has the wrong number of visual scenes.\n";
@@ -656,6 +667,10 @@ void Model::ImportFromCollada(const string& fileName){
 						bone->position = mat * Vector3(0,0,0);
 						bone->rotation = finalQuat;
 
+						if(armature->anim.boneAnims[boneIdx].positionAnim.Length() == 0.0f){
+							armature->anim.boneAnims[boneIdx].positionAnim.AddKeyFrame(bone->position, 0);
+							armature->anim.boneAnims[boneIdx].rotationAnim.AddKeyFrame(bone->rotation, 0);
+						}
 					}
 					else if(child.name == "node"){
 						BoneTransform* boneChild = armature->GetBoneByName(child.attributeMap.find("id")->second);
@@ -674,12 +689,104 @@ void Model::ImportFromCollada(const string& fileName){
 		armature->model = this;
 	}
 
+	if(animLibrary != nullptr){
+		ImportAnimationLibrary(*animLibrary);
+	}
+
 	CalculateNormals();
 	CalculateTangents();
 
 
 	if(armature != nullptr){
 		Scene::getInstance().testArmature = armature;
+	}
+}
+
+void Model::ImportAnimationLibrary(const XMLElement& elem){
+	Mat4x4 conv;
+	conv.SetRow(0, Vector4(1, 0,  0, 0));
+	conv.SetRow(1, Vector4(0, 0,  1, 0));
+	conv.SetRow(2, Vector4(0, 1,  0, 0));
+	conv.SetRow(3, Vector4(0, 0,  0, 1));
+
+	Mat4x4 revConv;
+	revConv.SetRow(0, Vector4(1,  0, 0, 0));
+	revConv.SetRow(1, Vector4(0,  0, 1, 0));
+	revConv.SetRow(2, Vector4(0,  1, 0, 0));
+	revConv.SetRow(3, Vector4(0,  0, 0, 1));
+
+	for(const XMLElement& child : elem.children){
+		if(child.name == "animation"){
+			map<string, vector<float>> sources;
+
+			string inputId, outputId;
+
+			for(const XMLElement& grandChild : child.children){
+				if(grandChild.name == "source"){
+					ParseColladaSourceElement(grandChild, sources);
+				}
+				else if(grandChild.name == "sampler"){
+					for(const XMLElement& samplers : grandChild.children){
+						if(samplers.name == "input"){
+							const string& semantic = samplers.attributeMap.find("semantic")->second;
+
+							if(semantic == "INPUT"){
+								inputId = samplers.attributeMap.find("source")->second.substr(1);
+							}
+							else if(semantic == "OUTPUT"){
+								outputId = samplers.attributeMap.find("source")->second.substr(1);
+							}
+						}
+					}
+				}
+				else if(grandChild.name == "channel"){
+					const string& channelName = grandChild.attributeMap.find("target")->second;
+					vector<string> channelSplit = SplitStringByDelimiter(channelName, "/");
+					if(channelSplit.size() != 2){
+						cout << "\n\nError: Invalid channel target: '" << channelName << "'\n";
+						break;
+					}
+					BoneTransform* bone = armature->GetBoneByName(channelSplit[0]);
+					if(bone == nullptr){
+						cout << "\n\nError: Invalid channel bone name: '" << channelSplit[0] << "'\n";
+						break;
+					}
+
+					int boneIdx = static_cast<int>((size_t)bone  - (size_t)(&armature->bones[0])) / sizeof(BoneTransform);
+
+					if(channelSplit[1] == "transform"){
+						const vector<float>& input = sources.find(inputId)->second;
+						const vector<float>& output = sources.find(outputId)->second;
+
+						armature->anim.boneAnims[boneIdx].positionAnim.keyFrames.clear();
+						armature->anim.boneAnims[boneIdx].rotationAnim.keyFrames.clear();
+
+						for(int i = 0; i < input.size(); i++){
+							float time = input[i];
+
+							Mat4x4 mat;
+							for(int x = 0; x < 4; x++){
+								for(int y = 0; y < 4; y++){
+									int idx = (i * 16) + (x * 4) + y;
+									mat.m[x][y] = output[idx];
+								}
+							}
+
+							mat = revConv * mat * conv;
+
+							Vector3 pos = mat * Vector3(0,0,0);
+							Quaternion rot = MatrixToQuaternion(mat);
+							
+							armature->anim.boneAnims[boneIdx].positionAnim.AddKeyFrame(pos, time);
+							armature->anim.boneAnims[boneIdx].rotationAnim.AddKeyFrame(rot, time);
+						}
+					}
+					else{
+						cout << "\n\nError: Invalid channel sub-target: '" << channelSplit[1] << "'\n";
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -735,7 +842,7 @@ Face ParseFaceLine(string line, const vector<Vector2>& uvs){
 	}
 }
 
-vector<string> SplitStringByDelimiter(string searchIn, string delimiter){
+vector<string> SplitStringByDelimiter(const string& searchIn, const string& delimiter){
 	vector<string> splits;
 
 	string searchString = searchIn;

@@ -8,7 +8,7 @@
 
 using std::vector; using std::string;
 
-struct Armature; struct GameObject; struct Quaternion; struct Mat4x4;
+struct Armature; struct GameObject; struct Quaternion; struct Mat4x4; struct XMLElement;
 
 #define MAX_BONES_PER_VERT 4
 
@@ -73,6 +73,8 @@ struct Model{
 	void ImportFromOBJ(const string& fileName);
 	void ImportFromCollada(const string& fileName);
 
+	void ImportAnimationLibrary(const XMLElement& elem);
+
 	void CalculateNormals();
 	void CalculateTangents();
 };
@@ -83,7 +85,7 @@ Vector2 ParseUVLine(string line);
 
 Face ParseFaceLine(string line, const vector<Vector2>& uvs);
 
-vector<string> SplitStringByDelimiter(string searchIn, string delimiter);
+vector<string> SplitStringByDelimiter(const string& searchIn, const string& delimiter);
 
 Quaternion MatrixToQuaternion(const Mat4x4& mat);
 

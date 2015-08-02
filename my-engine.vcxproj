@@ -139,6 +139,7 @@
     <ClCompile Include="src\3DUtilities.cpp" />
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Armature.cpp" />
+    <ClCompile Include="src\ArmatureAnimation.cpp" />
     <ClCompile Include="src\AudioSystem.cpp" />
     <ClCompile Include="src\Collider.cpp" />
     <ClCompile Include="src\Component.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="header\int\AABB.h" />
     <ClInclude Include="header\int\Animation.h" />
     <ClInclude Include="header\int\Armature.h" />
+    <ClInclude Include="header\int\ArmatureAnimation.h" />
     <ClInclude Include="header\int\AudioSystem.h" />
     <ClInclude Include="header\int\BoneTransform.h" />
     <ClInclude Include="header\int\Collider.h" />

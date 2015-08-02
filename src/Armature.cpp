@@ -84,6 +84,15 @@ void Armature::DebugRender(){
 	trans.SetParent(nullptr);
 }
 
+void Armature::Update(float deltaTime){
+	time += deltaTime;
+
+	for(int i = 0; i < boneCount; i++){
+		bones[i].position = anim.boneAnims[i].positionAnim.Evaluate(fmodf(time, anim.boneAnims[i].positionAnim.Length()));
+		bones[i].rotation = anim.boneAnims[i].rotationAnim.Evaluate(fmodf(time, anim.boneAnims[i].rotationAnim.Length()));
+	}
+}
+
 BoneTransform* Armature::GetBoneByName(const string& name){
 	for(int i = 0; i < boneCount; i++){
 		if(bones[i].name == name){
