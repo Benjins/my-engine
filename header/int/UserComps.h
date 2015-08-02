@@ -310,9 +310,11 @@ struct CameraControl : Component{
 			}
 			else if (testHit.hit){
 				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+#if defined(_WIN32) || defined(_WIN64)
 				if(_finitef(badVec.x) == 0){
 					_CrtDbgBreak();
 				}
+#endif
 				Vector3 goodVec = moveVec - badVec;
 				if(goodVec.MagnitudeSquared() > 0){
 
@@ -324,9 +326,11 @@ struct CameraControl : Component{
 						badVec = testHit2.normal * DotProduct(goodVec, testHit2.normal);
 						goodVec = goodVec - badVec;
 						camera->GetParent()->position = camera->GetParent()->position + goodVec;
+#if defined(_WIN32) || defined(_WIN64)
 						if(_finitef(camera->GetParent()->position.x) == 0){
 							_CrtDbgBreak();
 						}
+#endif
 					}
 				}
 			}
