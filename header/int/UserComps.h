@@ -310,17 +310,23 @@ struct CameraControl : Component{
 			}
 			else if (testHit.hit){
 				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+				if(_finitef(badVec.x) == 0){
+					_CrtDbgBreak();
+				}
 				Vector3 goodVec = moveVec - badVec;
 				if(goodVec.MagnitudeSquared() > 0){
 
-					RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), goodVec);
-					if(!testHit.hit || testHit.depth > goodVec.Magnitude() + 0.2f){
+					RaycastHit testHit2 = physics->Raycast(camera->GlobalPosition(), goodVec);
+					if(!testHit2.hit || testHit2.depth > goodVec.Magnitude() + 0.2f){
 						camera->GetParent()->position = camera->GetParent()->position + goodVec;
 					}
-					else if (testHit.hit){
-						badVec = testHit.normal * DotProduct(goodVec, testHit.normal);
+					else if (testHit2.hit){
+						badVec = testHit2.normal * DotProduct(goodVec, testHit2.normal);
 						goodVec = goodVec - badVec;
 						camera->GetParent()->position = camera->GetParent()->position + goodVec;
+						if(_finitef(camera->GetParent()->position.x) == 0){
+							_CrtDbgBreak();
+						}
 					}
 				}
 			}

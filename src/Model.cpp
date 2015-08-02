@@ -655,11 +655,6 @@ void Model::ImportFromCollada(const string& fileName){
 
 	CalculateNormals();
 	CalculateTangents();
-
-
-	if(armature != nullptr){
-		Scene::getInstance().testArmature = armature;
-	}
 }
 
 void Model::ImportAnimationLibrary(const XMLElement& elem){

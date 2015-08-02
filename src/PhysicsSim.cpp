@@ -5,6 +5,8 @@
 #include "../header/int/SCTransform.h"
 #include "../header/int/Interval.h"
 #include "../header/int/RaycastHit.h"
+#include "../header/int/Mat4.h"
+#include "../header/int/Vector4.h"
 #include <string>
 
 PhysicsSim::PhysicsSim(float _deltaTime){
@@ -187,9 +189,13 @@ RaycastHit RaycastBox(BoxCollider* col, Vector3 origin, Vector3 direction){
 		transformedHit = transformedHit.Scaled(Vector3(1 / col->size.x, 1 / col->size.y, 1 / col->size.z));
 
 		Vector3 normalLocal = transformedHit;
-		normalLocal.x = (abs(abs(normalLocal.x) - 1) < 0.0000001f ? 1 : 0) * (normalLocal.x < 0 ? -1 : 1);
-		normalLocal.y = (abs(abs(normalLocal.y) - 1) < 0.0000001f ? 1 : 0) * (normalLocal.y < 0 ? -1 : 1);
-		normalLocal.z = (abs(abs(normalLocal.z) - 1) < 0.0000001f ? 1 : 0) * (normalLocal.z < 0 ? -1 : 1);
+		normalLocal.x = (1 - (abs(normalLocal.x)) <= 0.00001f ? 1 : 0) * (normalLocal.x < 0 ? -1 : 1);
+		normalLocal.y = (1 - (abs(normalLocal.y)) <= 0.00001f ? 1 : 0) * (normalLocal.y < 0 ? -1 : 1);
+		normalLocal.z = (1 - (abs(normalLocal.z)) <= 0.00001f ? 1 : 0) * (normalLocal.z < 0 ? -1 : 1);
+
+		if(normalLocal.MagnitudeSquared() == 0){
+			int xaa = 0;
+		}
 
 		x.normal = Rotate(normalLocal, trans.TotalRotation()).Normalized();
 		return x;
