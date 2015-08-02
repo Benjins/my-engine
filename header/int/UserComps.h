@@ -322,16 +322,6 @@ struct CameraControl : Component{
 					if(!testHit2.hit || testHit2.depth > goodVec.Magnitude() + 0.2f){
 						camera->GetParent()->position = camera->GetParent()->position + goodVec;
 					}
-					else if (testHit2.hit){
-						badVec = testHit2.normal * DotProduct(goodVec, testHit2.normal);
-						goodVec = goodVec - badVec;
-						camera->GetParent()->position = camera->GetParent()->position + goodVec;
-#if defined(_WIN32) || defined(_WIN64)
-						if(_finitef(camera->GetParent()->position.x) == 0){
-							_CrtDbgBreak();
-						}
-#endif
-					}
 				}
 			}
 
