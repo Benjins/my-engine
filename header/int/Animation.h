@@ -2,8 +2,9 @@
 #define ANIMATION_H
 
 #include <vector>
+#include <iostream>
 
-using std::vector;
+using std::vector; using std::cout;
 
 enum struct AnimationType{
 	Quaternion,
