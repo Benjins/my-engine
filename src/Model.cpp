@@ -623,46 +623,6 @@ void Model::ImportFromCollada(const string& fileName){
 
 						armature->bindPoses[boneIdx] = revConv * invBindPoses[boneIdx] * conv;// revConv * invBindPoses[boneIdx] * conv;
 
-						/*
-						//Get quaternion from matrix
-						Vector4 rotX = mat * Vector4(X_AXIS, 0);
-						Vector3 rotatedX = Vector3(rotX.w, rotX.x, rotX.y).Normalized();
-						
-						Quaternion initialQuat;
-
-						if(rotatedX !=  X_AXIS){
-							Vector3 vec1 = CrossProduct(X_AXIS, rotatedX);
-							float sinAngle1 = vec1.Magnitude();
-							float angle1 = asinf(sinAngle1);
-							float halfAngle1 = angle1/2;
-							float cosHalfAngle1 = cosf(halfAngle1);
-							float sinHalfAngle1 = sinf(halfAngle1);
-							vec1 = vec1.Normalized() / sinHalfAngle1;
-							float w1 = cosHalfAngle1;
-							initialQuat = Quaternion(w1, vec1.x, vec1.y, vec1.z).Normalized();
-						}
-
-						Vector3 stepyY = Rotate(Y_AXIS, initialQuat);
-						Vector4 rotY = mat * Vector4(stepyY, 0);
-						Vector3 rotatedY = Vector3(rotY.w, rotY.x, rotY.y).Normalized();
-
-						Quaternion secondQuat;
-						if(rotatedY != stepyY && rotatedY != stepyY * -1){
-							Vector3 vec2 = CrossProduct(stepyY, rotatedY);
-							float sinAngle2 = vec2.Magnitude();
-							float angle2 = asinf(max(min(sinAngle2,1.0f),-1.0f));
-							float halfAngle2 = angle2/2;
-							float cosHalfAngle2 = cosf(halfAngle2);
-							float sinHalfAngle2 = sinf(halfAngle2);
-							vec2 = vec2.Normalized() / sinHalfAngle2;
-							float w2 = cosHalfAngle2;
-							secondQuat  = Quaternion(w2, vec2.x, vec2.y, vec2.z).Normalized();
-						}
-
-						Quaternion finalQuatConj = initialQuat * secondQuat;
-						Quaternion finalQuat = (secondQuat * initialQuat).Conjugate();
-						*/
-
 						Quaternion finalQuat = MatrixToQuaternion(mat);
 						bone->position = mat * Vector3(0,0,0);
 						bone->rotation = finalQuat;

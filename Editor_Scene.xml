@@ -30,7 +30,7 @@
 	<GameObject name='test2-obj'>
 	     <Transform position='1,0,0' rotation='1,0,0,0' scale='0.200000,0.200000,0.200000'/>
 		 <Material name='worm-arm'/>
-		 <Mesh source='data/char_03.dae'/>
+		 <Mesh source='data/Worm.dae'/>
 	</GameObject>
     <GameObject name='myObj'>
         <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
