@@ -26,6 +26,11 @@ struct KeyFrame{
 	T value;
 	float time;
 
+	KeyFrame(){
+		value = T();
+		time = 0;
+	}
+
 	KeyFrame(T _value, float _time){
 		value = _value;
 		time = _time;

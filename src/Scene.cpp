@@ -246,14 +246,6 @@ void Scene::OnUpdate(){
 		(*iter)->OnUpdate();
 	}
 
-	GameObject* transObj =  FindGameObject("test2-obj");
-	if(transObj != nullptr){
-		SC_Transform* trans = transObj->mesh->armature->GetBoneByName("Bone");
-		if(trans != nullptr){
-			//trans->rotation = trans->rotation * Quaternion(Y_AXIS, 0.02);
-		}
-	}
-
 	for(GameObject* obj : spawnedObjects){
 		AddObjectAndDescendants(obj);
 	}

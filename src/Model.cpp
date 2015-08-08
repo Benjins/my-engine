@@ -75,12 +75,17 @@ Model::Model(string fileName){
 
 	armature = nullptr;
 
+	gameObject = nullptr;
+
 	string fileExt = fileName.substr(fileName.length() - 4, 4);
 	if(fileExt == ".obj"){
 		ImportFromOBJ(fileName);
 	}
 	else if(fileExt == ".dae"){
 		ImportFromCollada(fileName);
+	}
+	else if(fileExt == ".mdf"){
+		ImportFromModelFile(fileName);
 	}
 	else{
 		cout << "\n\nError: unrecognised file format for file: '" << fileName << "'\n";
@@ -134,12 +139,6 @@ void Model::CalculateTangents(){
 
 				Vector2 uvEdge1 = (face.uv1 - face.uv0).Normalized();
 				Vector2 uvEdge2 = (face.uv2 - face.uv0).Normalized();
-
-				//uvEdge1.x * a + uvEdge2.x * b = 1;
-				//uvEdge1.y * a + uvEdge2.y * b = 0;
-				//
-				//uvEdge1.x * aOverB * b + uvEdge2.x * b = 1;
-				//1 / (uvEdge1.x * aOverB + uvEdge2.x) = b;
 
 				float a,b;
 
@@ -210,16 +209,8 @@ void Model::ImportFromOBJ(const string& fileName){
 	CalculateNormals();
 	CalculateTangents();
 
-	if(fileName == "data/test_2.obj"){
-		cout << "\nFaking armature info.\n";
-		for(int i = 0; i < vertices.size(); i++){
-			vertices[i].AddBone(i % 2, 0.5f);
-			vertices[i].AddBone(i % 3, 0.5f);
-		}
-
-		armature = Scene::getInstance().testArmature;
-		cout << "Adding armature, it's " << (armature == nullptr ? "null" : "not null") << endl;
-	}
+	ExportToModelFile(fileName + ".mdf");
+	ImportFromModelFile(fileName + ".mdf");
 }
 
 void ParseColladaSourceElement(const XMLElement& element, map<string, vector<string>>& sources){
@@ -655,6 +646,9 @@ void Model::ImportFromCollada(const string& fileName){
 
 	CalculateNormals();
 	CalculateTangents();
+
+	ExportToModelFile(fileName + ".mdf");
+	ImportFromModelFile(fileName + ".mdf");
 }
 
 void Model::ImportAnimationLibrary(const XMLElement& elem){
@@ -743,6 +737,288 @@ void Model::ImportAnimationLibrary(const XMLElement& elem){
 			}
 		}
 	}
+}
+
+void Model::ImportFromModelFile(const string& fileName){
+	faces.clear();
+	vertices.clear();
+	if(armature != nullptr){
+		delete armature;
+		armature = nullptr;
+	}
+
+	FILE* fileIn = fopen(fileName.c_str(), "rb");
+
+	char magicWords[4];
+	fread(magicWords, 1, 4, fileIn);
+
+	char chunkId[5] = {0, 0, 0, 0, 0};
+	while(fread(chunkId, 1, 4, fileIn) > 0){
+		if(strncmp(chunkId, "VPOS", 4) == 0){
+			int numVerts;
+			fread(&numVerts, 4, 1, fileIn);
+			vertices.resize(numVerts);
+			for(int i = 0; i < numVerts; i++){
+				fread(&vertices[i].position, 4, 3, fileIn);
+			}
+		}
+		else if(strncmp(chunkId, "FIDX", 4) == 0){
+			int numFaces;
+			fread(&numFaces, 4, 1, fileIn);
+			faces.resize(numFaces);
+			for(int i = 0; i < numFaces; i++){
+				fread(&faces[i].v0, 4, 1, fileIn);
+				fread(&faces[i].v1, 4, 1, fileIn);
+				fread(&faces[i].v2, 4, 1, fileIn);
+			}
+		}
+		else if(strncmp(chunkId, "FUVS", 4) == 0){
+			int numFaces;
+			fread(&numFaces, 4, 1, fileIn);
+			faces.resize(numFaces);
+			for(int i = 0; i < numFaces; i++){
+				fread(&faces[i].uv0, 4, 2, fileIn);
+				fread(&faces[i].uv1, 4, 2, fileIn);
+				fread(&faces[i].uv2, 4, 2, fileIn);
+			}
+		}
+		else if(strncmp(chunkId, "VBID", 4) == 0){
+			int numVerts;
+			fread(&numVerts, 4, 1, fileIn);
+			vertices.resize(numVerts);
+			for(int i = 0; i < numVerts; i++){
+				fread(&vertices[i].numBones, 4, 1, fileIn);
+				fread(&vertices[i].boneIndices[0], 4, vertices[i].numBones, fileIn);
+			}
+		}
+		else if(strncmp(chunkId, "VBWT", 4) == 0){
+			int numVerts;
+			fread(&numVerts, 4, 1, fileIn);
+			vertices.resize(numVerts);
+			for(int i = 0; i < numVerts; i++){
+				fread(&vertices[i].numBones, 4, 1, fileIn);
+				fread(&vertices[i].boneWeights[0], 4, vertices[i].numBones, fileIn);
+			}
+		}
+		else if(strncmp(chunkId, "BNMS", 4) == 0){
+			if(armature == nullptr){
+				armature = new Armature();
+			}
+
+			fread(&armature->boneCount, 4, 1, fileIn);
+			for(int i = 0; i < armature->boneCount; i++){
+				int boneNameLength;
+				fread(&boneNameLength, 4, 1, fileIn);
+
+				char* buffer = new char[boneNameLength];
+				fread(buffer, 1, boneNameLength, fileIn);
+				armature->bones[i].name = string(buffer);
+
+				delete[] buffer;
+			}
+		}
+		else if(strncmp(chunkId, "BPOS", 4) == 0){
+			if(armature == nullptr){
+				armature = new Armature();
+			}
+
+			fread(&armature->boneCount, 4, 1, fileIn);
+			for(int i = 0; i < armature->boneCount; i++){
+				fread(&armature->bones[i].position, 4, 3, fileIn);
+			}
+		}
+		else if(strncmp(chunkId, "BROT", 4) == 0){
+			if(armature == nullptr){
+				armature = new Armature();
+			}
+
+			fread(&armature->boneCount, 4, 1, fileIn);
+			for(int i = 0; i < armature->boneCount; i++){
+				fread(&armature->bones[i].rotation, 4, 4, fileIn);
+			}
+		}
+		else if(strncmp(chunkId, "BAPS", 4) == 0){
+			if(armature == nullptr){
+				armature = new Armature();
+			}
+
+			fread(&armature->boneCount, 4, 1, fileIn);
+			for(int i = 0; i < armature->boneCount; i++){
+				int numKeyframes;
+				fread(&numKeyframes, 4, 1, fileIn);
+				armature->anim.boneAnims[i].positionAnim.keyFrames.resize(numKeyframes);
+				for(int j = 0; j < numKeyframes; j++){
+					fread(&armature->anim.boneAnims[i].positionAnim.keyFrames[j].time,  4, 1, fileIn);
+					fread(&armature->anim.boneAnims[i].positionAnim.keyFrames[j].value, 4, 3, fileIn);
+				}
+			}
+		}
+		else if(strncmp(chunkId, "BART", 4) == 0){
+			if(armature == nullptr){
+				armature = new Armature();
+			}
+
+			fread(&armature->boneCount, 4, 1, fileIn);
+			for(int i = 0; i < armature->boneCount; i++){
+				int numKeyframes;
+				fread(&numKeyframes, 4, 1, fileIn);
+				armature->anim.boneAnims[i].rotationAnim.keyFrames.resize(numKeyframes);
+				for(int j = 0; j < numKeyframes; j++){
+					fread(&armature->anim.boneAnims[i].rotationAnim.keyFrames[j].time,  4, 1, fileIn);
+					fread(&armature->anim.boneAnims[i].rotationAnim.keyFrames[j].value, 4, 4, fileIn);
+				}
+			}
+		}
+		else if(strncmp(chunkId, "BBND", 4) == 0){
+			if(armature == nullptr){
+				armature = new Armature();
+			}
+
+			fread(&armature->boneCount, 4, 1, fileIn);
+			fread(&armature->bindPoses[0], 64, armature->boneCount, fileIn);
+		}
+		else if(strncmp(chunkId, "BPNT", 4) == 0){
+			fread(&armature->boneCount, 4, 1, fileIn);
+			for(int i = 0; i < armature->boneCount; i++){
+				int boneIdx;
+				fread(&boneIdx, 4, 1, fileIn);
+
+				BoneTransform* boneParent = nullptr;
+				if(boneIdx > -1){
+					boneParent = &armature->bones[boneIdx];
+				}
+
+				armature->bones[i].SetParent(boneParent);
+			}
+		}
+		else{
+			cout << "\n\nError: Invalid chunk ID: '" << chunkId << "'" << endl;
+		}
+	}
+
+	fclose(fileIn);
+
+	if(armature != nullptr){
+		int xwy= 0;
+		armature->model = this;
+	}
+
+	CalculateNormals();
+	CalculateTangents();
+}
+
+void Model::ExportToModelFile(const string& fileName){
+	FILE* fileOut = fopen(fileName.c_str(), "wb");
+
+	fwrite("MDF", 1, 4, fileOut);
+
+	fwrite("VPOS", 1, 4, fileOut);
+	int numVerts = vertices.size();
+	fwrite(&numVerts, 4, 1, fileOut);
+	for(int i = 0; i < vertices.size(); i++){
+		fwrite(&vertices[i].position, 4, 3, fileOut);
+	}
+
+	fwrite("FIDX", 1, 4, fileOut);
+	int numFaces = faces.size();
+	fwrite(&numFaces, 4, 1, fileOut);
+	for(int i = 0; i < faces.size(); i++){
+		fwrite(&faces[i].v0, 4, 1, fileOut);
+		fwrite(&faces[i].v1, 4, 1, fileOut);
+		fwrite(&faces[i].v2, 4, 1, fileOut);
+	}
+
+	fwrite("FUVS", 1, 4, fileOut);
+	fwrite(&numFaces, 4, 1, fileOut);
+	for(int i = 0; i < faces.size(); i++){
+		fwrite(&faces[i].uv0, 4, 2, fileOut);
+		fwrite(&faces[i].uv1, 4, 2, fileOut);
+		fwrite(&faces[i].uv2, 4, 2, fileOut);
+	}
+
+	if(armature != nullptr && armature->boneCount > 0){
+		fwrite("VBID", 1, 4, fileOut);
+		int numVerts = vertices.size();
+		fwrite(&numVerts, 4, 1, fileOut);
+		for(int i = 0; i < vertices.size(); i++){
+			int numBones = vertices[i].numBones;
+			fwrite(&vertices[i].numBones, 4, 1, fileOut);
+			fwrite(&vertices[i].boneIndices[0], 4, numBones, fileOut);
+		}
+
+		fwrite("VBWT", 1, 4, fileOut);
+		fwrite(&numVerts, 4, 1, fileOut);
+		for(int i = 0; i < vertices.size(); i++){
+			int numBones = vertices[i].numBones;
+			fwrite(&vertices[i].numBones, 4, 1, fileOut);
+			fwrite(&vertices[i].boneWeights[0], 4, numBones, fileOut);
+		}
+
+		fwrite("BNMS", 1, 4, fileOut);
+		int numBones = armature->boneCount;
+		fwrite(&numBones, 4, 1, fileOut);
+		for(int i = 0; i < numBones; i++){
+			int boneNameLength = armature->bones[i].name.size();
+			boneNameLength = ((boneNameLength + 3) / 4) * 4; //Pad to 4 bytes
+			armature->bones[i].name.resize(boneNameLength);
+
+			fwrite(&boneNameLength, 4, 1, fileOut);
+			fwrite(armature->bones[i].name.c_str(), 1, boneNameLength, fileOut);
+		}
+
+		fwrite("BPOS", 1, 4, fileOut);
+		fwrite(&numBones, 4, 1, fileOut);
+		for(int i = 0; i < numBones; i++){
+			fwrite(&armature->bones[i].position, 4, 3, fileOut);
+		}
+
+		fwrite("BROT", 1, 4, fileOut);
+		fwrite(&numBones, 4, 1, fileOut);
+		for(int i = 0; i < numBones; i++){
+			fwrite(&armature->bones[i].rotation, 4, 4, fileOut);
+		}
+
+		fwrite("BAPS", 1, 4, fileOut);
+		fwrite(&numBones, 4, 1, fileOut);
+		for(int i = 0; i < numBones; i++){
+			int numKeyframes = armature->anim.boneAnims[i].positionAnim.keyFrames.size();
+			fwrite(&numKeyframes, 4, 1, fileOut);
+			for(int j = 0; j < numKeyframes; j++){
+				fwrite(&armature->anim.boneAnims[i].positionAnim.keyFrames[j].time,  4, 1, fileOut);
+				fwrite(&armature->anim.boneAnims[i].positionAnim.keyFrames[j].value, 4, 3, fileOut);
+			}
+		}
+
+		fwrite("BART", 1, 4, fileOut);
+		fwrite(&numBones, 4, 1, fileOut);
+		for(int i = 0; i < numBones; i++){
+			int numKeyframes = armature->anim.boneAnims[i].rotationAnim.keyFrames.size();
+			fwrite(&numKeyframes, 4, 1, fileOut);
+			for(int j = 0; j < numKeyframes; j++){
+				fwrite(&armature->anim.boneAnims[i].rotationAnim.keyFrames[j].time,  4, 1, fileOut);
+				fwrite(&armature->anim.boneAnims[i].rotationAnim.keyFrames[j].value, 4, 4, fileOut);
+			}
+		}
+
+		fwrite("BBND", 1, 4, fileOut);
+		fwrite(&numBones, 4, 1, fileOut);
+		fwrite(&armature->bindPoses[0], 64, numBones, fileOut);
+
+		fwrite("BPNT", 1, 4, fileOut);
+		fwrite(&numBones, 4, 1, fileOut);
+		for(int i = 0; i < numBones; i++){
+			int boneIdx = -1;
+			
+			if(armature->bones[i].GetParent() != nullptr){
+				size_t boneDiff = (size_t)(armature->bones[i].GetParent()) - (size_t)(&armature->bones[0]);
+				boneIdx = ((int)boneDiff) / sizeof(BoneTransform);
+			}
+
+			fwrite(&boneIdx, 4, 1, fileOut);
+		}
+	}
+
+	fclose(fileOut);
 }
 
 Vertex ParseVertexLine(string line){
