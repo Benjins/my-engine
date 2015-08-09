@@ -3,6 +3,7 @@
 #include "../header/int/Armature.h"
 #include "../header/int/Mat4.h"
 #include "../header/int/Vector4.h"
+#include "../header/int/ResourceManager.h"
 #include "../header/ext/simple-xml.h"
 #include <fstream>
 #include <iostream>
@@ -13,7 +14,7 @@
 
 using std::ifstream; using std::cerr; using std::cout; using std::endl; using std::map;
 
-Face::Face(void){
+Face::Face(){
 	v0 = v1 = v2 = -1;
 	uv0 = uv1 = uv2 = Vector2(0,0);
 }
@@ -25,7 +26,7 @@ Face::Face(int _v0, int _v1, int _v2){
 	uv0 = uv1 = uv2 = Vector2(0,0);
 }
 
-Vertex::Vertex(void){
+Vertex::Vertex(){
 	position = Vector3(0,0,0);
 	color = Vector3(0,0,0);
 	numBones = 0;
@@ -67,29 +68,8 @@ Model::Model(const Model& model){
 	}
 }
 
-Model::Model(string fileName){
-	this->name="";
-	this->fileName="";
-	vertices = vector<Vertex>();
-	faces = vector<Face>();
-
-	armature = nullptr;
-
-	gameObject = nullptr;
-
-	string fileExt = fileName.substr(fileName.length() - 4, 4);
-	if(fileExt == ".obj"){
-		ImportFromOBJ(fileName);
-	}
-	else if(fileExt == ".dae"){
-		ImportFromCollada(fileName);
-	}
-	else if(fileExt == ".mdf"){
-		ImportFromModelFile(fileName);
-	}
-	else{
-		cout << "\n\nError: unrecognised file format for file: '" << fileName << "'\n";
-	}
+Model::Model(const string& fileName){
+	ImportFromFile(fileName);
 }
 
 Model::~Model(){
@@ -170,6 +150,27 @@ void Model::CalculateTangents(){
 
 		vertices[i].tangent = finalTangent;
 	}
+}
+
+void Model::ImportFromFile(const string& fileName){
+	armature = nullptr;
+	gameObject = nullptr;
+
+	string fileExt = fileName.substr(fileName.length() - 4, 4);
+	if(fileExt == ".obj"){
+		ImportFromOBJ(fileName);
+	}
+	else if(fileExt == ".dae"){
+		ImportFromCollada(fileName);
+	}
+	else if(fileExt == ".mdf"){
+		ImportFromModelFile(fileName);
+	}
+	else{
+		cout << "\n\nError: unrecognised file format for file: '" << fileName << "'\n";
+	}
+
+	this->fileName = fileName;
 }
 
 void Model::ImportFromOBJ(const string& fileName){
@@ -740,6 +741,9 @@ void Model::ImportAnimationLibrary(const XMLElement& elem){
 }
 
 void Model::ImportFromModelFile(const string& fileName){
+	this->fileName = fileName;
+	this->name = fileName;
+
 	faces.clear();
 	vertices.clear();
 	if(armature != nullptr){

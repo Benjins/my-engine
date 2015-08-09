@@ -122,9 +122,11 @@ GameObject::~GameObject(){
 		delete comp;
 	}
 
+	/*
 	if(mesh != NULL){
 		delete mesh;
 	}
+	*/
 	
 	//The material is managed by MaterialManager, so we don't delete it.
 

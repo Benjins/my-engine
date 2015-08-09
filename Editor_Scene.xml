@@ -75,8 +75,8 @@
     <BoxCollider position='0.000000,0.000000,0.000000' size='4.000000,0.500000,4.000000'/>
     <AnimationComponent type='vector2' target='uvOffset' loop='T' autoplay='T'>
       <KeyFrame time='0.000000' value='0.000000,0.000000'/>
-      <KeyFrame time='2.000000' value='0.000000,2.000000'/>
-	  <KeyFrame time='4.000000' value='0.000000,4.000000'/>
+      <KeyFrame time='2.000000' value='0.000000,0.010000'/>
+	  <KeyFrame time='4.000000' value='0.000000,0.000000'/>
     </AnimationComponent>
   </GameObject>
   <GameObject name='myObj2'>

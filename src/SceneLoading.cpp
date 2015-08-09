@@ -264,7 +264,7 @@ GameObject* Scene::LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvent
 			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
 				XMLAttribute attr = *iter2;
 				if(attr.name == "source"){
-					go->AddMesh(attr.data);
+					go->mesh = resources.LoadMesh(attr.data);
 				}
 			}
 		}

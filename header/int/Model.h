@@ -62,14 +62,15 @@ struct Model{
 
 	GameObject* gameObject;
 	
-	Model(void);
+	Model();
 	Model(const Model& model);
-	Model(string fileName);
+	Model(const string& fileName);
 
 	~Model();
 	
 	int GLVertexCount() const;
 	
+	void ImportFromFile(const string& fileName);
 	void ImportFromOBJ(const string& fileName);
 	void ImportFromCollada(const string& fileName);
 	void ImportFromModelFile(const string& fileName);

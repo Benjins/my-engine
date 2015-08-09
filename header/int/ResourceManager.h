@@ -11,9 +11,11 @@ struct Texture; struct Material; struct Model; struct GameObject;
 struct MaterialManager{
 	Material* materials;
 	Texture* textures;
+	Model* models;
 
 	unsigned int matAlloc;
 	unsigned int texAlloc;
+	unsigned int meshAlloc;
 
 public:
 	MaterialManager(int matCount = 40);
@@ -27,6 +29,9 @@ public:
 
 	Texture* LoadTexture(const string& fileName, bool forceInstance = false);
 	Texture* GetTextureByFileName(const string& fileName);
+
+	Model* LoadMesh(const string& fileName, bool forceInstance = false);
+	Model* GetMeshByName(const string& name);
 
 	void Clear();
 

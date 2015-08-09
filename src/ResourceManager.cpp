@@ -7,9 +7,11 @@
 MaterialManager::MaterialManager(int matCount){
 	matAlloc = matCount;
 	texAlloc = 20;
+	meshAlloc = 20;
 	
 	materials = new Material[matAlloc];
 	textures = new Texture[texAlloc];
+	models = new Model[meshAlloc];
 }
 
 Material* MaterialManager::GetMaterialByName(string name){
@@ -81,6 +83,35 @@ Material* MaterialManager::GetFreeMaterial(){
 	return nullptr;
 }
 
+Model* MaterialManager::LoadMesh(const string& fileName, bool forceInstance){
+	if(!forceInstance){
+		for(int i = 0; i < meshAlloc; i++){
+			if(models[i].fileName == fileName){
+				return &models[i];
+			}
+		}
+	}
+
+	for(int i = 0; i < meshAlloc; i++){
+		if(models[i].fileName == ""){
+			models[i].ImportFromFile(fileName);
+			return &models[i];
+		}
+	}
+
+	return nullptr;
+}
+
+Model* MaterialManager::GetMeshByName(const string& name){
+	for(int i = 0; i < meshAlloc; i++){
+		if(models[i].name == name){
+			return &models[i];
+		}
+	}
+
+	return nullptr;
+}
+
 void MaterialManager::Clear(){
 	if(materials != NULL){
 		delete[] materials;
@@ -96,5 +127,9 @@ MaterialManager::~MaterialManager(){
 
 	if(textures != nullptr){
 		delete[] textures;
+	}
+
+	if(models != nullptr){
+		delete[] models;
 	}
 }
