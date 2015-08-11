@@ -101,9 +101,9 @@ void Texture::Load(GLenum TextureTarget, GLenum textureType, bool apply){
 	pixelData = new RGBApixel[width*height];
 
 	for(int i = 0; i < width*height; i++){
-		pixelData[i].Blue = imgBuffer[i*3];
-		pixelData[i].Green = imgBuffer[i*3+1];
-		pixelData[i].Red = imgBuffer[i*3+2];
+		pixelData[i].Green = imgBuffer[i*3];
+		pixelData[i].Red = imgBuffer[i*3+1];
+		pixelData[i].Blue = imgBuffer[i*3+2];
 		pixelData[i].Alpha = 255;
 	}
 
