@@ -20,6 +20,7 @@ struct RigidBody;
 struct PhysicsSim;
 struct XMLElement;
 struct Armature;
+struct CubeMap;
 
 struct Scene{
 	SC_Transform* camera;
@@ -34,6 +35,8 @@ struct Scene{
 	vector<Light> lights;
 
 	Armature* testArmature;
+
+	CubeMap* skyBox;
 
 protected:
 	vector<GameObject*> prefabs;
@@ -113,6 +116,7 @@ public:
 	void Stop();
 
 	GameObject* LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvents = true);
+	void LoadSkyBoxXML(const XMLElement& res);
 
 	virtual ~Scene();
 };

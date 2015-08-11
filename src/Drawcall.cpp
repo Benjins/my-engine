@@ -191,10 +191,6 @@ void DrawCall::Draw() const{
 	glDisableVertexAttribArray(3);
 
 	if(obj->mesh->armature != nullptr){
-		GLuint armatureUniformLoc = glGetUniformLocation(material->shaderProgram, "_armatureMatrices");
-		float uniformData[MAX_BONE_COUNT * 16];
-		glGetUniformfv(obj->material->shaderProgram, armatureUniformLoc, uniformData);
-
 		glDisableVertexAttribArray(4);
 		glDisableVertexAttribArray(5);
 		glDisableVertexAttribArray(6);

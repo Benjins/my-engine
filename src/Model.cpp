@@ -210,8 +210,8 @@ void Model::ImportFromOBJ(const string& fileName){
 	CalculateNormals();
 	CalculateTangents();
 
-	ExportToModelFile(fileName + ".mdf");
-	ImportFromModelFile(fileName + ".mdf");
+	//ExportToModelFile(fileName + ".mdf");
+	//ImportFromModelFile(fileName + ".mdf");
 }
 
 void ParseColladaSourceElement(const XMLElement& element, map<string, vector<string>>& sources){
@@ -648,8 +648,8 @@ void Model::ImportFromCollada(const string& fileName){
 	CalculateNormals();
 	CalculateTangents();
 
-	ExportToModelFile(fileName + ".mdf");
-	ImportFromModelFile(fileName + ".mdf");
+	//ExportToModelFile(fileName + ".mdf");
+	//ImportFromModelFile(fileName + ".mdf");
 }
 
 void Model::ImportAnimationLibrary(const XMLElement& elem){
@@ -1056,7 +1056,7 @@ Face ParseFaceLine(string line, const vector<Vector2>& uvs){
 	}
 	else{
 		vector<string> faceDataSplit0 = SplitStringByDelimiter(tokens[1],"/");
-		if(faceDataSplit0.size() > 1){
+		if(faceDataSplit0.size() == 2){
 			vector<string> faceDataSplit1 = SplitStringByDelimiter(tokens[2],"/");
 			vector<string> faceDataSplit2 = SplitStringByDelimiter(tokens[3],"/");
 

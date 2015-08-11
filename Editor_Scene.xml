@@ -1,4 +1,5 @@
 <Scene name='my-engine'>
+
   <Material name='gui' shader='data/gui' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
   <Material name='color' shader='data/col' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
   <Material name='myMat' shader='data/shader' texture='data/Texture.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
@@ -15,10 +16,14 @@
   <Material name='worm-arm' shader='data/armature_shader' texture='data/Worm_Diff.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
   <Material name='wall' shader='data/shader' texture='data/Stonewall_D.bmp' bumpMap='data/Stonewall_N.bmp' uvScale='8.000000,16.000000' uvOffset='0.000000,0.000000'/>
   <Material name='shaderTexture2.bmp' shader='data/shader' texture='data/Texture2.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+  <Material name='skybox' shader='data/skybox'/> 
   <GuiElement name='' width='300' height='1' position='0.100000,0.100000' scale='0.200000,0.020000'/>
   <GuiText name='healthText' fuv='data/CODE_Bold64.fuv' text='Health: 100' textScale='0.400000,0.400000' position='0.100000,0.050000' scale='0.100000,0.100000'/>
   <AudioClip name='cough' fileName='data/coughing.wav'/>
   <AudioClip name='footstep' fileName='data/footstep.wav'/>
+  
+  <Skybox images='data/Sky_Right.bmp,data/Sky_Left.bmp,data/Sky_Up.bmp,data/Sky_Down.bmp,data/Sky_Back.bmp,data/Sky_Front.bmp' shader='data/skybox'/>
+  
   <Prefab name='bullet'>
     <Transform position='0.120000,3.000000,-0.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
     <Material name='floorMat'/>
@@ -30,7 +35,7 @@
   <GameObject name='test2-obj'>
     <Transform position='1.000000,0.000000,0.000000' rotation='1,0,0,0' scale='0.200000,0.200000,0.200000'/>
     <Material name='worm-arm'/>
-    <Mesh source='data/char_03.dae'/>
+    <Mesh source='data/char_03.dae.mdf'/>
   </GameObject>
   <GameObject name='myObj'>
     <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
@@ -43,6 +48,13 @@
     <BoxCollider position='0.000000,0.000000,0.000000' size='0.200000,0.200000,0.200000'/>
     <RigidBody mass='1.000000' isKinematic='F'/>
   </GameObject>
+  <?
+  <GameObject name='skyBoxObj'>
+    <Transform position='-1.000000,0.000000,2.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+    <Mesh source='data/sphere.obj'/>
+	<Material name='skybox'/>
+  </GameObject>
+  ?>
   <GameObject name='mainCamSub'>
     <Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
     <Camera/>

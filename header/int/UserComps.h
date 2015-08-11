@@ -260,7 +260,7 @@ struct CameraControl : Component{
 		input = &gameObject->scene->input;
 		camera = gameObject->scene->camera;
 		physics = gameObject->scene->physicsSim;
-		slider = gameObject->scene->guiSystem.elements[0];
+		//slider = gameObject->scene->guiSystem.elements[0];
 		healthBar = static_cast<GuiText*>(gameObject->scene->guiSystem.FindGUIElement("healthText"));
 		audioComp = gameObject->GetComponent<AudioComponent>();
 	}
@@ -295,7 +295,7 @@ struct CameraControl : Component{
 
 		//health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
 		health = max(0.0f, min(1.0f, health));
-		GuiSetSliderValue(slider, health);
+		//GuiSetSliderValue(slider, health);
 		if(healthBar != nullptr){
 			healthBar->text = "Health: " + to_string((int)(health*100));
 		}

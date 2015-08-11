@@ -8,6 +8,7 @@
 #include "../header/int/Collider.h"
 #include "../header/int/PhysicsSim.h"
 #include "../header/int/Armature.h"
+#include "../header/int/CubeMap.h"
 #include "../header/int/FontBMPMaker.h"
 #include "../header/ext/simple-xml.h"
 #include <time.h>
@@ -37,6 +38,8 @@ Scene::Scene(int argc, char** argv){
 	physicsSim = new PhysicsSim();
 	input = Input();
 	pathfinding.scene = this;
+
+	skyBox = nullptr;
 	/*
 	testArmature = new Armature();
 
@@ -275,8 +278,8 @@ void PhysicsUpdate(){
 }
 
 void Scene::OnPostLoad(){
-	FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
-	pathfinding.HookUpNodes();
+	//FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+	//pathfinding.HookUpNodes();
 }
 
 void Scene::Render(){
@@ -302,6 +305,7 @@ void Scene::Render(){
 		isDirectional[i] = lights[i].isDirectional ? 1 : 0;
 	}
 
+	
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		glUseProgram(iter->obj->material->shaderProgram);
 		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
@@ -313,10 +317,7 @@ void Scene::Render(){
 
 		iter->Draw();	
 	}
-
-	//Gui and gizmos stuff 
-	glDisable(GL_DEPTH_TEST);
-
+	
 	if(testArmature != nullptr){
 		Material* vertCol = resources.GetMaterialByName("color");
 		glUseProgram(vertCol->shaderProgram);
@@ -326,11 +327,18 @@ void Scene::Render(){
 		testArmature->DebugRender();
 	}
 
+	if(skyBox != nullptr){
+		skyBox->Render(camMatrix, perspMatrix);
+	}
+
+	//Gui and gizmos stuff 
+	glDisable(GL_DEPTH_TEST);
+
 	//Gui stuff
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	guiSystem.RenderGui();
+	//guiSystem.RenderGui();
 }
 
 void Scene::OnMouse(int button, int state, int x, int y){
@@ -414,6 +422,10 @@ Scene::~Scene(){
 	}
 
 	delete physicsSim;
+
+	if(skyBox != nullptr){
+		delete skyBox;
+	}
 
 	//delete testArmature;
 }

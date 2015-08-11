@@ -6,6 +6,7 @@
 #include "../header/int/GuiElement.h"
 #include "../header/int/UserComps.h"
 #include "../header/int/RigidBody.h"
+#include "../header/int/CubeMap.h"
 #include "../header/ext/simple-xml.h"
 
 struct FireGun;
@@ -326,6 +327,17 @@ GameObject* Scene::LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvent
 	return go;
 }
 
+void Scene::LoadSkyBoxXML(const XMLElement& res){
+	const string& images = res.attributeMap.find("images")->second;
+	vector<string> imagesSplit = SplitStringByDelimiter(images, ",");
+
+	const string& shader = res.attributeMap.find("shader")->second;
+
+	skyBox = new CubeMap();
+
+	skyBox->Load(imagesSplit.data(), shader, &resources);
+}
+
 void Scene::LoadScene(string fileName){
 
 	RemoveAllObjects(); 
@@ -357,6 +369,9 @@ void Scene::LoadScene(string fileName){
 				}
 				else if(res.name == "AudioClip"){
 					LoadAudioXML(this, res);
+				}
+				else if(res.name == "Skybox"){
+					LoadSkyBoxXML(res);
 				}
 			}
 		}

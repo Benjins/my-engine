@@ -143,6 +143,7 @@
     <ClCompile Include="src\AudioSystem.cpp" />
     <ClCompile Include="src\Collider.cpp" />
     <ClCompile Include="src\Component.cpp" />
+    <ClCompile Include="src\CubeMap.cpp" />
     <ClCompile Include="src\Drawcall.cpp" />
     <ClCompile Include="src\EditorScene.cpp" />
     <ClCompile Include="src\FontBMPMaker.cpp" />
@@ -207,6 +208,7 @@
     <ClInclude Include="header\int\BoneTransform.h" />
     <ClInclude Include="header\int\Collider.h" />
     <ClInclude Include="header\int\Component.h" />
+    <ClInclude Include="header\int\CubeMap.h" />
     <ClInclude Include="header\int\Drawcall.h" />
     <ClInclude Include="header\int\EditorScene.h" />
     <ClInclude Include="header\int\FontBMPMaker.h" />
