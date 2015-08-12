@@ -10,7 +10,13 @@
 
 using std::string;
 
-struct RGBApixel;
+struct RGBApixel {
+	unsigned char Blue;
+	unsigned char Green;
+	unsigned char Red;
+	unsigned char Alpha;
+};
+
 struct ResourceManager;
 
 struct Texture{

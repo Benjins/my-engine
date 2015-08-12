@@ -10,5 +10,5 @@ void main()
 {
 	vec3 texCoordTrans = texCoord;
 	texCoordTrans.y = -texCoordTrans.y;
-    FragColor = texture(_cubeMap, texCoordTrans);
+    FragColor = texture(_cubeMap, texCoordTrans/2);
 }

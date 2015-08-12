@@ -13,6 +13,7 @@ CubeMap::CubeMap(){
 }
 
 void CubeMap::Load(string fileNames[], const string& shaderName, MaterialManager* resources){
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	material = resources->LoadMaterial("skybox", shaderName);
 
 	Model mesh;
@@ -38,6 +39,22 @@ void CubeMap::Load(string fileNames[], const string& shaderName, MaterialManager
 		Texture tex;
 		tex.fileName = fileNames[i];
 		tex.Load(GL_TEXTURE0, GL_TEXTURE_2D, false);
+
+		//Edge debugging.
+		/*
+		RGBApixel red = {0,0,255,255};
+		for(int x = 0; x < tex.width; x++){
+			tex.SetPixel(x, 0, red);
+			tex.SetPixel(x, tex.height-1, red);
+		}
+		
+		for(int y = 0; y < tex.height; y++){
+			tex.SetPixel(0, y, red);
+			tex.SetPixel(tex.width-1, y, red);
+		}
+		*/
+
+		cout << "tex dimensions: " << tex.width << ", " << tex.height << endl;
 
 		Bind(GL_TEXTURE2);
 		glTexImage2D(types[i], 0, GL_RGBA, tex.width, tex.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, tex.pixelData);

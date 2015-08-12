@@ -315,6 +315,12 @@ void Scene::Render(){
 		glUniform3fv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightVectors"), lights.size(), (GLfloat*)lightVectors);
 		glUniform1iv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightIsDirectional"), lights.size(), isDirectional);
 
+		GLint cubeMapLoc = glGetUniformLocation(iter->obj->material->shaderProgram, "_cubeMap");
+		if(cubeMapLoc != -1){
+			skyBox->Bind(GL_TEXTURE2);
+			glUniform1i(cubeMapLoc, 2);
+		}
+
 		iter->Draw();	
 	}
 	

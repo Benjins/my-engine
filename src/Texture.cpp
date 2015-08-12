@@ -1,6 +1,5 @@
 #include "../header/int/Texture.h"
 #include "../header/int/ResourceManager.h"
-#include "../header/ext/EasyBMP.h"
 #include <stdio.h>
 #include <iostream>
 
@@ -87,8 +86,12 @@ void Texture::Load(GLenum TextureTarget, GLenum textureType, bool apply){
 	BitMapHeader header;	
 	fread(&header, sizeof(header), 1, bmpFile);
 
-	unsigned char* imgBuffer = new unsigned char[header.imageDataSize];
-	fread(imgBuffer, 1, header.imageDataSize, bmpFile);
+	int imageDataSize = header.imageDataSize;
+	if(imageDataSize == 0){
+		imageDataSize = header.imageHeight * header.imageWidth * header.bitDepth / 8;
+	}
+	unsigned char* imgBuffer = new unsigned char[imageDataSize];
+	fread(imgBuffer, 1, imageDataSize, bmpFile);
 	fclose(bmpFile);
 
 	width = header.imageWidth;
@@ -101,9 +104,9 @@ void Texture::Load(GLenum TextureTarget, GLenum textureType, bool apply){
 	pixelData = new RGBApixel[width*height];
 
 	for(int i = 0; i < width*height; i++){
-		pixelData[i].Green = imgBuffer[i*3];
-		pixelData[i].Red = imgBuffer[i*3+1];
-		pixelData[i].Blue = imgBuffer[i*3+2];
+		pixelData[i].Blue = imgBuffer[i*3];
+		pixelData[i].Green = imgBuffer[i*3+1];
+		pixelData[i].Red = imgBuffer[i*3+2];
 		pixelData[i].Alpha = 255;
 	}
 
