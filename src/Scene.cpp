@@ -242,6 +242,12 @@ void Scene::OnUpdate(){
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
 
+	GuiText* fpsText = static_cast<GuiText*>(guiSystem.FindGUIElement("fpsText"));
+	if(fpsText != nullptr && deltaTime > 0){
+		string fps = "FPS: " + to_string((int)((1/deltaTime) + 0.5f));
+		fpsText->text = fps;
+	}
+
 	audio.SetListenerPos(camera->GlobalPosition());
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
@@ -344,7 +350,7 @@ void Scene::Render(){
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//guiSystem.RenderGui();
+	guiSystem.RenderGui();
 }
 
 void Scene::OnMouse(int button, int state, int x, int y){

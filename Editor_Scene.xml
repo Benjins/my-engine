@@ -20,6 +20,7 @@
   <Material name='reflective' shader='data/reflective' texture='data/grass-dirt.bmp' bumpMap='data/grass-dirt-norm.bmp'/> 
   <GuiElement name='' width='300' height='1' position='0.100000,0.100000' scale='0.200000,0.020000'/>
   <GuiText name='healthText' fuv='data/CODE_Bold64.fuv' text='Health: 100' textScale='0.400000,0.400000' position='0.100000,0.050000' scale='0.100000,0.100000'/>
+  <GuiText name='fpsText' fuv='data/CODE_Bold64.fuv' text='FPS:' textScale='0.400000,0.400000' position='0.100000,0.950000' scale='0.100000,0.100000'/>
   <AudioClip name='cough' fileName='data/coughing.wav'/>
   <AudioClip name='footstep' fileName='data/footstep.wav'/>
   
