@@ -13,6 +13,21 @@
 
 using std::string;
 
+enum struct MaterialFlag{
+	None = 0,
+	Normals =           (1 << 0),
+	Tangents =          (1 << 1),
+	UVs =               (1 << 2),
+	Lighting =          (1 << 3),
+	Objectmatrix =      (1 << 4),
+	CameraMatrix =      (1 << 5),
+	PerspectiveMatrix = (1 << 6),
+	Skybox =            (1 << 7),
+	TintColor =         (1 << 8),
+	Armature =          (1 << 9),
+	All = 0xFFFFFFFF
+};
+
 struct Texture;
 struct Vector4;
 struct Mat4x4;

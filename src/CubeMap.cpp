@@ -12,9 +12,12 @@ CubeMap::CubeMap(){
 	material = nullptr;	
 }
 
-void CubeMap::Load(string fileNames[], const string& shaderName, MaterialManager* resources){
+void CubeMap::Load(string fileNames[], const string& matName, MaterialManager* resources){
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-	material = resources->LoadMaterial("skybox", shaderName);
+	material = resources->GetMaterialByName(matName);
+	if(material == nullptr){
+		cout << "\n\nError: Could not find material '" << matName << "' for skyBox.\n";
+	}
 
 	Model mesh;
 	mesh.ImportFromOBJ("data/sphere.obj");
@@ -38,6 +41,7 @@ void CubeMap::Load(string fileNames[], const string& shaderName, MaterialManager
 	for(int i = 0; i < 6; i++){
 		Texture tex;
 		tex.fileName = fileNames[i];
+		textureFileNames[i] = fileNames[i];
 		tex.Load(GL_TEXTURE0, GL_TEXTURE_2D, false);
 
 		//Edge debugging.

@@ -16,12 +16,14 @@ struct CubeMap{
 	GLuint cubeMeshObj;
 
 	int glVertexCount;
-	
+
+	string textureFileNames[6];
+
 	static GLenum types[];
 
 	CubeMap();
 
-	void Load(string fileNames[], const string& shaderName, MaterialManager* resources);
+	void Load(string fileNames[], const string& matName, MaterialManager* resources);
 
 	void Bind(GLenum textureUnit);
 

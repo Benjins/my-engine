@@ -1,5 +1,4 @@
 <Scene name='my-engine'>
-
   <Material name='gui' shader='data/gui' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
   <Material name='color' shader='data/col' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
   <Material name='myMat' shader='data/shader' texture='data/Texture.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
@@ -16,16 +15,24 @@
   <Material name='worm-arm' shader='data/armature_shader' texture='data/Worm_Diff.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
   <Material name='wall' shader='data/shader' texture='data/Stonewall_D.bmp' bumpMap='data/Stonewall_N.bmp' uvScale='8.000000,16.000000' uvOffset='0.000000,0.000000'/>
   <Material name='shaderTexture2.bmp' shader='data/shader' texture='data/Texture2.bmp' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
-  <Material name='skybox' shader='data/skybox'/> 
-  <Material name='reflective' shader='data/reflective' texture='data/grass-dirt.bmp' bumpMap='data/grass-dirt-norm.bmp'/> 
+  <Material name='skybox' shader='data/skybox' bumpMap='' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
+  <Material name='reflective' shader='data/reflective' texture='data/grass-dirt.bmp' bumpMap='data/grass-dirt-norm.bmp' uvScale='1.000000,1.000000' uvOffset='0.000000,0.000000'/>
   <GuiElement name='' width='300' height='1' position='0.100000,0.100000' scale='0.200000,0.020000'/>
   <GuiText name='healthText' fuv='data/CODE_Bold64.fuv' text='Health: 100' textScale='0.400000,0.400000' position='0.100000,0.050000' scale='0.100000,0.100000'/>
   <GuiText name='fpsText' fuv='data/CODE_Bold64.fuv' text='FPS:' textScale='0.400000,0.400000' position='0.100000,0.950000' scale='0.100000,0.100000'/>
   <AudioClip name='cough' fileName='data/coughing.wav'/>
   <AudioClip name='footstep' fileName='data/footstep.wav'/>
-  
-  <Skybox images='data/Sky_Right.bmp,data/Sky_Left.bmp,data/Sky_Up.bmp,data/Sky_Down.bmp,data/Sky_Back.bmp,data/Sky_Front.bmp' shader='data/skybox'/>
-  
+  <AudioClip name='cough' fileName='data/coughing.wav'/>
+  <AudioClip name='footstep' fileName='data/footstep.wav'/>
+  <Skybox images='data/Sky_Right.bmp,data/Sky_Left.bmp,data/Sky_Up.bmp,data/Sky_Down.bmp,data/Sky_Back.bmp,data/Sky_Front.bmp' material='skybox'/>
+  <Prefab name='bullet'>
+    <Transform position='0.120000,3.000000,-0.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
+    <Material name='floorMat'/>
+    <Mesh source='data/test.obj'/>
+    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+    <BulletComponent speed='6.000000'/>
+    <RigidBody mass='0.100000' isKinematic='F'/>
+  </Prefab>
   <Prefab name='bullet'>
     <Transform position='0.120000,3.000000,-0.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
     <Material name='floorMat'/>
@@ -35,7 +42,7 @@
     <RigidBody mass='0.100000' isKinematic='F'/>
   </Prefab>
   <GameObject name='test2-obj'>
-    <Transform position='1.000000,0.000000,0.000000' rotation='1,0,0,0' scale='0.200000,0.200000,0.200000'/>
+    <Transform position='1.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.200000,0.200000,0.200000'/>
     <Material name='worm-arm'/>
     <Mesh source='data/char_03.dae.mdf'/>
   </GameObject>
@@ -52,9 +59,9 @@
   </GameObject>
   <GameObject name='mainCamSub'>
     <Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
-    <Camera/>
     <AudioComponent clipName='footstep' volume='0.900000' loop='F' autoPlay='F'/>
     <FireGun/>
+	<Camera/>
     <CameraControl speed='6.000000' velocity='0.000000' isGrounded='F' health='1.000000' stepDelay='0.600000'/>
   </GameObject>
   <GameObject name='light1'>
@@ -83,7 +90,7 @@
     <AnimationComponent type='vector2' target='uvOffset' loop='T' autoplay='T'>
       <KeyFrame time='0.000000' value='0.000000,0.000000'/>
       <KeyFrame time='2.000000' value='0.000000,0.010000'/>
-	  <KeyFrame time='4.000000' value='0.000000,0.000000'/>
+      <KeyFrame time='4.000000' value='0.000000,0.000000'/>
     </AnimationComponent>
   </GameObject>
   <GameObject name='myObj2'>
@@ -112,11 +119,11 @@
     <Transform position='-2.487024,0.853775,-2.078232' rotation='0.814109,0.258640,0.157428,-0.495528' scale='1.000000,1.000000,1.000000'/>
     <Material name='reflective'/>
     <Mesh source='data/monkey.obj'/>
-	<AnimationComponent type='quaternion' target='rotation' loop='T' autoplay='T'>
-      <KeyFrame time='0.000000' value='0.9914448613738104,0,-0.13052619222005157,0'/>
-      <KeyFrame time='1.000000' value='0.49572243068690536,0.11303899832181541,-0.0652630961100258,0.8586164364012607'/>
-      <KeyFrame time='2.000000' value='0.495722430686905,,-0.11303899832181542,-0.06526309611002576,-0.858616436401261'/>
-	  <KeyFrame time='3.000000' value='0.9914448613738104,0,-0.13052619222005157,0'/>
+    <AnimationComponent type='quaternion' target='rotation' loop='T' autoplay='T'>
+      <KeyFrame time='0.000000' value='0.991445,0.000000,-0.130526,0.000000'/>
+      <KeyFrame time='1.000000' value='0.495722,0.113039,-0.065263,0.858616'/>
+      <KeyFrame time='2.000000' value='0.495722,0.000000,-0.113039,-0.065263'/>
+      <KeyFrame time='3.000000' value='0.991445,0.000000,-0.130526,0.000000'/>
     </AnimationComponent>
   </GameObject>
   <GameObject name='worm'>

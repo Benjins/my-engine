@@ -117,6 +117,7 @@ public:
 
 	GameObject* LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvents = true);
 	void LoadSkyBoxXML(const XMLElement& res);
+	XMLElement SaveSkyBoxXML();
 
 	virtual ~Scene();
 };

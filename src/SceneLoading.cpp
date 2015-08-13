@@ -331,11 +331,26 @@ void Scene::LoadSkyBoxXML(const XMLElement& res){
 	const string& images = res.attributeMap.find("images")->second;
 	vector<string> imagesSplit = SplitStringByDelimiter(images, ",");
 
-	const string& shader = res.attributeMap.find("shader")->second;
+	const string& materialName = res.attributeMap.find("material")->second;
 
 	skyBox = new CubeMap();
 
-	skyBox->Load(imagesSplit.data(), shader, &resources);
+	skyBox->Load(imagesSplit.data(), materialName, &resources);
+}
+
+XMLElement Scene::SaveSkyBoxXML(){
+	XMLElement elem;
+	elem.name = "Skybox";
+
+	string textureFileNames = skyBox->textureFileNames[0];
+	for(int i = 1; i < 6; i++){
+		textureFileNames = textureFileNames + "," + skyBox->textureFileNames[i];
+	}
+
+	elem.AddAttribute("images", textureFileNames);
+	elem.AddAttribute("material", skyBox->material->matName);
+
+	return elem;
 }
 
 void Scene::LoadScene(string fileName){
@@ -435,6 +450,10 @@ void Scene::SaveScene(string fileName){
 		elem.attributes.emplace_back("name", audio.clips[i].clipName);
 		elem.attributes.emplace_back("fileName", audio.clips[i].clipFileName);
 		scene.children.push_back(elem);
+	}
+
+	if(skyBox != nullptr){
+		scene.children.push_back(SaveSkyBoxXML());
 	}
 
 	for(auto iter = prefabs.begin(); iter != prefabs.end(); iter++){

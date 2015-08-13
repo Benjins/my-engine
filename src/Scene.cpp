@@ -418,6 +418,11 @@ void Scene::RemoveAllObjects(){
 	drawCalls.clear();
 
 	resources.Clear();
+
+	if(skyBox != nullptr){
+		delete skyBox;
+		skyBox = nullptr;
+	}
 }
 
 void Scene::Stop(){
@@ -437,6 +442,7 @@ Scene::~Scene(){
 
 	if(skyBox != nullptr){
 		delete skyBox;
+		skyBox = nullptr;
 	}
 
 	//delete testArmature;
