@@ -59,9 +59,9 @@
   </GameObject>
   <GameObject name='mainCamSub'>
     <Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+    <Camera/>
     <AudioComponent clipName='footstep' volume='0.900000' loop='F' autoPlay='F'/>
     <FireGun/>
-	<Camera/>
     <CameraControl speed='6.000000' velocity='0.000000' isGrounded='F' health='1.000000' stepDelay='0.600000'/>
   </GameObject>
   <GameObject name='light1'>
