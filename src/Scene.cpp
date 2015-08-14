@@ -314,8 +314,9 @@ void Scene::Render(){
 	
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		glUseProgram(iter->obj->material->shaderProgram);
-		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
-		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
+
+		iter->obj->material->SetMat4Uniform("_perspMatrix", perspMatrix);
+		iter->obj->material->SetMat4Uniform("_cameraMatrix", camMatrix);
 
 		glUniform1i(glGetUniformLocation(iter->obj->material->shaderProgram, "numLights"), lights.size());
 		glUniform3fv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightVectors"), lights.size(), (GLfloat*)lightVectors);

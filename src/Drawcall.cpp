@@ -116,15 +116,11 @@ void DrawCall::Draw() const{
 
 	glUniformMatrix3fv(material->GetUniformByName("_uvMatrix"), 1, GL_TRUE, uvMatrix);
 
-	GLenum erroQ = glGetError();
+	material->SetMat4Uniform("_objectMatrix", obj->transform.LocalToGlobalMatrix());
 
-	glUniformMatrix4fv(material->GetUniformByName("_objectMatrix"), 1, GL_TRUE,  &obj->transform.LocalToGlobalMatrix().m[0][0]);
 	glUniform1i(glGetUniformLocation(material->shaderProgram, "_mainTex"), 0);
 	if(material->bumpMap != nullptr){
 		glUniform1i(glGetUniformLocation(material->shaderProgram, "_bumpMap"), 1);
-	}
-	else{
-		glUniform1i(glGetUniformLocation(material->shaderProgram, "_bumpMap"), -1);
 	}
 
 	GLenum erroX = glGetError();

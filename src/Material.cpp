@@ -134,22 +134,62 @@ void Material::Switch(string _shaderName, MaterialManager* manager, string textu
 }
 
 void Material::SetFloatUniform(string name, float value){
-	SetFloatUniform(GetUniformIndexByName(name), value);
+	auto iter = uniformLocCache.find(name);
+	if(iter == uniformLocCache.end()){
+		GLint loc = glGetUniformLocation(shaderProgram, name.c_str());
+		uniformLocCache.insert(std::make_pair(name, loc));
+		glUniform1f(loc, value);
+	}
+	else{
+		glUniform1f(iter->second, value);
+	}
 }
 
 void Material::SetVec2Uniform(string name, Vector2 value){
-	SetVec2Uniform(GetUniformIndexByName(name), value);
+	auto iter = uniformLocCache.find(name);
+	if(iter == uniformLocCache.end()){
+		GLint loc = glGetUniformLocation(shaderProgram, name.c_str());
+		uniformLocCache.insert(std::make_pair(name, loc));
+		glUniform2fv(loc, 1, (GLfloat*)&value);
+	}
+	else{
+		glUniform2fv(iter->second, 1, (GLfloat*)&value);
+	}
 }
 void Material::SetVec3Uniform(string name, Vector3 value){
-	SetVec3Uniform(GetUniformIndexByName(name), value);
+	auto iter = uniformLocCache.find(name);
+	if(iter == uniformLocCache.end()){
+		GLint loc = glGetUniformLocation(shaderProgram, name.c_str());
+		uniformLocCache.insert(std::make_pair(name, loc));
+		glUniform3fv(loc, 1, (GLfloat*)&value);
+	}
+	else{
+		glUniform3fv(iter->second, 1, (GLfloat*)&value);
+	}
 }
 
 void Material::SetVec4Uniform(string name, Vector4 value){
-	SetVec4Uniform(GetUniformIndexByName(name), value);
+	auto iter = uniformLocCache.find(name);
+	if(iter == uniformLocCache.end()){
+		GLint loc = glGetUniformLocation(shaderProgram, name.c_str());
+		uniformLocCache.insert(std::make_pair(name, loc));
+		glUniform4fv(loc, 1, (GLfloat*)&value);
+	}
+	else{
+		glUniform4fv(iter->second, 1, (GLfloat*)&value);
+	}
 }
 
 void Material::SetMat4Uniform(string name, Mat4x4 value){
-	SetMat4Uniform(GetUniformIndexByName(name), value);
+	auto iter = uniformLocCache.find(name);
+	if(iter == uniformLocCache.end()){
+		GLint loc = glGetUniformLocation(shaderProgram, name.c_str());
+		uniformLocCache.insert(std::make_pair(name, loc));
+		glUniformMatrix4fv(loc, 1, GL_TRUE, (GLfloat*)&value.m);
+	}
+	else{
+		glUniformMatrix4fv(iter->second, 1,  GL_TRUE, (GLfloat*)&value.m);
+	}
 }
 
 void Material::SetTextureUniform(string name, Texture* value){
@@ -166,46 +206,6 @@ void Material::SetMainTexture(Texture* value){
 	}
 
 	mainTexture = value;
-}
-
-void Material::SetFloatUniform(int index, float value){
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	glUseProgram(shaderProgram);
-	glUniform1f(GetUniformByIndex(index),value);
-	glUseProgram(currProgram);
-}
-
-void Material::SetVec2Uniform(int index, Vector2 value){
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	glUseProgram(shaderProgram);
-	glUniform2f(GetUniformByIndex(index),value.x, value.y);
-	glUseProgram(currProgram);
-}
-
-void Material::SetVec3Uniform(int index, Vector3 value){
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	glUseProgram(shaderProgram);
-	glUniform3f(GetUniformByIndex(index),value.x, value.y, value.z);
-	glUseProgram(currProgram);
-}
-
-void Material::SetVec4Uniform(int index, Vector4 value){
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	glUseProgram(shaderProgram);
-	glUniform4f(GetUniformByIndex(index), value.w, value.x, value.y, value.z);
-	glUseProgram(currProgram);
-}
-
-void Material::SetMat4Uniform(int index, Mat4x4 value){
-	GLint currProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-	glUseProgram(shaderProgram);
-	glUniformMatrix4fv(GetUniformByIndex(index),1, GL_TRUE, &(value.m[0][0]));
-	glUseProgram(currProgram);
 }
 
 bool ReadFile(string fileName, string& readInto){
