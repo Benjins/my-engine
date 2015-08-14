@@ -25,7 +25,7 @@ enum struct MaterialFlag{
 	Skybox =            (1 << 7),
 	TintColor =         (1 << 8),
 	Armature =          (1 << 9),
-	All = 0xFFFFFFFF
+	All = 0x7FFFFFFF
 };
 
 struct Texture;
