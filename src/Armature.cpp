@@ -88,11 +88,11 @@ void Armature::Update(float deltaTime){
 	time += deltaTime;
 
 	for(int i = 0; i < boneCount; i++){
-		float posTime = fmodf(time, anim.boneAnims[i].positionAnim.Length());
-		float rotTime = fmodf(time, anim.boneAnims[i].rotationAnim.Length());
+		float posTime = fmodf(time, anim[0].boneAnims[i].positionAnim.Length());
+		float rotTime = fmodf(time, anim[0].boneAnims[i].rotationAnim.Length());
 
-		bones[i].position = anim.boneAnims[i].positionAnim.Evaluate(posTime);
-		bones[i].rotation = anim.boneAnims[i].rotationAnim.Evaluate(rotTime);
+		bones[i].position = anim[0].boneAnims[i].positionAnim.Evaluate(posTime);
+		bones[i].rotation = anim[0].boneAnims[i].rotationAnim.Evaluate(rotTime);
 	}
 }
 

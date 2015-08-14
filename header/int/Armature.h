@@ -10,12 +10,14 @@
 
 using std::vector; using std::string;
 
+#define MAX_ANIM_COUNT 8
+
 struct Model;
 
 struct Armature{
 	BoneTransform bones[MAX_BONE_COUNT];
 	Mat4x4 bindPoses[MAX_BONE_COUNT];
-	ArmatureAnimation anim;
+	ArmatureAnimation anim[MAX_ANIM_COUNT];
 
 	Model* model;
 	int boneCount;

@@ -619,9 +619,9 @@ void Model::ImportFromCollada(const string& fileName){
 						bone->position = mat * Vector3(0,0,0);
 						bone->rotation = finalQuat;
 
-						if(armature->anim.boneAnims[boneIdx].positionAnim.Length() == 0.0f){
-							armature->anim.boneAnims[boneIdx].positionAnim.AddKeyFrame(bone->position, 0);
-							armature->anim.boneAnims[boneIdx].rotationAnim.AddKeyFrame(bone->rotation, 0);
+						if(armature->anim[0].boneAnims[boneIdx].positionAnim.Length() == 0.0f){
+							armature->anim[0].boneAnims[boneIdx].positionAnim.AddKeyFrame(bone->position, 0);
+							armature->anim[0].boneAnims[boneIdx].rotationAnim.AddKeyFrame(bone->rotation, 0);
 						}
 					}
 					else if(child.name == "node"){
@@ -708,8 +708,8 @@ void Model::ImportAnimationLibrary(const XMLElement& elem){
 						const vector<float>& input = sources.find(inputId)->second;
 						const vector<float>& output = sources.find(outputId)->second;
 
-						armature->anim.boneAnims[boneIdx].positionAnim.keyFrames.clear();
-						armature->anim.boneAnims[boneIdx].rotationAnim.keyFrames.clear();
+						armature->anim[0].boneAnims[boneIdx].positionAnim.keyFrames.clear();
+						armature->anim[0].boneAnims[boneIdx].rotationAnim.keyFrames.clear();
 
 						for(int i = 0; i < input.size(); i++){
 							float time = input[i];
@@ -727,8 +727,8 @@ void Model::ImportAnimationLibrary(const XMLElement& elem){
 							Vector3 pos = mat * Vector3(0,0,0);
 							Quaternion rot = MatrixToQuaternion(mat);
 							
-							armature->anim.boneAnims[boneIdx].positionAnim.AddKeyFrame(pos, time);
-							armature->anim.boneAnims[boneIdx].rotationAnim.AddKeyFrame(rot, time);
+							armature->anim[0].boneAnims[boneIdx].positionAnim.AddKeyFrame(pos, time);
+							armature->anim[0].boneAnims[boneIdx].rotationAnim.AddKeyFrame(rot, time);
 						}
 					}
 					else{
@@ -850,10 +850,10 @@ void Model::ImportFromModelFile(const string& fileName){
 			for(int i = 0; i < armature->boneCount; i++){
 				int numKeyframes;
 				fread(&numKeyframes, 4, 1, fileIn);
-				armature->anim.boneAnims[i].positionAnim.keyFrames.resize(numKeyframes);
+				armature->anim[0].boneAnims[i].positionAnim.keyFrames.resize(numKeyframes);
 				for(int j = 0; j < numKeyframes; j++){
-					fread(&armature->anim.boneAnims[i].positionAnim.keyFrames[j].time,  4, 1, fileIn);
-					fread(&armature->anim.boneAnims[i].positionAnim.keyFrames[j].value, 4, 3, fileIn);
+					fread(&armature->anim[0].boneAnims[i].positionAnim.keyFrames[j].time,  4, 1, fileIn);
+					fread(&armature->anim[0].boneAnims[i].positionAnim.keyFrames[j].value, 4, 3, fileIn);
 				}
 			}
 		}
@@ -866,10 +866,10 @@ void Model::ImportFromModelFile(const string& fileName){
 			for(int i = 0; i < armature->boneCount; i++){
 				int numKeyframes;
 				fread(&numKeyframes, 4, 1, fileIn);
-				armature->anim.boneAnims[i].rotationAnim.keyFrames.resize(numKeyframes);
+				armature->anim[0].boneAnims[i].rotationAnim.keyFrames.resize(numKeyframes);
 				for(int j = 0; j < numKeyframes; j++){
-					fread(&armature->anim.boneAnims[i].rotationAnim.keyFrames[j].time,  4, 1, fileIn);
-					fread(&armature->anim.boneAnims[i].rotationAnim.keyFrames[j].value, 4, 4, fileIn);
+					fread(&armature->anim[0].boneAnims[i].rotationAnim.keyFrames[j].time,  4, 1, fileIn);
+					fread(&armature->anim[0].boneAnims[i].rotationAnim.keyFrames[j].value, 4, 4, fileIn);
 				}
 			}
 		}
@@ -985,22 +985,22 @@ void Model::ExportToModelFile(const string& fileName){
 		fwrite("BAPS", 1, 4, fileOut);
 		fwrite(&numBones, 4, 1, fileOut);
 		for(int i = 0; i < numBones; i++){
-			int numKeyframes = armature->anim.boneAnims[i].positionAnim.keyFrames.size();
+			int numKeyframes = armature->anim[0].boneAnims[i].positionAnim.keyFrames.size();
 			fwrite(&numKeyframes, 4, 1, fileOut);
 			for(int j = 0; j < numKeyframes; j++){
-				fwrite(&armature->anim.boneAnims[i].positionAnim.keyFrames[j].time,  4, 1, fileOut);
-				fwrite(&armature->anim.boneAnims[i].positionAnim.keyFrames[j].value, 4, 3, fileOut);
+				fwrite(&armature->anim[0].boneAnims[i].positionAnim.keyFrames[j].time,  4, 1, fileOut);
+				fwrite(&armature->anim[0].boneAnims[i].positionAnim.keyFrames[j].value, 4, 3, fileOut);
 			}
 		}
 
 		fwrite("BART", 1, 4, fileOut);
 		fwrite(&numBones, 4, 1, fileOut);
 		for(int i = 0; i < numBones; i++){
-			int numKeyframes = armature->anim.boneAnims[i].rotationAnim.keyFrames.size();
+			int numKeyframes = armature->anim[0].boneAnims[i].rotationAnim.keyFrames.size();
 			fwrite(&numKeyframes, 4, 1, fileOut);
 			for(int j = 0; j < numKeyframes; j++){
-				fwrite(&armature->anim.boneAnims[i].rotationAnim.keyFrames[j].time,  4, 1, fileOut);
-				fwrite(&armature->anim.boneAnims[i].rotationAnim.keyFrames[j].value, 4, 4, fileOut);
+				fwrite(&armature->anim[0].boneAnims[i].rotationAnim.keyFrames[j].time,  4, 1, fileOut);
+				fwrite(&armature->anim[0].boneAnims[i].rotationAnim.keyFrames[j].value, 4, 4, fileOut);
 			}
 		}
 

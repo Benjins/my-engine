@@ -13,6 +13,7 @@ struct BoneAnim{
 };
 
 struct ArmatureAnimation{
+	string stateName;
 	BoneAnim boneAnims[MAX_BONE_COUNT];
 };
 
