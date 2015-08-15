@@ -118,9 +118,9 @@ void DrawCall::Draw() const{
 
 	material->SetMat4Uniform("_objectMatrix", obj->transform.LocalToGlobalMatrix());
 
-	glUniform1i(glGetUniformLocation(material->shaderProgram, "_mainTex"), 0);
+	glUniform1i(material->GetUniformByName("_mainTex"), 0);
 	if(material->bumpMap != nullptr){
-		glUniform1i(glGetUniformLocation(material->shaderProgram, "_bumpMap"), 1);
+		glUniform1i(material->GetUniformByName("_bumpMap"), 1);
 	}
 
 	GLenum erroX = glGetError();
@@ -165,7 +165,7 @@ void DrawCall::Draw() const{
 
 		GLenum erro1 = glGetError();
 
-		GLint armatureUniformLoc = glGetUniformLocation(material->shaderProgram, "_armatureMatrices");
+		GLint armatureUniformLoc = material->GetUniformByName("_armatureMatrices");
 		glUniformMatrix4fv(armatureUniformLoc, boneMatrices.size(), GL_TRUE, &(boneMatrices[0].m[0][0]));
 
 		erro1 = glGetError();

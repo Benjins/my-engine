@@ -77,10 +77,8 @@ struct Material{
 	void SetTextureUniform(string name, Texture* value);
 
 	void SetMainTexture(Texture* value);
-	
-	GLuint GetUniformByName(string name);
-	int GetUniformIndexByName(string name);
-	GLuint GetUniformByIndex(int index);
+
+	GLint GetUniformByName(string name);
 
 	void Release(ResourceManager* manager);
 

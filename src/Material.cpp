@@ -276,32 +276,15 @@ vector<string> GetUniformNames(string shaderCode){
 	return uniformNames;
 }
 
-GLuint Material::GetUniformByName(string name){
-	for(int i = 0; i < uniformNames.size(); i++){
-		if(uniformNames[i] == name){
-			return glGetUniformLocation(shaderProgram, name.c_str());
-		}
-	}
-
-	return -1;
-}
-
-int Material::GetUniformIndexByName(string name){
-	for(int i = 0; i < uniformNames.size(); i++){
-		if(uniformNames[i] == name){
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-GLuint Material::GetUniformByIndex(int index){
-	if(index < MAX_NUMBER_OF_UNIFORMS && index > 0){
-		return uniforms[index];
+GLint Material::GetUniformByName(string name){
+	auto iter = uniformLocCache.find(name);
+	if(iter == uniformLocCache.end()){
+		GLint loc = glGetUniformLocation(shaderProgram, name.c_str());
+		uniformLocCache.insert(std::make_pair(name, loc));
+		return loc;
 	}
 	else{
-		return -1;
+		return iter->second;
 	}
 }
 
