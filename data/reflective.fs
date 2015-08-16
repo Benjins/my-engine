@@ -7,6 +7,7 @@ in vec2 uv_coord;
 in vec3 normal;
 in vec3 pos;
 in vec3 tangent;
+in vec3 cameraVec;
 
 uniform float reflectiveLevel = 0.9;
 
@@ -23,7 +24,10 @@ void main()
 	bumpCol = bumpCol * 2.0 - vec4(1.0,1.0,1.0,0.0);
 	vec3 usedNormal = normal * bumpCol.b + actualTangent * bumpCol.g + cross(normal, actualTangent) * bumpCol.r;
 	
-	vec4 reflectiveSample = texture(_cubeMap, usedNormal);
+	vec3 normalProj = dot(cameraVec, usedNormal) * usedNormal;
+	vec3 sampleVec = cameraVec - (2 * normalProj);
+	
+	vec4 reflectiveSample = texture(_cubeMap, sampleVec);
 	
 	FragColor = mix(texCol, reflectiveSample, reflectiveLevel);
 }

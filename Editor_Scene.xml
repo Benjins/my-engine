@@ -119,12 +119,14 @@
     <Transform position='-2.487024,0.853775,-2.078232' rotation='0.814109,0.258640,0.157428,-0.495528' scale='1.000000,1.000000,1.000000'/>
     <Material name='reflective'/>
     <Mesh source='data/monkey.obj'/>
+	<?
     <AnimationComponent type='quaternion' target='rotation' loop='T' autoplay='T'>
       <KeyFrame time='0.000000' value='0.991445,0.000000,-0.130526,0.000000'/>
-      <KeyFrame time='1.000000' value='0.495722,0.113039,-0.065263,0.858616'/>
-      <KeyFrame time='2.000000' value='0.495722,0.000000,-0.113039,-0.065263'/>
-      <KeyFrame time='3.000000' value='0.991445,0.000000,-0.130526,0.000000'/>
+      <KeyFrame time='10.000000' value='0.495722,0.113039,-0.065263,0.858616'/>
+      <KeyFrame time='20.000000' value='0.495722,0.000000,-0.113039,-0.065263'/>
+      <KeyFrame time='30.000000' value='0.991445,0.000000,-0.130526,0.000000'/>
     </AnimationComponent>
+	?>
   </GameObject>
   <GameObject name='worm'>
     <Transform position='-3.487024,5.153775,-5.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
