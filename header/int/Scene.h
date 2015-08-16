@@ -22,6 +22,8 @@ struct XMLElement;
 struct Armature;
 struct CubeMap;
 
+#define FPS_SMOOTHING_FACTOR 60
+
 struct Scene{
 	SC_Transform* camera;
 	float deltaTime;
@@ -53,6 +55,9 @@ protected:
 	int buttonDown;
 	float xRot;
 	float yRot;
+
+	float prevDeltaTime[FPS_SMOOTHING_FACTOR];
+	int prevDeltaTimeIndex;
 
 	bool running;
 

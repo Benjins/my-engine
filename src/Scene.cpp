@@ -202,6 +202,11 @@ void Scene::Start(){
 	prevTime = clock();
 #endif
 
+	prevDeltaTimeIndex = 0;
+	for(int i = 0; i < FPS_SMOOTHING_FACTOR; i++){
+		prevDeltaTime[i] = 0.0f;
+	}
+
 	running = true;
 	while(running){
 #ifdef __APPLE__
@@ -242,9 +247,19 @@ void Scene::OnUpdate(){
 	deltaTime = ((double)currTime - prevTime)/divisor;
 	prevTime = currTime;
 
+	prevDeltaTime[prevDeltaTimeIndex] = deltaTime;
+	prevDeltaTimeIndex = (prevDeltaTimeIndex + 1) % FPS_SMOOTHING_FACTOR;
+
+	float smoothedFPS = 0.0f;
+	for(int i = 0; i < FPS_SMOOTHING_FACTOR; i++){
+		smoothedFPS = smoothedFPS + prevDeltaTime[i];
+	}
+
+	smoothedFPS /= FPS_SMOOTHING_FACTOR;
+
 	GuiText* fpsText = static_cast<GuiText*>(guiSystem.FindGUIElement("fpsText"));
 	if(fpsText != nullptr && deltaTime > 0){
-		string fps = "FPS: " + to_string((int)((1/deltaTime) + 0.5f));
+		string fps = "FPS: " + to_string((int)((1/smoothedFPS) + 0.5f));
 		fpsText->text = fps;
 	}
 
