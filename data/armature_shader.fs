@@ -14,7 +14,7 @@ uniform vec4 _color;
 
 uniform vec3 lightVectors[MAX_NUM_LIGHTS];
 uniform int lightIsDirectional[MAX_NUM_LIGHTS];
-uniform int numLights;
+uniform float numLights;
 
 void main()
 {
@@ -28,7 +28,7 @@ void main()
 	vec3 usedNormal = normal * bumpCol.b + actualTangent * bumpCol.g + cross(normal, actualTangent) * bumpCol.r;
 	
 	float lighting = 0.1;
-	for(int i = 0; i < numLights; i++){
+	for(int i = 0; i < int(numLights + 0.5); i++){
 		if(lightIsDirectional[i] != 0){
 			lighting += (dot(usedNormal, lightVectors[i]) + 1)/2;
 		}

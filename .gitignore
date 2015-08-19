@@ -24,6 +24,9 @@
 !lib/*.a
 !lib/*.lib
 
+#OpenGL traces
+*.trace
+
 # Executables
 *.exe
 *.out

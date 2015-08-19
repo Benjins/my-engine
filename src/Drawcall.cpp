@@ -112,8 +112,6 @@ void DrawCall::Draw() const{
 							0, material->uvScale.y, material->uvOffset.y,
 							0,                      0,                 1};
 
-	GLenum erroR = glGetError();
-
 	glUniformMatrix3fv(material->GetUniformByName("_uvMatrix"), 1, GL_TRUE, uvMatrix);
 
 	material->SetMat4Uniform("_objectMatrix", obj->transform.LocalToGlobalMatrix());
@@ -122,8 +120,6 @@ void DrawCall::Draw() const{
 	if(material->bumpMap != nullptr){
 		glUniform1i(material->GetUniformByName("_bumpMap"), 1);
 	}
-
-	GLenum erroX = glGetError();
 
 	vector<Mat4x4> boneMatrices;
 	if(obj->mesh->armature != nullptr){
@@ -148,8 +144,6 @@ void DrawCall::Draw() const{
 	glBindBuffer(GL_ARRAY_BUFFER, tangents);
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	GLenum erroV = glGetError();
-
 	if(obj->mesh->armature != nullptr){
 		glEnableVertexAttribArray(4);
 		glBindBuffer(GL_ARRAY_BUFFER, boneIndices);
@@ -163,12 +157,8 @@ void DrawCall::Draw() const{
 		glBindBuffer(GL_ARRAY_BUFFER, boneCount);
 		glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE,  0, 0);
 
-		GLenum erro1 = glGetError();
-
 		GLint armatureUniformLoc = material->GetUniformByName("_armatureMatrices");
 		glUniformMatrix4fv(armatureUniformLoc, boneMatrices.size(), GL_TRUE, &(boneMatrices[0].m[0][0]));
-
-		erro1 = glGetError();
 	}
 
 	if(material->mainTexture != nullptr){
