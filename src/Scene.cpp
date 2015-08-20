@@ -217,9 +217,11 @@ void Scene::Start(){
 
 		double total = ((double)afterSwap - start)/CLOCKS_PER_SEC;
 
+		/*
 		if(total < 0.016f){
-			Sleep(16 - int(total * 1000));
+			sleep(16 - int(total * 1000));
 		}
+		*/
 
 		printf("event: %.1f, updt: %.1f, rend: %.1f, flush: %.1f, swap: %.1f, total: %.1f\n", loopEventTime * 1000, 1000 * updateTime, renderTime * 1000, finishTime * 1000, swapTime * 1000, total * 1000);
 
