@@ -193,22 +193,22 @@ void Scene::Start(){
 
 		double loopEventTime = ((double)afterCheck - start)/CLOCKS_PER_SEC;
 
+		Render();
+
+		clock_t afterRender = clock();
+		double renderTime = ((double)afterRender - afterCheck)/CLOCKS_PER_SEC;
+
 		OnUpdate();
 		physicsSim->Advance(deltaTime);
 
 		clock_t afterUpdate = clock();
 
-		double updateTime = ((double)afterUpdate - afterCheck)/CLOCKS_PER_SEC;
+		double updateTime = ((double)afterUpdate - afterRender)/CLOCKS_PER_SEC;
 
-		Render();
-
-		clock_t afterRender = clock();
-		double renderTime = ((double)afterRender - afterUpdate)/CLOCKS_PER_SEC;
-
-		glFinish();
+		//glFinish();
 
 		clock_t afterFinish = clock();
-		double finishTime = ((double)afterFinish - afterRender)/CLOCKS_PER_SEC;
+		double finishTime = ((double)afterFinish - afterUpdate)/CLOCKS_PER_SEC;
 
 		glutSwapBuffers();
 
@@ -217,7 +217,11 @@ void Scene::Start(){
 
 		double total = ((double)afterSwap - start)/CLOCKS_PER_SEC;
 
-		printf("Frame times: loopEventTime: %.1f, renderTime: %.1f, finishTime: %.1f, total: %.1f\n", loopEventTime * 1000, renderTime * 1000, finishTime * 1000, total * 1000);
+		if(total < 0.016f){
+			Sleep(16 - int(total * 1000));
+		}
+
+		printf("event: %.1f, updt: %.1f, rend: %.1f, flush: %.1f, swap: %.1f, total: %.1f\n", loopEventTime * 1000, 1000 * updateTime, renderTime * 1000, finishTime * 1000, swapTime * 1000, total * 1000);
 
 		GLenum err = glGetError();
 		if(err != 0){
@@ -326,6 +330,7 @@ void Scene::Render(){
 		isDirectional[i] = lights[i].isDirectional ? 1 : 0;
 	}
 	
+	
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		Vector3 objPos = iter->obj->transform.GlobalPosition();
 		Vector3 cameraPos = camera->GlobalPosition();
@@ -357,6 +362,7 @@ void Scene::Render(){
 		skyBox->Render(camMatrix, perspMatrix);
 	}
 
+	
 	//Gui and gizmos stuff 
 	glDisable(GL_DEPTH_TEST);
 

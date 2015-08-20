@@ -80,15 +80,15 @@ void CubeMap::Render(const Mat4x4& cameraMat, const Mat4x4& perspMat){
 	Mat4x4 scaleCamMat = cameraMat;
 	glUseProgram(material->shaderProgram);
 
-	GLint uniformLoc = glGetUniformLocation(material->shaderProgram, "_cameraMatrix");
+	GLint uniformLoc = material->GetUniformByName("_cameraMatrix");
 	glUniformMatrix4fv(uniformLoc, 1, GL_TRUE, &scaleCamMat.m[0][0]);
 
-	GLint perspUniformLoc = glGetUniformLocation(material->shaderProgram, "_perspMatrix");
+	GLint perspUniformLoc = material->GetUniformByName("_perspMatrix");
 	glUniformMatrix4fv(perspUniformLoc, 1, GL_TRUE, &perspMat.m[0][0]);
 	
 	Bind(GL_TEXTURE2);
 
-	GLint textureLoc = glGetUniformLocation(material->shaderProgram, "_cubeMap");
+	GLint textureLoc = material->GetUniformByName("_cubeMap");
 	glUniform1i(textureLoc, 2);
 
 	GLint oldCullFaceMode;
@@ -98,9 +98,6 @@ void CubeMap::Render(const Mat4x4& cameraMat, const Mat4x4& perspMat){
 
 	glCullFace(GL_FRONT);
 	glDepthFunc(GL_LEQUAL);
-
-	glDisable(GL_CULL_FACE);
-	//glEnable(GL_DEPTH_WR
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, cubeMeshObj);
