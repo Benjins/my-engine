@@ -906,7 +906,9 @@ struct EnemyComp : HitComponent{
 	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
 		health--;
 		float ratio = ((float)health)/maxHealth;
-		gameObject->material->SetVec4Uniform("_color", Vector4(1.0f - ratio, 0, 0, 1.0f));
+		cout << "Ratio: " << ratio << endl;
+		//glUseProgram(gameObject->material->shaderProgram);
+		//gameObject->material->SetVec4Uniform("_color", Vector4(1.0f - ratio, 0, 0, 1.0f));
 		if(health <= 0){
 			GameObject* newObj = gameObject->Clone();
 			gameObject->material->matName = "";
@@ -935,7 +937,7 @@ struct EnemyComp : HitComponent{
 			currentTarget = player->transform.position;
 			longTermGoal = currentTarget;
 			pathNeedsUpdate = true;
-			//gameObject->material->SetVec4Uniform("_color", Vector4(0, 1, 0, 1.0f));
+			gameObject->material->SetVec4Uniform("_color", Vector4(0, 1, 0, 1.0f));
 		}
 		else{
 			//gameObject->material->SetVec4Uniform("_color", Vector4(0, 0, 0, 1.0f));
@@ -1006,9 +1008,7 @@ struct EnemyComp : HitComponent{
 		if(reloadTimeCounter > reloadTime){
 			reloadTimeCounter = 0;
 			Vector3 spawnPos = gameObject->transform.position + gameObject->transform.Forward();
-			//spawnPos.y = 6.4f;
 			GameObject* instance = gameObject->scene->Instantiate(bulletPrefab, spawnPos, gameObject->transform.rotation);
-			//cout << "Instance '" << instance->name << "' was created.\n";
 		}
 	}
 };

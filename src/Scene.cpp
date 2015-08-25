@@ -227,7 +227,7 @@ void Scene::Start(){
 
 		GLenum err = glGetError();
 		if(err != 0){
-			printf("GL Error: %d\n", err);
+			printf("GL Error: %d, meaning: '%s'\n", err, gluErrorString(err));
 		}
 
 		input.EndFrame();
@@ -306,7 +306,7 @@ void PhysicsUpdate(){
 
 void Scene::OnPostLoad(){
 	//FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
-	//pathfinding.HookUpNodes();
+	pathfinding.HookUpNodes();
 }
 
 void Scene::Render(){
