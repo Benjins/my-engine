@@ -58,8 +58,6 @@ void CubeMap::Load(string fileNames[], const string& matName, MaterialManager* r
 		}
 		*/
 
-		cout << "tex dimensions: " << tex.width << ", " << tex.height << endl;
-
 		Bind(GL_TEXTURE2);
 		glTexImage2D(types[i], 0, GL_RGBA, tex.width, tex.height, 0, GL_BGRA, GL_UNSIGNED_BYTE, tex.pixelData);
 		

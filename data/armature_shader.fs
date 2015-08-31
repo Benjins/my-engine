@@ -26,6 +26,7 @@ void main()
 	vec3 actualTangent = normalize(tangent - dot(tangent, normal) * normal);
 	bumpCol = bumpCol * 2.0 - vec4(1.0,1.0,1.0,0.0);
 	vec3 usedNormal = normal * bumpCol.b + actualTangent * bumpCol.g + cross(normal, actualTangent) * bumpCol.r;
+	//usedNormal = normalize(usedNormal);
 	
 	float lighting = 0.1;
 	for(int i = 0; i < int(numLights + 0.5); i++){
@@ -42,5 +43,5 @@ void main()
 		}
 	}
 	
-	FragColor = color;// * lighting;
+	FragColor = color * lighting;
 }

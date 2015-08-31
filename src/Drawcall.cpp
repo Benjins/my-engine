@@ -151,7 +151,7 @@ void DrawCall::Draw() const{
 
 		glEnableVertexAttribArray(5);
 		glBindBuffer(GL_ARRAY_BUFFER, boneWeights);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_TRUE, 0, 0);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glEnableVertexAttribArray(6);
 		glBindBuffer(GL_ARRAY_BUFFER, boneCount);
