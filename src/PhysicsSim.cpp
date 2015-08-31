@@ -130,23 +130,34 @@ RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
 
 RaycastHit RaycastSphere(SphereCollider* col, Vector3 origin, Vector3 direction){
 	SC_Transform trans = col->gameObject->transform;
-	Vector3 transformedColPosition = trans.LocalToGlobal(col->position);
-	float transformedColRadius = trans.TotalScale().x * col->radius;
+	Vector3 transformedOrigin = trans.GlobalToLocal(origin);
+	Vector3 transformedDirection = trans.GlobalToLocal(direction) - trans.GlobalToLocal(Vector3(0,0,0));
+	transformedDirection = transformedDirection.Normalized();
+	
+	Vector3 originToCenter = col->position - transformedOrigin;
+	Vector3 originToCenterProjectedOntoDir = VectorProject(originToCenter, transformedDirection);
+	
+	Vector3 checkVec = (transformedOrigin + originToCenterProjectedOntoDir - col->position);
+	float distance = checkVec.Magnitude();
 
-	Vector3 originToCentre = transformedColPosition - origin;
-	Vector3 projection = VectorProject(originToCentre, direction);
-	float distance = (origin + projection - transformedColPosition).Magnitude();
-
-	if(distance > transformedColRadius){
+	if(distance > col->radius){
 		RaycastHit hit;
 		hit.hit = false;
 		return hit;
 	}
+	
+	float backOutDist = sqrt((col->radius * col->radius) - (distance * distance));
+	Vector3 hitLocation = transformedOrigin + originToCenterProjectedOntoDir - (transformedDirection * backOutDist);
+
+	float depth = (hitLocation - transformedOrigin).Magnitude();
 
 	RaycastHit hit;
 	hit.hit = true;
-	hit.depth = 0;
+	hit.depth = depth;
+	hit.worldPos = origin + direction*hit.depth;
+	hit.hit = true;
 	hit.col = col;
+	hit.normal = (hitLocation - col->position).Normalized();
 	return hit;
 }
 

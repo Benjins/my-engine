@@ -121,8 +121,9 @@
     <Mesh source='data/monkey.obj'/>
   </GameObject>
   <GameObject name='refl_sphere'>
-    <Transform position='-4.487024,0.853775,2.078232' rotation='1,0,0,0' scale='1.000000,1.000000,1.000000'/>
+    <Transform position='-4.487024,0.053775,2.078232' rotation='1,0,0,0' scale='1.000000,1.000000,1.000000'/>
     <Material name='reflective'/>
+    <SphereCollider position='0,0,0' radius='1.01'/>
     <Mesh source='data/sphere.obj'/>
   </GameObject>
   <GameObject name='worm'>
@@ -298,7 +299,7 @@
       <KeyFrame time='2.000000' value='2.000000,1.100000,-2.000000'/>
     </AnimationComponent>
   </GameObject>
-  <?
+  
   <GameObject name='enemy1'>
 		<Material name='enemyMat'/>
 		<Mesh source='data/test.obj'/>
@@ -313,5 +314,5 @@
 		<BoxCollider position='0,0,0' size='1,1,1'/>
 		<EnemyComp speed="1.5" health='12' maxHealth="12"/>
 	</GameObject>
-	?>
+	
 </Scene>
