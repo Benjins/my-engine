@@ -21,6 +21,8 @@ struct GuiSystem{
 	void RenderGui();
 
 	GuiElement* FindGUIElement(const string& name);
+	void RemoveElement(GuiElement* elem);
+	void ClearElementChildren(GuiElement* elem);
 
 	GuiElement* AddGuiElement(MaterialManager* resources);
 	void LoadGuiElement(const XMLElement& elem, MaterialManager* resources);

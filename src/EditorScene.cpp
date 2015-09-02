@@ -106,6 +106,16 @@ void EditorScene::Start(){
 
 	editorGui.elements.push_back(nameField);
 
+	GuiElement* componentPanel = new GuiElement(&resources);
+	componentPanel->name = "components_panel";
+	componentPanel->position = Vector2(0.85f,0.16f);
+	componentPanel->scale = Vector2(0.3f, 0.3f);
+	componentPanel->tex = new Texture(1,1);
+	componentPanel->tex->SetPixel(0,0,pix);
+	componentPanel->tex->Apply();
+
+	editorGui.elements.push_back(componentPanel);
+
 	running = true;
 	while(running){
 #ifdef __APPLE__
@@ -204,7 +214,7 @@ void EditorScene::EditorUpdate(){
 
 	if(input.GetKeyUp(127)){
 		RemoveObject(selectedObj);
-		selectedObj = nullptr;
+		DeselectObject();
 	}
 	
 	if(input.GetKeyUp('p')){
@@ -222,7 +232,8 @@ void EditorScene::EditorUpdate(){
 	}
 
 	if(input.GetKeyUp('f') && selectedObj != nullptr){
-		selectedObj = Instantiate(selectedObj, selectedObj->transform.GlobalPosition() + editorCamera.Right(), selectedObj->transform.TotalRotation());
+		GameObject* copy = Instantiate(selectedObj, selectedObj->transform.GlobalPosition() + editorCamera.Right(), selectedObj->transform.TotalRotation());
+		SelectObject(copy);
 	}
 
 	const float speed = 2.0f;
@@ -376,10 +387,10 @@ void EditorScene::EditorUpdate(){
 		else if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
 			RaycastHit testHit = selectionSim.Raycast(editorCamera.position, rayDirection);
 			if(testHit.hit){
-				selectedObj = testHit.col->gameObject;
+				SelectObject(testHit.col->gameObject);
 			}
 			else{
-				selectedObj = nullptr;
+				DeselectObject();
 			}
 
 			selectedAxis = -1;
@@ -438,6 +449,39 @@ void EditorScene::EditorUpdate(){
 
 	prevX = input.mouseX;
 	prevY = input.mouseY;
+}
+
+void EditorScene::SelectObject(GameObject* obj){
+	if(selectedObj != nullptr){
+		DeselectObject();
+	}
+
+	selectedObj = obj;
+
+	GuiElement* compPanel = editorGui.FindGUIElement("components_panel");
+
+	int index = 0;
+	for(Component* component : selectedObj->components){
+		XMLElement compCache = component->Serialize();
+		if(compCache.name != ""){
+			GuiText* guiTxt = new GuiText(&resources, "data/arial_16.fuv");
+			guiTxt->position = Vector2(0.8f, 0.25f - 0.04f * index);
+			guiTxt->scale = Vector2(0.1f, 0.04f);
+			guiTxt->text = compCache.name + ":";
+
+			editorGui.elements.push_back(guiTxt);
+			guiTxt->SetParent(compPanel);
+
+			index++;
+		}
+	}
+}
+
+void EditorScene::DeselectObject(){
+	selectedObj = nullptr;
+
+	GuiElement* compPanel = editorGui.FindGUIElement("components_panel");
+	editorGui.ClearElementChildren(compPanel);
 }
 
 void EditorScene::EditorGUI(){

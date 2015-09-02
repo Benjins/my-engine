@@ -27,6 +27,8 @@ struct Collider : Component{
 	virtual void OnAwake();
 
 	virtual Component* Clone() = 0;
+	virtual XMLElement Serialize() = 0;
+	virtual void Deserialize(const XMLElement& elem) = 0;
 
 	virtual ~Collider();
 };
@@ -47,6 +49,8 @@ struct BoxCollider : Collider{
 	virtual void OnAwake();
 
 	virtual Component* Clone();
+	virtual XMLElement Serialize();
+	virtual void Deserialize(const XMLElement& elem);
 
 	virtual ~BoxCollider();
 };
@@ -65,6 +69,8 @@ struct SphereCollider : Collider{
 	virtual void OnAwake();
 
 	virtual Component* Clone();
+	virtual XMLElement Serialize();
+	virtual void Deserialize(const XMLElement& elem);
 
 	virtual ~SphereCollider();
 };

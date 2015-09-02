@@ -29,6 +29,26 @@ GuiElement* GuiSystem::FindGUIElement(const string& name){
 	return NULL;
 }
 
+void GuiSystem::RemoveElement(GuiElement* elem){
+	for(auto iter = elements.begin(); iter != elements.end(); ++iter){
+		if(*iter == elem){
+			elements.erase(iter);
+			break;
+		}
+	}
+
+	delete elem;
+}
+
+void GuiSystem::ClearElementChildren(GuiElement* elem){
+	for(GuiElement* child : elem->children){
+		ClearElementChildren(child);
+		RemoveElement(child);
+	}
+
+	elem->children.clear();
+}
+
 GuiElement* GuiSystem::OnMouseDown(const Vector2& hitPoint){
 	for(GuiElement* elem : elements){
 		if(elem->WasHit(hitPoint)){

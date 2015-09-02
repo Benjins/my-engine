@@ -17,6 +17,8 @@ Component* GetUserDefinedComp(const string& name){
 	if(name == ""){
 		return nullptr;
 	}
+	DEFINE_USER_COMPONENT(BoxCollider)
+	DEFINE_USER_COMPONENT(SphereCollider)
 	DEFINE_USER_COMPONENT(MatChangeOnHit)
 	DEFINE_USER_COMPONENT(FireGun)
 	DEFINE_USER_COMPONENT(EnemyComp)
@@ -29,6 +31,8 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(BulletComponent)
 	DEFINE_USER_COMPONENT(PlayerComponent)
 	DEFINE_USER_COMPONENT(DoorComponent)
+
+	return nullptr;
 }
 
 string EncodeVector3(Vector3 vec){
@@ -271,44 +275,6 @@ GameObject* Scene::LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvent
 		}
 		else if(child.name == "Camera"){
 			camera = &(go->transform);
-		}
-		else if(child.name == "BoxCollider"){
-			BoxCollider* col = new BoxCollider();
-			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
-				XMLAttribute attr = *iter2;
-				if(attr.name == "position"){
-					col->position = ParseVector3(attr.data);
-				}
-				else if(attr.name == "size"){
-					col->size = ParseVector3(attr.data);
-				}
-			}
-
-			if(fireAwakeEvents){
-				go->AddComponent(col);
-			}
-			else{
-				go->AddComponentDirect(col);
-			}
-		}
-		else if(child.name == "SphereCollider"){
-			SphereCollider* col = new SphereCollider();
-			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
-				XMLAttribute attr = *iter2;
-				if(attr.name == "position"){
-					col->position = ParseVector3(attr.data);
-				}
-				else if(attr.name == "radius"){
-					col->radius = atof(attr.data.c_str());
-				}
-			}
-
-			if(fireAwakeEvents){
-				go->AddComponent(col);
-			}
-			else{
-				go->AddComponentDirect(col);
-			}
 		}
 		else{
 			Component* userComp = GetUserDefinedComp(iter->name);

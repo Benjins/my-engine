@@ -36,6 +36,9 @@ struct EditorScene : Scene{
 		return instance;
 	}
 
+	void SelectObject(GameObject* obj);
+	void DeselectObject();
+
 	virtual void Start();
 
 	void RecalculateSelectionSim();
