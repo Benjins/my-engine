@@ -418,6 +418,10 @@ void EditorScene::EditorUpdate(){
 		else{
 			meshTxt->text = "Mesh: ";
 		}
+
+		for(EditorComponentGui& compGui : componentGui){
+			compGui.Save();
+		}
 	}
 	else{
 		static_cast<GuiText*>(editorGui.elements[1])->text = "Position:";
@@ -465,7 +469,7 @@ void EditorScene::SelectObject(GameObject* obj){
 		XMLElement compCache = component->Serialize();
 		if(compCache.name != ""){
 			GuiText* guiTxt = new GuiText(&resources, "data/arial_16.fuv");
-			guiTxt->position = Vector2(0.8f, 0.25f - 0.04f * index);
+			guiTxt->position = Vector2(0.8f, 0.25f - 0.03f * index);
 			guiTxt->scale = Vector2(0.1f, 0.04f);
 			guiTxt->text = compCache.name + ":";
 
@@ -473,12 +477,43 @@ void EditorScene::SelectObject(GameObject* obj){
 			guiTxt->SetParent(compPanel);
 
 			index++;
+
+			for(const XMLAttribute& attr : compCache.attributes){
+				GuiText* fieldLabel = new GuiText(&resources, "data/arial_16.fuv");
+				fieldLabel->position = Vector2(0.8f, 0.25f - 0.03f * index);
+				fieldLabel->scale = Vector2(0.08f, 0.03f);
+				fieldLabel->text = attr.name;
+
+				editorGui.elements.push_back(fieldLabel);
+				fieldLabel->SetParent(guiTxt);
+
+				GuiTextField* inputField = new GuiTextField(&resources, "data/arial_16.fuv");
+				inputField->position = Vector2(0.9f, 0.25f - 0.03f * index);
+				inputField->scale = Vector2(0.1f, 0.03f);
+				inputField->text = attr.data;
+
+				editorGui.elements.push_back(inputField);
+				inputField->SetParent(guiTxt);
+
+				EditorComponentGui compGui;
+				compGui.serializedComponent = compCache;
+				compGui.liveComponent = component;
+				compGui.fieldLabel = fieldLabel;
+				compGui.inputText = inputField;
+				compGui.Load();
+
+				componentGui.push_back(compGui);
+
+				index++;
+			}
 		}
 	}
 }
 
 void EditorScene::DeselectObject(){
 	selectedObj = nullptr;
+
+	componentGui.clear();
 
 	GuiElement* compPanel = editorGui.FindGUIElement("components_panel");
 	editorGui.ClearElementChildren(compPanel);

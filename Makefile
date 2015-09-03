@@ -21,6 +21,9 @@ testing_mac: src/*.cpp test/testing.cpp
 engine_debug: src/*.cpp
 	$(CXX) -std=c++11 -g -Iheader/ext/freetype2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine_debug
 
+editor_debug: src/*.cpp
+	$(CXX) -std=c++11 -g -DEDITOR -Iheader/ext/freetype2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine-editor_debug
+
 engine_opt: src/*.cpp
 	$(CXX) -std=c++11 -Iheader/ext/freetype2 -O2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine
 

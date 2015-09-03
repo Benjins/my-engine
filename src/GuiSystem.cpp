@@ -50,7 +50,8 @@ void GuiSystem::ClearElementChildren(GuiElement* elem){
 }
 
 GuiElement* GuiSystem::OnMouseDown(const Vector2& hitPoint){
-	for(GuiElement* elem : elements){
+	for(auto iter = elements.rbegin(); iter != elements.rend(); ++iter){
+		GuiElement* elem = *iter;
 		if(elem->WasHit(hitPoint)){
 			elem->OnMouseDown(hitPoint);
 			mouseDownElement = elem;
@@ -64,7 +65,8 @@ GuiElement* GuiSystem::OnMouseDown(const Vector2& hitPoint){
 }
 
 GuiElement* GuiSystem::OnMouseDrag(const Vector2& hitPoint){
-	for(GuiElement* elem : elements){
+	for(auto iter = elements.rbegin(); iter != elements.rend(); ++iter){
+		GuiElement* elem = *iter;
 		if(elem->WasHit(hitPoint)){
 			elem->OnMouseDrag(hitPoint);
 			return elem;
@@ -79,7 +81,8 @@ GuiElement* GuiSystem::OnMouseUp(const Vector2& hitPoint){
 		mouseDownElement->OnMouseUp(hitPoint);
 	}
 
-	for(GuiElement* elem : elements){
+	for(auto iter = elements.rbegin(); iter != elements.rend(); ++iter){
+		GuiElement* elem = *iter;
 		if(elem->WasHit(hitPoint)){
 			if(elem != mouseDownElement){
 				elem->OnMouseUp(hitPoint);
