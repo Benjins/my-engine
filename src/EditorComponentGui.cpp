@@ -3,6 +3,8 @@
 #include "../header/int/Component.h"
 #include "../header/int/Collider.h"
 
+#include <algorithm>
+
 EditorComponentGui::EditorComponentGui(){
 	liveComponent = nullptr;
 	fieldLabel = nullptr;
@@ -15,6 +17,7 @@ void EditorComponentGui::Load(){
 		if(attr.name == fieldLabel->text){
 			inputText->text = attr.data;
 			cachedInputText = inputText->text;
+			commaCount = std::count(cachedInputText.begin(), cachedInputText.end(), ',');
 			break;
 		}
 	}	
@@ -22,18 +25,21 @@ void EditorComponentGui::Load(){
 
 void EditorComponentGui::Save(){
 	if(cachedInputText != inputText->text){
-		serializedComponent = liveComponent->Serialize();
-
-		for(auto iter = serializedComponent.attributes.begin(); iter !=  serializedComponent.attributes.end(); ++iter){
-			if(iter->name == fieldLabel->text){
-				serializedComponent.attributes.erase(iter);
-				break;
-			}
-		}
-
-		serializedComponent.AddAttribute(fieldLabel->text, inputText->text);
-		liveComponent->Deserialize(serializedComponent);
 		cachedInputText = inputText->text;
+		int currentCommaCount = std::count(cachedInputText.begin(), cachedInputText.end(), ',');
+
+		if(currentCommaCount == commaCount){
+			serializedComponent = liveComponent->Serialize();
+			for(auto iter = serializedComponent.attributes.begin(); iter !=  serializedComponent.attributes.end(); ++iter){
+				if(iter->name == fieldLabel->text){
+					serializedComponent.attributes.erase(iter);
+					break;
+				}
+			}
+
+			serializedComponent.AddAttribute(fieldLabel->text, inputText->text);
+			liveComponent->Deserialize(serializedComponent);
+		}
 	}
 }
 

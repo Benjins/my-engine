@@ -12,6 +12,8 @@ struct EditorComponentGui{
 	GuiText* fieldLabel;
 	GuiTextField* inputText;
 
+	int commaCount;
+
 	EditorComponentGui();
 
 	void Load();

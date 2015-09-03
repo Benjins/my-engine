@@ -34,7 +34,13 @@
     <Material name='floorMat'/>
     <Mesh source='data/test.obj'/>
     <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+    <BulletComponent speed='6.000000'/>
+    <RigidBody mass='0.100000' isKinematic='F'/>
+  </Prefab>
+  <Prefab name='bullet'>
+    <Transform position='0.120000,3.000000,-0.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
+    <Material name='floorMat'/>
+    <Mesh source='data/test.obj'/>
     <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
     <BulletComponent speed='6.000000'/>
     <RigidBody mass='0.100000' isKinematic='F'/>
@@ -44,8 +50,6 @@
     <Material name='floorMat'/>
     <Mesh source='data/test.obj'/>
     <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
     <BulletComponent speed='6.000000'/>
     <RigidBody mass='0.100000' isKinematic='F'/>
   </Prefab>
@@ -53,20 +57,6 @@
     <Transform position='0.120000,3.000000,-0.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
     <Material name='floorMat'/>
     <Mesh source='data/test.obj'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-    <BulletComponent speed='6.000000'/>
-    <RigidBody mass='0.100000' isKinematic='F'/>
-  </Prefab>
-  <Prefab name='bullet'>
-    <Transform position='0.120000,3.000000,-0.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
-    <Material name='floorMat'/>
-    <Mesh source='data/test.obj'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
     <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
     <BulletComponent speed='6.000000'/>
     <RigidBody mass='0.100000' isKinematic='F'/>
@@ -288,7 +278,6 @@
     <Transform position='-12.740051,0.618957,5.415617' rotation='0.831550,0.000000,-0.555449,0.000000' scale='5.000000,1.000000,0.200000'/>
     <Material name='wall'/>
     <Mesh source='data/test.obj'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
     <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
   </GameObject>
   <GameObject name='door1'>
