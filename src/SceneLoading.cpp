@@ -459,22 +459,6 @@ void Scene::SaveScene(string fileName){
 			mesh.attributes.push_back(XMLAttribute("source",model->name));
 			elem.children.push_back(mesh);
 		}
-		BoxCollider* col = obj->GetComponent<BoxCollider>();
-		if(col != NULL){
-			XMLElement boxCol;
-			boxCol.name = "BoxCollider";
-			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col->position)));
-			boxCol.attributes.push_back(XMLAttribute("size",EncodeVector3(col->size)));
-			elem.children.push_back(boxCol);
-		}
-		SphereCollider* col2 = obj->GetComponent<SphereCollider>();
-		if(col2 != NULL){
-			XMLElement boxCol;
-			boxCol.name = "SphereCollider";
-			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col2->position)));
-			boxCol.attributes.push_back(XMLAttribute("radius",to_string(col2->radius)));
-			elem.children.push_back(boxCol);
-		}
 
 		for(auto iter = obj->components.begin(); iter != obj->components.end(); iter++){
 			XMLElement newElem = (*iter)->Serialize();
