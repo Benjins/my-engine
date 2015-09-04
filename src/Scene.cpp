@@ -424,6 +424,12 @@ void Scene::RemoveAllObjects(){
 
 	objects.clear();
 
+	for(auto iter = prefabs.begin(); iter != prefabs.end(); iter++){
+		delete (*iter);
+	}
+
+	prefabs.clear();
+
 	for(auto iter = guiSystem.elements.begin(); iter != guiSystem.elements.end(); iter++){
 		delete (*iter);
 	}
@@ -440,6 +446,8 @@ void Scene::RemoveAllObjects(){
 	drawCalls.clear();
 
 	resources.Clear();
+
+	audio.ClearClips();
 
 	if(skyBox != nullptr){
 		delete skyBox;
