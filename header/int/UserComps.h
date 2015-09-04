@@ -152,10 +152,10 @@ struct AudioComponent : Component{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "AudioComponent";
-		elem.attributes.emplace_back("clipName", clipName);
-		elem.attributes.emplace_back("volume", to_string(volume));
-		elem.attributes.emplace_back("loop", (loop ? "T" : "F"));
-		elem.attributes.emplace_back("autoPlay", (autoPlay ? "T" : "F"));
+		elem.AddAttribute("clipName", clipName);
+		elem.AddAttribute("volume", to_string(volume));
+		elem.AddAttribute("loop", (loop ? "T" : "F"));
+		elem.AddAttribute("autoPlay", (autoPlay ? "T" : "F"));
 		return elem;
 	}
 
@@ -218,11 +218,11 @@ struct CameraControl : Component{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "CameraControl";
-		elem.attributes.push_back(XMLAttribute("speed",  to_string(speed)));
-		elem.attributes.push_back(XMLAttribute("velocity", to_string(velocity)));
-		elem.attributes.push_back(XMLAttribute("isGrounded", isGrounded ? "T" : "F"));
-		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
-		elem.attributes.push_back(XMLAttribute("stepDelay", to_string(stepDelay)));
+		elem.AddAttribute("speed",  to_string(speed));
+		elem.AddAttribute("velocity", to_string(velocity));
+		elem.AddAttribute("isGrounded", isGrounded ? "T" : "F");
+		elem.AddAttribute("health", to_string(health));
+		elem.AddAttribute("stepDelay", to_string(stepDelay));
 
 		return elem;
 	}
@@ -376,7 +376,7 @@ struct BulletComponent : Component{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "BulletComponent";
-		elem.attributes.emplace_back("speed", to_string(speed));
+		elem.AddAttribute("speed", to_string(speed));
 		return elem;
 	}
 
@@ -493,17 +493,17 @@ struct AnimationComponent : Component{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "AnimationComponent";
-		elem.attributes.emplace_back("type", EncodeAnimationType(animType));
-		elem.attributes.emplace_back("target", EncodeAnimationTarget(animTarget));
-		elem.attributes.emplace_back("loop", (loop ? "T" : "F"));
-		elem.attributes.emplace_back("autoplay", (playAutomatically ? "T" : "F"));
+		elem.AddAttribute("type", EncodeAnimationType(animType));
+		elem.AddAttribute("target", EncodeAnimationTarget(animTarget));
+		elem.AddAttribute("loop", (loop ? "T" : "F"));
+		elem.AddAttribute("autoplay", (playAutomatically ? "T" : "F"));
 
 		if(animType == AnimationType::Float){
 			for(const KeyFrame<float>& frame : floatAnim.keyFrames){
 				XMLElement child;
 				child.name = "KeyFrame";
-				child.attributes.emplace_back("time", to_string(frame.time));
-				child.attributes.emplace_back("value", to_string(frame.value));
+				child.AddAttribute("time", to_string(frame.time));
+				child.AddAttribute("value", to_string(frame.value));
 				elem.children.push_back(child);
 			}
 		}
@@ -511,8 +511,8 @@ struct AnimationComponent : Component{
 			for(const KeyFrame<Vector2>& frame : vec2Anim.keyFrames){
 				XMLElement child;
 				child.name = "KeyFrame";
-				child.attributes.emplace_back("time", to_string(frame.time));
-				child.attributes.emplace_back("value", EncodeVector2(frame.value));
+				child.AddAttribute("time", to_string(frame.time));
+				child.AddAttribute("value", EncodeVector2(frame.value));
 				elem.children.push_back(child);
 			}
 		}
@@ -520,8 +520,8 @@ struct AnimationComponent : Component{
 			for(const KeyFrame<Vector3>& frame : vec3Anim.keyFrames){
 				XMLElement child;
 				child.name = "KeyFrame";
-				child.attributes.emplace_back("time", to_string(frame.time));
-				child.attributes.emplace_back("value", EncodeVector3(frame.value));
+				child.AddAttribute("time", to_string(frame.time));
+				child.AddAttribute("value", EncodeVector3(frame.value));
 				elem.children.push_back(child);
 			}
 		}
@@ -529,8 +529,8 @@ struct AnimationComponent : Component{
 			for(const KeyFrame<Quaternion>& frame : quatAnim.keyFrames){
 				XMLElement child;
 				child.name = "KeyFrame";
-				child.attributes.emplace_back("time", to_string(frame.time));
-				child.attributes.emplace_back("value", EncodeQuaternion(frame.value));
+				child.AddAttribute("time", to_string(frame.time));
+				child.AddAttribute("value", EncodeQuaternion(frame.value));
 				elem.children.push_back(child);
 			}
 		}
@@ -689,8 +689,8 @@ struct LightComponent : Component{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "LightComponent";
-		elem.attributes.emplace_back("intensity", to_string(intensity));
-		elem.attributes.emplace_back("isDirectional", isDirectional ? "T" : "F");
+		elem.AddAttribute("intensity", to_string(intensity));
+		elem.AddAttribute("isDirectional", isDirectional ? "T" : "F");
 		return elem;
 	}
 
@@ -867,9 +867,9 @@ struct EnemyComp : HitComponent{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "EnemyComp";
-		elem.attributes.push_back(XMLAttribute("speed",  to_string(speed)));
-		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
-		elem.attributes.push_back(XMLAttribute("maxHalth", to_string(maxHealth)));
+		elem.AddAttribute("speed",  to_string(speed));
+		elem.AddAttribute("health", to_string(health));
+		elem.AddAttribute("maxHalth", to_string(maxHealth));
 
 		return elem;
 	}
