@@ -280,6 +280,7 @@ void EditorScene::EditorUpdate(){
 		selectionSim.staticBoxBodies.clear();
 		LoadScene("Editor_Scene.xml");
 		RecalculateSelectionSim();
+		sceneCamera = camera;
 		camera = &editorCamera;
 	}
 
