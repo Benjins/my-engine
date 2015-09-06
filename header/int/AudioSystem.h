@@ -1,8 +1,8 @@
 #ifndef AUDIOSYSTEM_H
 #define AUDIOSYSTEM_H
 
-#include <AL/al.h>
-#include <AL/alc.h>
+#include "../ext/AL/al.h"
+#include "../ext/AL/alc.h"
 
 #include "../ext/Vector3.h"
 #include <vector>
