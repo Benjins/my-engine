@@ -33,13 +33,7 @@ EditorScene::EditorScene(int argc, char** argv) : Scene(argc, argv){
 
 void EditorScene::Start(){
 	
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-	timeval start;
-	gettimeofday(&start, NULL);
-	prevTime = start.tv_sec*1000 + start.tv_usec/1000;
-#else
-	prevTime = clock();
-#endif
+	timer.Reset();
 
 	RecalculateSelectionSim();
 
@@ -173,18 +167,8 @@ void EditorScene::RecalculateSelectionSim(){
 }
 
 void EditorScene::EditorUpdate(){
-	int divisor = CLOCKS_PER_SEC;
-	clock_t currTime;
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-	divisor = 1000;
-	timeval start;
-	gettimeofday(&start, NULL);
-	currTime = start.tv_sec*1000 + start.tv_usec/1000;
-#else
-	currTime = clock();
-#endif
-	deltaTime = ((double)currTime - prevTime)/divisor;
-	prevTime = currTime;
+	deltaTime = timer.GetTimeSince();
+	timer.Reset();
 	
 	//cout << "EditorScene::EditorUpdate(): " << (deltaTime * 1000) << "  ms.\n";
 

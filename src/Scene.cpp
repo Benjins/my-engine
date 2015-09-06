@@ -168,13 +168,7 @@ int Scene::AddLight(){
 }
 
 void Scene::Start(){
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-	timeval start;
-	gettimeofday(&start, NULL);
-	prevTime = start.tv_sec*1000 + start.tv_usec/1000;
-#else
-	prevTime = clock();
-#endif
+	timer.Reset();
 
 	prevDeltaTimeIndex = 0;
 	for(int i = 0; i < FPS_SMOOTHING_FACTOR; i++){
@@ -217,12 +211,6 @@ void Scene::Start(){
 
 		double total = ((double)afterSwap - start)/CLOCKS_PER_SEC;
 
-		/*
-		if(total < 0.016f){
-			sleep(16 - int(total * 1000));
-		}
-		*/
-
 		printf("event: %.1f, updt: %.1f, rend: %.1f, flush: %.1f, swap: %.1f, total: %.1f\n", loopEventTime * 1000, 1000 * updateTime, renderTime * 1000, finishTime * 1000, swapTime * 1000, total * 1000);
 
 		GLenum err = glGetError();
@@ -239,20 +227,8 @@ void Scene::UpdateVertexBuffer(){
 }
 
 void Scene::OnUpdate(){
-	int divisor = CLOCKS_PER_SEC;
-	clock_t currTime;
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-	divisor = 1000;
-	timeval start;
-	gettimeofday(&start, NULL);
-	currTime = start.tv_sec*1000 + start.tv_usec/1000;
-#else
-	currTime = clock();
-#endif
-	deltaTime = ((double)currTime - prevTime)/divisor;
-	prevTime = currTime;
-
-	//cout << "Frame took " << (deltaTime * 1000) << " ms.\n";
+	deltaTime = timer.GetTimeSince();
+	timer.Reset();
 
 	prevDeltaTime[prevDeltaTimeIndex] = deltaTime;
 	prevDeltaTimeIndex = (prevDeltaTimeIndex + 1) % FPS_SMOOTHING_FACTOR;

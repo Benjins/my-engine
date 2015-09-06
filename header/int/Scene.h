@@ -11,7 +11,7 @@
 #include "Pathfinding.h"
 #include "Light.h"
 #include "AudioSystem.h"
-#include <time.h>
+#include "Timer.h"
 #include <random>
 
 using std::list;
@@ -61,7 +61,7 @@ protected:
 
 	bool running;
 
-	clock_t prevTime;
+	Timer timer;
 public:
 	
 	//NEVER call this version before the parameterized version
