@@ -303,4 +303,15 @@
     <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
     <EnemyComp speed='1.000000' health='12' maxHalth='5'/>
   </GameObject>
+  <GameObject name='platform1'>
+    <Transform position='-8.495996,0.478573,-5.043204' rotation='1.000000,0.000000,0.000000,0.000000' scale='2.800000,0.300000,1.000000'/>
+    <Material name='enemyMat2'/>
+    <Mesh source='data/test.obj'/>
+    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+    <AnimationComponent type='vector3' target='position' loop='T' autoplay='T'>
+      <KeyFrame time='0.000000' value='-8.495996,0.478573,-5.043204'/>
+      <KeyFrame time='5.000000' value='-8.495996,4.478573,-5.043204'/>
+      <KeyFrame time='10.000000' value='-8.495996,0.478573,-5.043204'/>
+    </AnimationComponent>
+  </GameObject>
 </Scene>
