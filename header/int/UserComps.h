@@ -556,6 +556,19 @@ struct AnimationComponent : Component{
 
 		//Maybe verify target and type?
 
+		if(animType == AnimationType::Float){
+			floatAnim.keyFrames.clear();
+		}
+		else if(animType == AnimationType::Vector2){
+			vec2Anim.keyFrames.clear();
+		}
+		else if(animType == AnimationType::Vector3){
+			vec3Anim.keyFrames.clear();
+		}
+		else if(animType == AnimationType::Quaternion){
+			quatAnim.keyFrames.clear();
+		}
+
 		for(const XMLElement& child : elem.children){
 			if(child.name == "KeyFrame"){
 				float floatVal;
