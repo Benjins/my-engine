@@ -38,8 +38,6 @@ struct DrawCall{
 	void Draw() const;
 };
 
-//Get uniform locations, and use them
-
 void CalculateTangents(Model* model, vector<Vector3>& outTangentData);
 
 #endif
