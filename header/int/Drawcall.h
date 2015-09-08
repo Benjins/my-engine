@@ -20,10 +20,17 @@ struct DrawCall{
 	GLuint boneWeights;
 	GLuint boneIndices;
 	GLuint boneCount;
+
+	short positionLoc;
+	short uvLoc;
+	short normalLoc;
+	short tangentLoc;
+	short boneIndicesLoc;
+	short boneWeightsLoc;
+	short boneCountLoc;
 	
 	int vertCount;
 	
-	//Material* material;
 	GameObject* obj;
 	
 	DrawCall(GameObject* _obj);
