@@ -305,21 +305,16 @@ struct CameraControl : Component{
 			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
 
 			RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), moveVec);
-			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
+			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.1f){
 				camera->GetParent()->position = camera->GetParent()->position + moveVec;
 			}
 			else if (testHit.hit){
 				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
-#if defined(_WIN32) || defined(_WIN64)
-				if(_finitef(badVec.x) == 0){
-					_CrtDbgBreak();
-				}
-#endif
 				Vector3 goodVec = moveVec - badVec;
 				if(goodVec.MagnitudeSquared() > 0){
 
 					RaycastHit testHit2 = physics->Raycast(camera->GlobalPosition(), goodVec);
-					if(!testHit2.hit || testHit2.depth > goodVec.Magnitude() + 0.2f){
+					if(!testHit2.hit || testHit2.depth > goodVec.Magnitude() + 0.1f){
 						camera->GetParent()->position = camera->GetParent()->position + goodVec;
 					}
 				}

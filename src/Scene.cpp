@@ -211,7 +211,7 @@ void Scene::Start(){
 
 		double total = ((double)afterSwap - start)/CLOCKS_PER_SEC;
 
-		printf("event: %.1f, updt: %.1f, rend: %.1f, flush: %.1f, swap: %.1f, total: %.1f\n", loopEventTime * 1000, 1000 * updateTime, renderTime * 1000, finishTime * 1000, swapTime * 1000, total * 1000);
+		//printf("event: %.1f, updt: %.1f, rend: %.1f, flush: %.1f, swap: %.1f, total: %.1f\n", loopEventTime * 1000, 1000 * updateTime, renderTime * 1000, finishTime * 1000, swapTime * 1000, total * 1000);
 
 		GLenum err = glGetError();
 		if(err != 0){
@@ -308,11 +308,11 @@ void Scene::Render(){
 		isDirectional[i] = lights[i].isDirectional ? 1 : 0;
 	}
 	
-	
+	Vector3 cameraPos = camera->GlobalPosition();
+	Vector3 cameraForward = camera->Forward();
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
 		Vector3 objPos = iter->obj->transform.GlobalPosition();
-		Vector3 cameraPos = camera->GlobalPosition();
-		Vector3 cameraForward = camera->Forward();
+		
 
 		//if(DotProduct(objPos - cameraPos, cameraForward) > 0){
 			glUseProgram(iter->obj->material->shaderProgram);
@@ -329,6 +329,8 @@ void Scene::Render(){
 			if(cubeMapLoc != -1){
 				skyBox->Bind(GL_TEXTURE2);
 				glUniform1i(cubeMapLoc, 2);
+
+				mat->SetVec3Uniform("_cameraPos", cameraPos);
 			}
 
 			iter->Draw();	

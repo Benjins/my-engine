@@ -9,7 +9,6 @@ out vec2 uv_coord;
 out vec3 normal;
 out vec3 pos;
 out vec3 tangent;
-out vec3 cameraVec;
 
 uniform mat3 _uvMatrix;
 uniform mat4 _perspMatrix;
@@ -23,5 +22,4 @@ void main()
 	uv_coord = (_uvMatrix * vec3(UV, 1.0)).xy;
 	normal  = (_objectMatrix * vec4(_normal, 0.0)).xyz;
 	tangent = (_objectMatrix * vec4(_tangent, 0.0)).xyz;
-	cameraVec = (_cameraMatrix * vec4(0.0, 0.0, 1.0, 0.0)).xyz;
 }

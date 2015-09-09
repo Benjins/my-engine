@@ -35,7 +35,7 @@ struct DrawCall{
 	
 	DrawCall(GameObject* _obj);
 	
-	void Draw() const;
+	void Draw() const;	
 };
 
 void CalculateTangents(Model* model, vector<Vector3>& outTangentData);
