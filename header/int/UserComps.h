@@ -197,6 +197,9 @@ struct CameraControl : Component{
 	float stepDelay;
 	float timeMoving;
 
+	float characterHeight;
+	float groundedAdjustment;
+
 	int prevX;
 	int prevY;
 	float xRot;
@@ -213,6 +216,8 @@ struct CameraControl : Component{
 		health = 1;
 		timeMoving = 0;
 		stepDelay = 0.6f;
+		characterHeight = 0.4f;
+		groundedAdjustment = 0.05f;
 	}
 
 	virtual XMLElement Serialize(){
@@ -260,7 +265,7 @@ struct CameraControl : Component{
 		input = &gameObject->scene->input;
 		camera = gameObject->scene->camera;
 		physics = gameObject->scene->physicsSim;
-		//slider = gameObject->scene->guiSystem.elements[0];
+		slider = gameObject->scene->guiSystem.FindGUIElement("healthSlider");
 		healthBar = static_cast<GuiText*>(gameObject->scene->guiSystem.FindGUIElement("healthText"));
 		audioComp = gameObject->GetComponent<AudioComponent>();
 	}
@@ -291,11 +296,12 @@ struct CameraControl : Component{
 		}
 		if(input->GetKeyDown(' ') && isGrounded){
 			velocity = 4;
+			isGrounded = false;
 		}
 
 		//health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
 		health = max(0.0f, min(1.0f, health));
-		//GuiSetSliderValue(slider, health);
+		GuiSetSliderValue(slider, health);
 		if(healthBar != nullptr){
 			healthBar->text = "Health: " + to_string((int)(health*100));
 		}
@@ -334,8 +340,8 @@ struct CameraControl : Component{
 
 		velocity -= gameObject->scene->deltaTime * 5;
 		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
-		if(camera->GetParent()->position.y <= floorHeight + 0.4f){
-			camera->GetParent()->position.y = floorHeight + 0.4f;
+		if(camera->GetParent()->position.y <= floorHeight + (isGrounded ? characterHeight + groundedAdjustment : characterHeight)){
+			camera->GetParent()->position.y = floorHeight + characterHeight;
 			velocity = 0;
 			isGrounded = true;
 		}

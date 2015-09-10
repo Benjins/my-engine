@@ -8,14 +8,12 @@ in vec3 normal;
 in vec3 pos;
 in vec3 tangent;
 
-uniform float reflectiveLevel = 0.6;
+uniform float reflectiveLevel = 0.9;
 
 uniform sampler2D _mainTex;
 uniform sampler2D _bumpMap;
 uniform samplerCube _cubeMap;
 uniform vec3 _cameraPos;
-
-uniform mat3 sampleSpace = mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1));
 
 void main()
 {
