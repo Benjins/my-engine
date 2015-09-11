@@ -111,7 +111,7 @@
     <Mesh source='data/monkey.obj'/>
   </GameObject>
   <GameObject name='refl_sphere'>
-    <Transform position='-6.427332,0.946075,2.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+    <Transform position='-6.427332,0.246075,2.078232' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
     <Material name='reflective'/>
     <Mesh source='data/sphere.obj'/>
     <SphereCollider position='0.000000,0.000000,0.000000' radius='1.100000'/>

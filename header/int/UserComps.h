@@ -315,10 +315,16 @@ struct CameraControl : Component{
 				camera->GetParent()->position = camera->GetParent()->position + moveVec;
 			}
 			else if (testHit.hit){
-				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
+				Vector3 newNormal = testHit.normal;
+				if(testHit.normal.y < 0){
+					newNormal.y = 0;
+					newNormal.Normalize();
+				}
+				float overlap = DotProduct(moveVec, newNormal);
+				Vector3 badVec = newNormal * overlap;
 				Vector3 goodVec = moveVec - badVec;
-				if(goodVec.MagnitudeSquared() > 0){
 
+				if(goodVec.MagnitudeSquared() > 0){
 					RaycastHit testHit2 = physics->Raycast(camera->GlobalPosition(), goodVec);
 					if(!testHit2.hit || testHit2.depth > goodVec.Magnitude() + 0.1f){
 						camera->GetParent()->position = camera->GetParent()->position + goodVec;
@@ -334,8 +340,13 @@ struct CameraControl : Component{
 
 		float floorHeight = -10;
 		RaycastHit lookDown = physics->Raycast(camera->GetParent()->position, Y_AXIS*-1);
+		RaycastHit lookUp = physics->Raycast(camera->GetParent()->position, Y_AXIS);
 		if(lookDown.hit){
 			floorHeight = lookDown.worldPos.y;
+		}
+
+		if(lookUp.hit && lookUp.depth < 0.1f && velocity > 0){
+			velocity = 0;
 		}
 
 		velocity -= gameObject->scene->deltaTime * 5;
