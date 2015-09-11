@@ -73,34 +73,56 @@ DrawCall::DrawCall(GameObject* _obj){
 		}
 	}
 
+	GLuint shaderProg = _obj->material->shaderProgram;
+
+	positionLoc = glGetAttribLocation(shaderProg, "Position");
+	uvLoc = glGetAttribLocation(shaderProg, "UV");
+	normalLoc = glGetAttribLocation(shaderProg, "_normal");
+	tangentLoc = glGetAttribLocation(shaderProg, "_tangent");
+	boneIndicesLoc= glGetAttribLocation(shaderProg, "boneIndices");
+	boneWeightsLoc = glGetAttribLocation(shaderProg, "boneWeights");
+	boneCountLoc= glGetAttribLocation(shaderProg, "boneCount");
+
  	glGenBuffers(1, &vertices);
 	glBindBuffer(GL_ARRAY_BUFFER, vertices);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3)*Vertices.size(), &(Vertices[0]), GL_STATIC_DRAW);
 	
-	glGenBuffers(1, &uvs);
-	glBindBuffer(GL_ARRAY_BUFFER, uvs);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vector2)*uvCoords.size(), &(uvCoords[0]), GL_STATIC_DRAW);
+	if(uvLoc != -1){
+		glGenBuffers(1, &uvs);
+		glBindBuffer(GL_ARRAY_BUFFER, uvs);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vector2)*uvCoords.size(), &(uvCoords[0]), GL_STATIC_DRAW);
+	}
 
-	glGenBuffers(1, &normals);
-	glBindBuffer(GL_ARRAY_BUFFER, normals);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3)*Normals.size(), &(Normals[0]), GL_STATIC_DRAW);
+	if(normalLoc != -1){
+		glGenBuffers(1, &normals);
+		glBindBuffer(GL_ARRAY_BUFFER, normals);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3)*Normals.size(), &(Normals[0]), GL_STATIC_DRAW);
+	}
 
-	glGenBuffers(1, &tangents);
-	glBindBuffer(GL_ARRAY_BUFFER, tangents);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3)*tangentData.size(), &(tangentData[0]), GL_STATIC_DRAW);
+	if(tangentLoc != -1){
+		glGenBuffers(1, &tangents);
+		glBindBuffer(GL_ARRAY_BUFFER, tangents);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3)*tangentData.size(), &(tangentData[0]), GL_STATIC_DRAW);
+	}
 
 	if(_obj->mesh->armature != nullptr){
-		glGenBuffers(1, &boneCount);
-		glBindBuffer(GL_ARRAY_BUFFER, boneCount);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(int)*boneCountsData.size(), &(boneCountsData[0]), GL_STATIC_DRAW);
+		if(boneCountLoc != -1){
+			glGenBuffers(1, &boneCount);
+			glBindBuffer(GL_ARRAY_BUFFER, boneCount);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(int)*boneCountsData.size(), &(boneCountsData[0]), GL_STATIC_DRAW);
+		}
 
-		glGenBuffers(1, &boneIndices);
-		glBindBuffer(GL_ARRAY_BUFFER, boneIndices);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(int)*boneIndicesData.size(), &(boneIndicesData[0]), GL_STATIC_DRAW);
+		if(boneIndicesLoc != -1){
+			glGenBuffers(1, &boneIndices);
+			glBindBuffer(GL_ARRAY_BUFFER, boneIndices);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(int)*boneIndicesData.size(), &(boneIndicesData[0]), GL_STATIC_DRAW);
+		}
 
-		glGenBuffers(1, &boneWeights);
-		glBindBuffer(GL_ARRAY_BUFFER, boneWeights);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*boneWeightsData.size(), &(boneWeightsData[0]), GL_STATIC_DRAW);
+		if(boneWeightsLoc != -1){
+			glGenBuffers(1, &boneWeights);
+			glBindBuffer(GL_ARRAY_BUFFER, boneWeights);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float)*boneWeightsData.size(), &(boneWeightsData[0]), GL_STATIC_DRAW);
+		}
 	}
 }
 
@@ -112,67 +134,44 @@ void DrawCall::Draw() const{
 							0, material->uvScale.y, material->uvOffset.y,
 							0,                      0,                 1};
 
-	GLenum erroR = glGetError();
-
 	glUniformMatrix3fv(material->GetUniformByName("_uvMatrix"), 1, GL_TRUE, uvMatrix);
 
-	GLenum erroQ = glGetError();
+	material->SetMat4Uniform("_objectMatrix", obj->transform.LocalToGlobalMatrix());
 
-	glUniformMatrix4fv(material->GetUniformByName("_objectMatrix"), 1, GL_TRUE,  &obj->transform.LocalToGlobalMatrix().m[0][0]);
-	glUniform1i(glGetUniformLocation(material->shaderProgram, "_mainTex"), 0);
+	glUniform1i(material->GetUniformByName("_mainTex"), 0);
 	if(material->bumpMap != nullptr){
-		glUniform1i(glGetUniformLocation(material->shaderProgram, "_bumpMap"), 1);
+		glUniform1i(material->GetUniformByName("_bumpMap"), 1);
 	}
-	else{
-		glUniform1i(glGetUniformLocation(material->shaderProgram, "_bumpMap"), -1);
-	}
-
-	GLenum erroX = glGetError();
 
 	vector<Mat4x4> boneMatrices;
 	if(obj->mesh->armature != nullptr){
 		obj->mesh->armature->GetBoneMatrices(boneMatrices);
 	}
 
-	GLenum erroC = glGetError();
+	GLenum erroC = glGetError();		
 	
-	glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertices);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	if(positionLoc != -1){
+		glEnableVertexAttribArray(positionLoc);
+		glBindBuffer(GL_ARRAY_BUFFER, vertices);
+		glVertexAttribPointer(positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	}
 
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvs);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	static const int attributeCount = 7;
+	GLint attrLocs[attributeCount] = {positionLoc, uvLoc, normalLoc, tangentLoc, boneIndicesLoc, boneWeightsLoc, boneCountLoc};
+	GLuint buffers[attributeCount] = {vertices, uvs, normals, tangents, boneIndices, boneWeights, boneCount};
+	GLint sizes[attributeCount] = {3,2,3,3,4,4,1};
 
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, normals);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glEnableVertexAttribArray(3);
-	glBindBuffer(GL_ARRAY_BUFFER, tangents);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	GLenum erroV = glGetError();
+	for(int i = 0; i < attributeCount; i++){
+		if(attrLocs[i] != -1){
+			glEnableVertexAttribArray(attrLocs[i]);
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
+			glVertexAttribPointer(attrLocs[i], sizes[i], GL_FLOAT, GL_FALSE, 0, 0);
+		}
+	}
 
 	if(obj->mesh->armature != nullptr){
-		glEnableVertexAttribArray(4);
-		glBindBuffer(GL_ARRAY_BUFFER, boneIndices);
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE,  0, 0);
-
-		glEnableVertexAttribArray(5);
-		glBindBuffer(GL_ARRAY_BUFFER, boneWeights);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_TRUE, 0, 0);
-
-		glEnableVertexAttribArray(6);
-		glBindBuffer(GL_ARRAY_BUFFER, boneCount);
-		glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE,  0, 0);
-
-		GLenum erro1 = glGetError();
-
-		GLint armatureUniformLoc = glGetUniformLocation(material->shaderProgram, "_armatureMatrices");
+		GLint armatureUniformLoc = material->GetUniformByName("_armatureMatrices");
 		glUniformMatrix4fv(armatureUniformLoc, boneMatrices.size(), GL_TRUE, &(boneMatrices[0].m[0][0]));
-
-		erro1 = glGetError();
 	}
 
 	if(material->mainTexture != nullptr){
@@ -185,15 +184,11 @@ void DrawCall::Draw() const{
 	
 	glDrawArrays(GL_TRIANGLES, 0, vertCount);
 	
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(3);
-
-	if(obj->mesh->armature != nullptr){
-		glDisableVertexAttribArray(4);
-		glDisableVertexAttribArray(5);
-		glDisableVertexAttribArray(6);
+	
+	for(int i = 0; i < attributeCount; i++){
+		if(attrLocs[i] != -1){
+			glDisableVertexAttribArray(attrLocs[i]);
+		}
 	}
 }
 

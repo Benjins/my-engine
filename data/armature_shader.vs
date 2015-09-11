@@ -1,6 +1,6 @@
 #version 130
 
-#define MAX_BONE_COUNT 32
+#define MAX_BONE_COUNT 24
 
 in vec3 Position;
 in vec2 UV;
@@ -24,8 +24,6 @@ uniform mat4 _armatureMatrices[MAX_BONE_COUNT];
 
 void main()
 {
-	vec3 vertPos = Position;
-	vec2 uvPos = UV;
 	mat4 boneMatrix = mat4(0.0);
 	
 	for(int i = 0; i < int(boneCount + 0.5); i++){
@@ -33,12 +31,12 @@ void main()
 		boneMatrix += singleBoneMat;
 	}
 	
-	mat4 objMat = _objectMatrix;
-	objMat[3][3] = boneMatrix[3][3];
+	mat4 boneObjMatrix = _objectMatrix * boneMatrix;
 	
-	pos = (objMat * boneMatrix * vec4(Position, 1.0)).xyz;
-    gl_Position =  _perspMatrix * _cameraMatrix * vec4(pos, 1.0);
+	vec3 _pos = (boneObjMatrix * vec4(Position, 1.0)).xyz;
+	pos = _pos;
+    gl_Position =  _perspMatrix * _cameraMatrix * vec4(_pos, 1.0);
 	uv_coord = (_uvMatrix * vec3(UV, 1.0)).xy;
-	normal  = (_objectMatrix * vec4(_normal, 0.0)).xyz;
-	tangent = (_objectMatrix * vec4(_tangent, 0.0)).xyz;
+	normal  = (boneObjMatrix * vec4(_normal, 0.0)).xyz;
+	tangent = (boneObjMatrix * vec4(_tangent, 0.0)).xyz;
 }

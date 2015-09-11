@@ -13,6 +13,7 @@ uniform float reflectiveLevel = 0.9;
 uniform sampler2D _mainTex;
 uniform sampler2D _bumpMap;
 uniform samplerCube _cubeMap;
+uniform vec3 _cameraPos;
 
 void main()
 {
@@ -23,7 +24,11 @@ void main()
 	bumpCol = bumpCol * 2.0 - vec4(1.0,1.0,1.0,0.0);
 	vec3 usedNormal = normal * bumpCol.b + actualTangent * bumpCol.g + cross(normal, actualTangent) * bumpCol.r;
 	
-	vec4 reflectiveSample = texture(_cubeMap, usedNormal);
+	vec3 lookVector = (pos - _cameraPos);
+	vec3 normalProj = dot(lookVector, usedNormal) * usedNormal;
+	vec3 sampleVec = (lookVector - (2 * (lookVector - normalProj)));
+	
+	vec4 reflectiveSample = texture(_cubeMap, sampleVec);
 	
 	FragColor = mix(texCol, reflectiveSample, reflectiveLevel);
 }

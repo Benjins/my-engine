@@ -17,6 +17,8 @@ Component* GetUserDefinedComp(const string& name){
 	if(name == ""){
 		return nullptr;
 	}
+	DEFINE_USER_COMPONENT(BoxCollider)
+	DEFINE_USER_COMPONENT(SphereCollider)
 	DEFINE_USER_COMPONENT(MatChangeOnHit)
 	DEFINE_USER_COMPONENT(FireGun)
 	DEFINE_USER_COMPONENT(EnemyComp)
@@ -29,6 +31,8 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(BulletComponent)
 	DEFINE_USER_COMPONENT(PlayerComponent)
 	DEFINE_USER_COMPONENT(DoorComponent)
+
+	return nullptr;
 }
 
 string EncodeVector3(Vector3 vec){
@@ -272,44 +276,6 @@ GameObject* Scene::LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvent
 		else if(child.name == "Camera"){
 			camera = &(go->transform);
 		}
-		else if(child.name == "BoxCollider"){
-			BoxCollider* col = new BoxCollider();
-			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
-				XMLAttribute attr = *iter2;
-				if(attr.name == "position"){
-					col->position = ParseVector3(attr.data);
-				}
-				else if(attr.name == "size"){
-					col->size = ParseVector3(attr.data);
-				}
-			}
-
-			if(fireAwakeEvents){
-				go->AddComponent(col);
-			}
-			else{
-				go->AddComponentDirect(col);
-			}
-		}
-		else if(child.name == "SphereCollider"){
-			SphereCollider* col = new SphereCollider();
-			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
-				XMLAttribute attr = *iter2;
-				if(attr.name == "position"){
-					col->position = ParseVector3(attr.data);
-				}
-				else if(attr.name == "radius"){
-					col->radius = atof(attr.data.c_str());
-				}
-			}
-
-			if(fireAwakeEvents){
-				go->AddComponent(col);
-			}
-			else{
-				go->AddComponentDirect(col);
-			}
-		}
 		else{
 			Component* userComp = GetUserDefinedComp(iter->name);
 			if(userComp != nullptr){
@@ -493,22 +459,6 @@ void Scene::SaveScene(string fileName){
 			mesh.attributes.push_back(XMLAttribute("source",model->name));
 			elem.children.push_back(mesh);
 		}
-		BoxCollider* col = obj->GetComponent<BoxCollider>();
-		if(col != NULL){
-			XMLElement boxCol;
-			boxCol.name = "BoxCollider";
-			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col->position)));
-			boxCol.attributes.push_back(XMLAttribute("size",EncodeVector3(col->size)));
-			elem.children.push_back(boxCol);
-		}
-		SphereCollider* col2 = obj->GetComponent<SphereCollider>();
-		if(col2 != NULL){
-			XMLElement boxCol;
-			boxCol.name = "SphereCollider";
-			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col2->position)));
-			boxCol.attributes.push_back(XMLAttribute("radius",to_string(col2->radius)));
-			elem.children.push_back(boxCol);
-		}
 
 		for(auto iter = obj->components.begin(); iter != obj->components.end(); iter++){
 			XMLElement newElem = (*iter)->Serialize();
@@ -556,22 +506,6 @@ void Scene::SaveScene(string fileName){
 			mesh.name = "Mesh";
 			mesh.attributes.push_back(XMLAttribute("source",model->name));
 			elem.children.push_back(mesh);
-		}
-		BoxCollider* col = obj->GetComponent<BoxCollider>();
-		if(col != NULL){
-			XMLElement boxCol;
-			boxCol.name = "BoxCollider";
-			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col->position)));
-			boxCol.attributes.push_back(XMLAttribute("size",EncodeVector3(col->size)));
-			elem.children.push_back(boxCol);
-		}
-		SphereCollider* col2 = obj->GetComponent<SphereCollider>();
-		if(col2 != NULL){
-			XMLElement boxCol;
-			boxCol.name = "SphereCollider";
-			boxCol.attributes.push_back(XMLAttribute("position",EncodeVector3(col2->position)));
-			boxCol.attributes.push_back(XMLAttribute("radius",to_string(col2->radius)));
-			elem.children.push_back(boxCol);
 		}
 
 		for(auto iter = obj->components.begin(); iter != obj->components.end(); iter++){

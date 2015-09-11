@@ -1,6 +1,6 @@
 #version 130
 
-attribute vec3 Position;
+in vec3 Position;
 out vec2 uv_coord;
 uniform vec2 uvs[4] = vec2[](vec2(0,0), vec2(1,0), vec2(0,1), vec2(1,1));
 

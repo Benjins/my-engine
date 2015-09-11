@@ -1,8 +1,8 @@
 #ifndef AUDIOSYSTEM_H
 #define AUDIOSYSTEM_H
 
-#include <AL/al.h>
-#include <AL/alc.h>
+#include "../ext/AL/al.h"
+#include "../ext/AL/alc.h"
 
 #include "../ext/Vector3.h"
 #include <vector>
@@ -39,6 +39,14 @@ struct AudioSystem{
 	}
 
 	void Initialise();
+
+	void ClearClips(){
+		for(int i = 0; i < clipCount; i++){
+			alDeleteBuffers(1, &(clips[i].buffer));
+		}
+
+		clipCount = 0;
+	}
 
 	void SetListenerPos(const Vector3& pos){
 		ALfloat listen[] = {pos.x, pos.y, pos.z};

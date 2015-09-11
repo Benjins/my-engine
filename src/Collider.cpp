@@ -6,6 +6,8 @@
 #include "../header/int/Scene.h"
 #include "../header/int/AABB.h"
 #include "../header/int/RaycastHit.h"
+#include "../header/ext/simple-xml.h"
+#include "../header/int/LoadingUtilities.h"
 #include <cfloat>
 
 
@@ -53,6 +55,27 @@ Component* BoxCollider::Clone(){
 	newBox->size = size;
 
 	return newBox;
+}
+
+XMLElement BoxCollider::Serialize(){
+	XMLElement elem;
+	elem.name = "BoxCollider";
+	elem.AddAttribute("position", EncodeVector3(position));
+	elem.AddAttribute("size", EncodeVector3(size));
+
+	return elem;
+}
+
+void BoxCollider::Deserialize(const XMLElement& elem){
+	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
+		XMLAttribute attr = *iter;
+		if(attr.name == "position"){
+			position = ParseVector3(attr.data);
+		}
+		else if(attr.name == "size"){
+			size = ParseVector3(attr.data);
+		}
+	}
 }
 
 BoxCollider::~BoxCollider(){
@@ -103,6 +126,27 @@ Component* SphereCollider::Clone(){
 	newSphere->radius = radius;
 
 	return newSphere;
+}
+
+XMLElement SphereCollider::Serialize(){
+	XMLElement elem;
+	elem.name = "SphereCollider";
+	elem.AddAttribute("position", EncodeVector3(position));
+	elem.AddAttribute("radius", to_string(radius));
+
+	return elem;
+}
+
+void SphereCollider::Deserialize(const XMLElement& elem){
+	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
+		XMLAttribute attr = *iter;
+		if(attr.name == "position"){
+			position = ParseVector3(attr.data);
+		}
+		else if(attr.name == "radius"){
+			radius = atof(attr.data.c_str());
+		}
+	}
 }
 
 SphereCollider::~SphereCollider(){

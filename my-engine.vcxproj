@@ -145,6 +145,7 @@
     <ClCompile Include="src\Component.cpp" />
     <ClCompile Include="src\CubeMap.cpp" />
     <ClCompile Include="src\Drawcall.cpp" />
+    <ClCompile Include="src\EditorComponentGui.cpp" />
     <ClCompile Include="src\EditorScene.cpp" />
     <ClCompile Include="src\FontBMPMaker.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="header\int\Component.h" />
     <ClInclude Include="header\int\CubeMap.h" />
     <ClInclude Include="header\int\Drawcall.h" />
+    <ClInclude Include="header\int\EditorComponentGui.h" />
     <ClInclude Include="header\int\EditorScene.h" />
     <ClInclude Include="header\int\FontBMPMaker.h" />
     <ClInclude Include="header\int\GameObject.h" />
@@ -231,6 +233,7 @@
     <ClInclude Include="header\int\Scene.h" />
     <ClInclude Include="header\int\SCTransform.h" />
     <ClInclude Include="header\int\Texture.h" />
+    <ClInclude Include="header\int\Timer.h" />
     <ClInclude Include="header\int\UserComps.h" />
     <ClInclude Include="header\int\Vector4.h" />
     <ClInclude Include="test\testing.h" />

@@ -4,6 +4,7 @@
 #define MAX_NUMBER_OF_UNIFORMS 12
 
 #include <string>
+#include <map>
 #include "Model.h"
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -11,7 +12,7 @@
 #include <GL/glew.h>
 #endif
 
-using std::string;
+using std::string; using std::map;
 
 enum struct MaterialFlag{
 	None = 0,
@@ -25,7 +26,7 @@ enum struct MaterialFlag{
 	Skybox =            (1 << 7),
 	TintColor =         (1 << 8),
 	Armature =          (1 << 9),
-	All = 0xFFFFFFFF
+	All = 0x7FFFFFFF
 };
 
 struct Texture;
@@ -49,6 +50,7 @@ struct Material{
 
 	GLuint uniforms[MAX_NUMBER_OF_UNIFORMS];
 	vector<string> uniformNames;
+	map<string, GLint> uniformLocCache;
 
 	GLuint textureUniform;
 	GLuint cameraUniform;
@@ -76,17 +78,7 @@ struct Material{
 
 	void SetMainTexture(Texture* value);
 
-	void SetFloatUniform(int index, float value);
-	void SetVec2Uniform(int index, Vector2 value);
-	void SetVec3Uniform(int index, Vector3 value);
-	void SetVec4Uniform(int index, Vector4 value);
-	void SetMat4Uniform(int index, Mat4x4 value);
-	void SetTextureUniform(int index, Texture* value);
-	
-
-	GLuint GetUniformByName(string name);
-	int GetUniformIndexByName(string name);
-	GLuint GetUniformByIndex(int index);
+	GLint GetUniformByName(string name);
 
 	void Release(ResourceManager* manager);
 

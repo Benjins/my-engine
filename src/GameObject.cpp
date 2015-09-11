@@ -61,8 +61,8 @@ GameObject* GameObject::Clone() const{
 	}
 
 	newObj->name = name + "(clone)";
-	newObj->mesh = (mesh == nullptr) ? nullptr : new Model(mesh->fileName);
-	newObj->material = material;//(material == nullptr) ? nullptr : material->Clone(&scene->resources);
+	newObj->mesh = mesh;
+	newObj->material = material;
 	for(Component* comp : components){
 		newObj->AddComponent(comp->Clone());
 	}

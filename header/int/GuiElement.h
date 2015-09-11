@@ -15,9 +15,10 @@
 #endif
 
 #include <string>
+#include <iostream>
 #include <vector>
 
-using std::string; using std::vector;
+using std::string; using std::vector; using std::cout;
 
 struct Texture; struct MaterialManager; struct Scene; struct FUV; struct XMLElement;
 

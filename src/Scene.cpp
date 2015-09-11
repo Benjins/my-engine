@@ -40,36 +40,10 @@ Scene::Scene(int argc, char** argv){
 	pathfinding.scene = this;
 
 	skyBox = nullptr;
-	/*
-	testArmature = new Armature();
-
-	BoneTransform* root = testArmature->AddBone(nullptr);
-	root->name = "root";
-
-	BoneTransform* chest = testArmature->AddBone(root);
-	chest->name = "chest";
-	chest->position = Vector3(0,1,0);
-	chest->rotation = Quaternion(X_AXIS, 0.12f);
-
-	BoneTransform* leg = testArmature->AddBone(root);
-	leg->name = "leg";
-	leg->position = Vector3(0.1f,-0.4f,0);
-
-	BoneTransform* arm = testArmature->AddBone(chest);
-	arm->name = "arm";
-	arm->position = Vector3(0.4f,-0.04f,0);
-
-	BoneTransform* hand = testArmature->AddBone(arm);
-	hand->name = "hand";
-	hand->position = Vector3(0.3f,-0.14f,0);
-	*/
 
 	myRandom = default_random_engine(time(NULL));
 
 	audio.Initialise();
-	//audio.clips.emplace_back();
-	//audio.clips[0].LoadFromWavFile("data/squeak.wav");
-	//audio.clips[0].Play();
 
 	glutInit(&argc, argv);
 
@@ -99,12 +73,12 @@ Scene::Scene(int argc, char** argv){
 	
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 
-	//Init();
-
 	xRot = 0;
 	yRot = 0;
 
     printf("GL version: %s\n", glGetString(GL_VERSION));
+    printf("GL vendor: %s\n", glGetString(GL_VENDOR));
+	printf("GL Renderer: %s\n", glGetString(GL_RENDERER));
 }
 
 void Scene::Init(){
@@ -194,31 +168,55 @@ int Scene::AddLight(){
 }
 
 void Scene::Start(){
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-	timeval start;
-	gettimeofday(&start, NULL);
-	prevTime = start.tv_sec*1000 + start.tv_usec/1000;
-#else
-	prevTime = clock();
-#endif
+	timer.Reset();
+
+	prevDeltaTimeIndex = 0;
+	for(int i = 0; i < FPS_SMOOTHING_FACTOR; i++){
+		prevDeltaTime[i] = 0.0f;
+	}
 
 	running = true;
 	while(running){
+		clock_t start = clock();
 #ifdef __APPLE__
 		glutCheckLoop();
 #else
 		glutMainLoopEvent();
 #endif
-		OnUpdate();
+		clock_t afterCheck = clock();
 
-		//BoneTransform* leg = testArmature->GetBoneByName("ribs");
-		//leg->rotation = leg->rotation * Quaternion(Z_AXIS, 0.01f);
-
-		physicsSim->Advance(deltaTime);
+		double loopEventTime = ((double)afterCheck - start)/CLOCKS_PER_SEC;
 
 		Render();
+
+		clock_t afterRender = clock();
+		double renderTime = ((double)afterRender - afterCheck)/CLOCKS_PER_SEC;
+
+		OnUpdate();
+		physicsSim->Advance(deltaTime);
+
+		clock_t afterUpdate = clock();
+
+		double updateTime = ((double)afterUpdate - afterRender)/CLOCKS_PER_SEC;
+
+		//glFinish();
+
+		clock_t afterFinish = clock();
+		double finishTime = ((double)afterFinish - afterUpdate)/CLOCKS_PER_SEC;
+
 		glutSwapBuffers();
-		glutPostRedisplay();
+
+		clock_t afterSwap = clock();
+		double swapTime = ((double)afterSwap - afterFinish)/CLOCKS_PER_SEC;
+
+		double total = ((double)afterSwap - start)/CLOCKS_PER_SEC;
+
+		//printf("event: %.1f, updt: %.1f, rend: %.1f, flush: %.1f, swap: %.1f, total: %.1f\n", loopEventTime * 1000, 1000 * updateTime, renderTime * 1000, finishTime * 1000, swapTime * 1000, total * 1000);
+
+		GLenum err = glGetError();
+		if(err != 0){
+			printf("GL Error: %d, meaning: '%s'\n", err, gluErrorString(err));
+		}
 
 		input.EndFrame();
 	}
@@ -229,29 +227,28 @@ void Scene::UpdateVertexBuffer(){
 }
 
 void Scene::OnUpdate(){
-	int divisor = CLOCKS_PER_SEC;
-	clock_t currTime;
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-	divisor = 1000;
-	timeval start;
-	gettimeofday(&start, NULL);
-	currTime = start.tv_sec*1000 + start.tv_usec/1000;
-#else
-	currTime = clock();
-#endif
-	deltaTime = ((double)currTime - prevTime)/divisor;
-	prevTime = currTime;
+	deltaTime = timer.GetTimeSince();
+	timer.Reset();
+
+	prevDeltaTime[prevDeltaTimeIndex] = deltaTime;
+	prevDeltaTimeIndex = (prevDeltaTimeIndex + 1) % FPS_SMOOTHING_FACTOR;
+
+	float smoothedFPS = 0.0f;
+	for(int i = 0; i < FPS_SMOOTHING_FACTOR; i++){
+		smoothedFPS = smoothedFPS + prevDeltaTime[i];
+	}
+
+	smoothedFPS /= FPS_SMOOTHING_FACTOR;
 
 	GuiText* fpsText = static_cast<GuiText*>(guiSystem.FindGUIElement("fpsText"));
 	if(fpsText != nullptr && deltaTime > 0){
-		string fps = "FPS: " + to_string((int)((1/deltaTime) + 0.5f));
+		string fps = "FPS: " + to_string((int)((1/smoothedFPS) + 0.5f));
 		fpsText->text = fps;
 	}
 
 	audio.SetListenerPos(camera->GlobalPosition());
 
 	for(auto iter = objects.begin(); iter != objects.end(); iter++){
-		//cout << "Updating object at position: " << (size_t)(*iter) << endl;
 		(*iter)->OnUpdate();
 	}
 
@@ -285,7 +282,7 @@ void PhysicsUpdate(){
 
 void Scene::OnPostLoad(){
 	//FindGameObject("reticle")->material->SetVec4Uniform("_color", Vector4(0.0f, 0.0f, 1.0f, 1.0f));
-	//pathfinding.HookUpNodes();
+	pathfinding.HookUpNodes();
 }
 
 void Scene::Render(){
@@ -310,39 +307,42 @@ void Scene::Render(){
 		lightVectors[i] = lights[i].isDirectional ? lights[i].direction : lights[i].position;
 		isDirectional[i] = lights[i].isDirectional ? 1 : 0;
 	}
-
 	
+	Vector3 cameraPos = camera->GlobalPosition();
+	Vector3 cameraForward = camera->Forward();
 	for(auto iter = drawCalls.begin(); iter != drawCalls.end(); iter++){
-		glUseProgram(iter->obj->material->shaderProgram);
-		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
-		glUniformMatrix4fv(iter->obj->material->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
+		Vector3 objPos = iter->obj->transform.GlobalPosition();
+		
 
-		glUniform1i(glGetUniformLocation(iter->obj->material->shaderProgram, "numLights"), lights.size());
-		glUniform3fv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightVectors"), lights.size(), (GLfloat*)lightVectors);
-		glUniform1iv(glGetUniformLocation(iter->obj->material->shaderProgram, "lightIsDirectional"), lights.size(), isDirectional);
+		//if(DotProduct(objPos - cameraPos, cameraForward) > 0){
+			glUseProgram(iter->obj->material->shaderProgram);
 
-		GLint cubeMapLoc = glGetUniformLocation(iter->obj->material->shaderProgram, "_cubeMap");
-		if(cubeMapLoc != -1){
-			skyBox->Bind(GL_TEXTURE2);
-			glUniform1i(cubeMapLoc, 2);
-		}
+			Material* mat = iter->obj->material;
+			mat->SetMat4Uniform("_perspMatrix", perspMatrix);
+			mat->SetMat4Uniform("_cameraMatrix", camMatrix);
 
-		iter->Draw();	
+			glUniform1f(mat->GetUniformByName("numLights"), lights.size());
+			glUniform3fv(mat->GetUniformByName("lightVectors"), lights.size(), (GLfloat*)lightVectors);
+			glUniform1iv(mat->GetUniformByName("lightIsDirectional"), lights.size(), isDirectional);
+
+			GLint cubeMapLoc = mat->GetUniformByName("_cubeMap");
+			if(cubeMapLoc != -1){
+				skyBox->Bind(GL_TEXTURE2);
+				glUniform1i(cubeMapLoc, 2);
+
+				mat->SetVec3Uniform("_cameraPos", cameraPos);
+			}
+
+			iter->Draw();	
+		//}
 	}
 	
-	if(testArmature != nullptr){
-		Material* vertCol = resources.GetMaterialByName("color");
-		glUseProgram(vertCol->shaderProgram);
-		glUniformMatrix4fv(vertCol->GetUniformByName("_perspMatrix"), 1, GL_TRUE, &perspMatrix.m[0][0]);
-		glUniformMatrix4fv(vertCol->GetUniformByName("_cameraMatrix"), 1, GL_TRUE,  &camMatrix.m[0][0]);
-		glUniform4f(vertCol->GetUniformByName("_color"), 1, 0, 1, 1);
-		testArmature->DebugRender();
-	}
 
 	if(skyBox != nullptr){
 		skyBox->Render(camMatrix, perspMatrix);
 	}
 
+	
 	//Gui and gizmos stuff 
 	glDisable(GL_DEPTH_TEST);
 
@@ -402,6 +402,12 @@ void Scene::RemoveAllObjects(){
 
 	objects.clear();
 
+	for(auto iter = prefabs.begin(); iter != prefabs.end(); iter++){
+		delete (*iter);
+	}
+
+	prefabs.clear();
+
 	for(auto iter = guiSystem.elements.begin(); iter != guiSystem.elements.end(); iter++){
 		delete (*iter);
 	}
@@ -418,6 +424,8 @@ void Scene::RemoveAllObjects(){
 	drawCalls.clear();
 
 	resources.Clear();
+
+	audio.ClearClips();
 
 	if(skyBox != nullptr){
 		delete skyBox;

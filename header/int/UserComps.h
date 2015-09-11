@@ -152,10 +152,10 @@ struct AudioComponent : Component{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "AudioComponent";
-		elem.attributes.emplace_back("clipName", clipName);
-		elem.attributes.emplace_back("volume", to_string(volume));
-		elem.attributes.emplace_back("loop", (loop ? "T" : "F"));
-		elem.attributes.emplace_back("autoPlay", (autoPlay ? "T" : "F"));
+		elem.AddAttribute("clipName", clipName);
+		elem.AddAttribute("volume", to_string(volume));
+		elem.AddAttribute("loop", (loop ? "T" : "F"));
+		elem.AddAttribute("autoPlay", (autoPlay ? "T" : "F"));
 		return elem;
 	}
 
@@ -197,6 +197,9 @@ struct CameraControl : Component{
 	float stepDelay;
 	float timeMoving;
 
+	float characterHeight;
+	float groundedAdjustment;
+
 	int prevX;
 	int prevY;
 	float xRot;
@@ -213,16 +216,18 @@ struct CameraControl : Component{
 		health = 1;
 		timeMoving = 0;
 		stepDelay = 0.6f;
+		characterHeight = 0.4f;
+		groundedAdjustment = 0.05f;
 	}
 
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "CameraControl";
-		elem.attributes.push_back(XMLAttribute("speed",  to_string(speed)));
-		elem.attributes.push_back(XMLAttribute("velocity", to_string(velocity)));
-		elem.attributes.push_back(XMLAttribute("isGrounded", isGrounded ? "T" : "F"));
-		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
-		elem.attributes.push_back(XMLAttribute("stepDelay", to_string(stepDelay)));
+		elem.AddAttribute("speed",  to_string(speed));
+		elem.AddAttribute("velocity", to_string(velocity));
+		elem.AddAttribute("isGrounded", isGrounded ? "T" : "F");
+		elem.AddAttribute("health", to_string(health));
+		elem.AddAttribute("stepDelay", to_string(stepDelay));
 
 		return elem;
 	}
@@ -260,7 +265,7 @@ struct CameraControl : Component{
 		input = &gameObject->scene->input;
 		camera = gameObject->scene->camera;
 		physics = gameObject->scene->physicsSim;
-		//slider = gameObject->scene->guiSystem.elements[0];
+		slider = gameObject->scene->guiSystem.FindGUIElement("healthSlider");
 		healthBar = static_cast<GuiText*>(gameObject->scene->guiSystem.FindGUIElement("healthText"));
 		audioComp = gameObject->GetComponent<AudioComponent>();
 	}
@@ -291,11 +296,12 @@ struct CameraControl : Component{
 		}
 		if(input->GetKeyDown(' ') && isGrounded){
 			velocity = 4;
+			isGrounded = false;
 		}
 
 		//health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
 		health = max(0.0f, min(1.0f, health));
-		//GuiSetSliderValue(slider, health);
+		GuiSetSliderValue(slider, health);
 		if(healthBar != nullptr){
 			healthBar->text = "Health: " + to_string((int)(health*100));
 		}
@@ -305,21 +311,22 @@ struct CameraControl : Component{
 			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
 
 			RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), moveVec);
-			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.2f){
+			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.1f){
 				camera->GetParent()->position = camera->GetParent()->position + moveVec;
 			}
 			else if (testHit.hit){
-				Vector3 badVec = testHit.normal * DotProduct(moveVec, testHit.normal);
-#if defined(_WIN32) || defined(_WIN64)
-				if(_finitef(badVec.x) == 0){
-					_CrtDbgBreak();
+				Vector3 newNormal = testHit.normal;
+				if(testHit.normal.y < 0){
+					newNormal.y = 0;
+					newNormal.Normalize();
 				}
-#endif
+				float overlap = DotProduct(moveVec, newNormal);
+				Vector3 badVec = newNormal * overlap;
 				Vector3 goodVec = moveVec - badVec;
-				if(goodVec.MagnitudeSquared() > 0){
 
+				if(goodVec.MagnitudeSquared() > 0){
 					RaycastHit testHit2 = physics->Raycast(camera->GlobalPosition(), goodVec);
-					if(!testHit2.hit || testHit2.depth > goodVec.Magnitude() + 0.2f){
+					if(!testHit2.hit || testHit2.depth > goodVec.Magnitude() + 0.1f){
 						camera->GetParent()->position = camera->GetParent()->position + goodVec;
 					}
 				}
@@ -333,14 +340,19 @@ struct CameraControl : Component{
 
 		float floorHeight = -10;
 		RaycastHit lookDown = physics->Raycast(camera->GetParent()->position, Y_AXIS*-1);
+		RaycastHit lookUp = physics->Raycast(camera->GetParent()->position, Y_AXIS);
 		if(lookDown.hit){
 			floorHeight = lookDown.worldPos.y;
 		}
 
+		if(lookUp.hit && lookUp.depth < 0.1f && velocity > 0){
+			velocity = 0;
+		}
+
 		velocity -= gameObject->scene->deltaTime * 5;
 		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
-		if(camera->GetParent()->position.y <= floorHeight + 0.4f){
-			camera->GetParent()->position.y = floorHeight + 0.4f;
+		if(camera->GetParent()->position.y <= floorHeight + (isGrounded ? characterHeight + groundedAdjustment : characterHeight)){
+			camera->GetParent()->position.y = floorHeight + characterHeight;
 			velocity = 0;
 			isGrounded = true;
 		}
@@ -376,7 +388,7 @@ struct BulletComponent : Component{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "BulletComponent";
-		elem.attributes.emplace_back("speed", to_string(speed));
+		elem.AddAttribute("speed", to_string(speed));
 		return elem;
 	}
 
@@ -493,17 +505,17 @@ struct AnimationComponent : Component{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "AnimationComponent";
-		elem.attributes.emplace_back("type", EncodeAnimationType(animType));
-		elem.attributes.emplace_back("target", EncodeAnimationTarget(animTarget));
-		elem.attributes.emplace_back("loop", (loop ? "T" : "F"));
-		elem.attributes.emplace_back("autoplay", (playAutomatically ? "T" : "F"));
+		elem.AddAttribute("type", EncodeAnimationType(animType));
+		elem.AddAttribute("target", EncodeAnimationTarget(animTarget));
+		elem.AddAttribute("loop", (loop ? "T" : "F"));
+		elem.AddAttribute("autoplay", (playAutomatically ? "T" : "F"));
 
 		if(animType == AnimationType::Float){
 			for(const KeyFrame<float>& frame : floatAnim.keyFrames){
 				XMLElement child;
 				child.name = "KeyFrame";
-				child.attributes.emplace_back("time", to_string(frame.time));
-				child.attributes.emplace_back("value", to_string(frame.value));
+				child.AddAttribute("time", to_string(frame.time));
+				child.AddAttribute("value", to_string(frame.value));
 				elem.children.push_back(child);
 			}
 		}
@@ -511,8 +523,8 @@ struct AnimationComponent : Component{
 			for(const KeyFrame<Vector2>& frame : vec2Anim.keyFrames){
 				XMLElement child;
 				child.name = "KeyFrame";
-				child.attributes.emplace_back("time", to_string(frame.time));
-				child.attributes.emplace_back("value", EncodeVector2(frame.value));
+				child.AddAttribute("time", to_string(frame.time));
+				child.AddAttribute("value", EncodeVector2(frame.value));
 				elem.children.push_back(child);
 			}
 		}
@@ -520,8 +532,8 @@ struct AnimationComponent : Component{
 			for(const KeyFrame<Vector3>& frame : vec3Anim.keyFrames){
 				XMLElement child;
 				child.name = "KeyFrame";
-				child.attributes.emplace_back("time", to_string(frame.time));
-				child.attributes.emplace_back("value", EncodeVector3(frame.value));
+				child.AddAttribute("time", to_string(frame.time));
+				child.AddAttribute("value", EncodeVector3(frame.value));
 				elem.children.push_back(child);
 			}
 		}
@@ -529,8 +541,8 @@ struct AnimationComponent : Component{
 			for(const KeyFrame<Quaternion>& frame : quatAnim.keyFrames){
 				XMLElement child;
 				child.name = "KeyFrame";
-				child.attributes.emplace_back("time", to_string(frame.time));
-				child.attributes.emplace_back("value", EncodeQuaternion(frame.value));
+				child.AddAttribute("time", to_string(frame.time));
+				child.AddAttribute("value", EncodeQuaternion(frame.value));
 				elem.children.push_back(child);
 			}
 		}
@@ -555,6 +567,19 @@ struct AnimationComponent : Component{
 		}
 
 		//Maybe verify target and type?
+
+		if(animType == AnimationType::Float){
+			floatAnim.keyFrames.clear();
+		}
+		else if(animType == AnimationType::Vector2){
+			vec2Anim.keyFrames.clear();
+		}
+		else if(animType == AnimationType::Vector3){
+			vec3Anim.keyFrames.clear();
+		}
+		else if(animType == AnimationType::Quaternion){
+			quatAnim.keyFrames.clear();
+		}
 
 		for(const XMLElement& child : elem.children){
 			if(child.name == "KeyFrame"){
@@ -689,8 +714,8 @@ struct LightComponent : Component{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "LightComponent";
-		elem.attributes.emplace_back("intensity", to_string(intensity));
-		elem.attributes.emplace_back("isDirectional", isDirectional ? "T" : "F");
+		elem.AddAttribute("intensity", to_string(intensity));
+		elem.AddAttribute("isDirectional", isDirectional ? "T" : "F");
 		return elem;
 	}
 
@@ -867,9 +892,9 @@ struct EnemyComp : HitComponent{
 	virtual XMLElement Serialize(){
 		XMLElement elem;
 		elem.name = "EnemyComp";
-		elem.attributes.push_back(XMLAttribute("speed",  to_string(speed)));
-		elem.attributes.push_back(XMLAttribute("health", to_string(health)));
-		elem.attributes.push_back(XMLAttribute("maxHalth", to_string(maxHealth)));
+		elem.AddAttribute("speed",  to_string(speed));
+		elem.AddAttribute("health", to_string(health));
+		elem.AddAttribute("maxHalth", to_string(maxHealth));
 
 		return elem;
 	}
@@ -906,7 +931,9 @@ struct EnemyComp : HitComponent{
 	virtual void OnHit(RaycastHit hitInfo, GameObject* sender){
 		health--;
 		float ratio = ((float)health)/maxHealth;
-		gameObject->material->SetVec4Uniform("_color", Vector4(1.0f - ratio, 0, 0, 1.0f));
+		cout << "Ratio: " << ratio << endl;
+		//glUseProgram(gameObject->material->shaderProgram);
+		//gameObject->material->SetVec4Uniform("_color", Vector4(1.0f - ratio, 0, 0, 1.0f));
 		if(health <= 0){
 			GameObject* newObj = gameObject->Clone();
 			gameObject->material->matName = "";
@@ -935,7 +962,7 @@ struct EnemyComp : HitComponent{
 			currentTarget = player->transform.position;
 			longTermGoal = currentTarget;
 			pathNeedsUpdate = true;
-			//gameObject->material->SetVec4Uniform("_color", Vector4(0, 1, 0, 1.0f));
+			gameObject->material->SetVec4Uniform("_color", Vector4(0, 1, 0, 1.0f));
 		}
 		else{
 			//gameObject->material->SetVec4Uniform("_color", Vector4(0, 0, 0, 1.0f));
@@ -1006,9 +1033,7 @@ struct EnemyComp : HitComponent{
 		if(reloadTimeCounter > reloadTime){
 			reloadTimeCounter = 0;
 			Vector3 spawnPos = gameObject->transform.position + gameObject->transform.Forward();
-			//spawnPos.y = 6.4f;
 			GameObject* instance = gameObject->scene->Instantiate(bulletPrefab, spawnPos, gameObject->transform.rotation);
-			//cout << "Instance '" << instance->name << "' was created.\n";
 		}
 	}
 };

@@ -147,7 +147,7 @@ void AudioSystem::Initialise(){
 		return;
 	}
   
-  printf("%s\n", alGetString(AL_VERSION));
+  printf("OpenAL Version: %s\n", alGetString(AL_VERSION));
 
 	ALfloat listenerPos[] = {0,0,0};
 	ALfloat listenerVel[] = {0,0,0};

@@ -11,7 +11,7 @@
 #include "Pathfinding.h"
 #include "Light.h"
 #include "AudioSystem.h"
-#include <time.h>
+#include "Timer.h"
 #include <random>
 
 using std::list;
@@ -21,6 +21,8 @@ struct PhysicsSim;
 struct XMLElement;
 struct Armature;
 struct CubeMap;
+
+#define FPS_SMOOTHING_FACTOR 10
 
 struct Scene{
 	SC_Transform* camera;
@@ -54,9 +56,12 @@ protected:
 	float xRot;
 	float yRot;
 
+	float prevDeltaTime[FPS_SMOOTHING_FACTOR];
+	int prevDeltaTimeIndex;
+
 	bool running;
 
-	clock_t prevTime;
+	Timer timer;
 public:
 	
 	//NEVER call this version before the parameterized version

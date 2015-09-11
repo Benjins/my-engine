@@ -33,13 +33,7 @@ EditorScene::EditorScene(int argc, char** argv) : Scene(argc, argv){
 
 void EditorScene::Start(){
 	
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-	timeval start;
-	gettimeofday(&start, NULL);
-	prevTime = start.tv_sec*1000 + start.tv_usec/1000;
-#else
-	prevTime = clock();
-#endif
+	timer.Reset();
 
 	RecalculateSelectionSim();
 
@@ -106,6 +100,16 @@ void EditorScene::Start(){
 
 	editorGui.elements.push_back(nameField);
 
+	GuiElement* componentPanel = new GuiElement(&resources);
+	componentPanel->name = "components_panel";
+	componentPanel->position = Vector2(0.85f,0.16f);
+	componentPanel->scale = Vector2(0.3f, 0.3f);
+	componentPanel->tex = new Texture(1,1);
+	componentPanel->tex->SetPixel(0,0,pix);
+	componentPanel->tex->Apply();
+
+	editorGui.elements.push_back(componentPanel);
+
 	running = true;
 	while(running){
 #ifdef __APPLE__
@@ -163,18 +167,8 @@ void EditorScene::RecalculateSelectionSim(){
 }
 
 void EditorScene::EditorUpdate(){
-	int divisor = CLOCKS_PER_SEC;
-	clock_t currTime;
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-	divisor = 1000;
-	timeval start;
-	gettimeofday(&start, NULL);
-	currTime = start.tv_sec*1000 + start.tv_usec/1000;
-#else
-	currTime = clock();
-#endif
-	deltaTime = ((double)currTime - prevTime)/divisor;
-	prevTime = currTime;
+	deltaTime = timer.GetTimeSince();
+	timer.Reset();
 	
 	//cout << "EditorScene::EditorUpdate(): " << (deltaTime * 1000) << "  ms.\n";
 
@@ -204,7 +198,7 @@ void EditorScene::EditorUpdate(){
 
 	if(input.GetKeyUp(127)){
 		RemoveObject(selectedObj);
-		selectedObj = nullptr;
+		DeselectObject();
 	}
 	
 	if(input.GetKeyUp('p')){
@@ -222,7 +216,8 @@ void EditorScene::EditorUpdate(){
 	}
 
 	if(input.GetKeyUp('f') && selectedObj != nullptr){
-		selectedObj = Instantiate(selectedObj, selectedObj->transform.GlobalPosition() + editorCamera.Right(), selectedObj->transform.TotalRotation());
+		GameObject* copy = Instantiate(selectedObj, selectedObj->transform.GlobalPosition() + editorCamera.Right(), selectedObj->transform.TotalRotation());
+		SelectObject(copy);
 	}
 
 	const float speed = 2.0f;
@@ -269,6 +264,7 @@ void EditorScene::EditorUpdate(){
 		selectionSim.staticBoxBodies.clear();
 		LoadScene("Editor_Scene.xml");
 		RecalculateSelectionSim();
+		sceneCamera = camera;
 		camera = &editorCamera;
 	}
 
@@ -376,10 +372,10 @@ void EditorScene::EditorUpdate(){
 		else if(input.GetMouseUp(GLUT_LEFT_BUTTON)){
 			RaycastHit testHit = selectionSim.Raycast(editorCamera.position, rayDirection);
 			if(testHit.hit){
-				selectedObj = testHit.col->gameObject;
+				SelectObject(testHit.col->gameObject);
 			}
 			else{
-				selectedObj = nullptr;
+				DeselectObject();
 			}
 
 			selectedAxis = -1;
@@ -406,6 +402,10 @@ void EditorScene::EditorUpdate(){
 		}
 		else{
 			meshTxt->text = "Mesh: ";
+		}
+
+		for(EditorComponentGui& compGui : componentGui){
+			compGui.Save();
 		}
 	}
 	else{
@@ -438,6 +438,70 @@ void EditorScene::EditorUpdate(){
 
 	prevX = input.mouseX;
 	prevY = input.mouseY;
+}
+
+void EditorScene::SelectObject(GameObject* obj){
+	if(selectedObj != nullptr){
+		DeselectObject();
+	}
+
+	selectedObj = obj;
+
+	GuiElement* compPanel = editorGui.FindGUIElement("components_panel");
+
+	int index = 0;
+	for(Component* component : selectedObj->components){
+		XMLElement compCache = component->Serialize();
+		if(compCache.name != ""){
+			GuiText* guiTxt = new GuiText(&resources, "data/arial_16.fuv");
+			guiTxt->position = Vector2(0.8f, 0.25f - 0.03f * index);
+			guiTxt->scale = Vector2(0.1f, 0.04f);
+			guiTxt->text = compCache.name + ":";
+
+			editorGui.elements.push_back(guiTxt);
+			guiTxt->SetParent(compPanel);
+
+			index++;
+
+			for(const XMLAttribute& attr : compCache.attributes){
+				GuiText* fieldLabel = new GuiText(&resources, "data/arial_16.fuv");
+				fieldLabel->position = Vector2(0.8f, 0.25f - 0.03f * index);
+				fieldLabel->scale = Vector2(0.08f, 0.03f);
+				fieldLabel->text = attr.name;
+
+				editorGui.elements.push_back(fieldLabel);
+				fieldLabel->SetParent(guiTxt);
+
+				GuiTextField* inputField = new GuiTextField(&resources, "data/arial_16.fuv");
+				inputField->position = Vector2(0.9f, 0.25f - 0.03f * index);
+				inputField->scale = Vector2(0.1f, 0.03f);
+				inputField->text = attr.data;
+
+				editorGui.elements.push_back(inputField);
+				inputField->SetParent(guiTxt);
+
+				EditorComponentGui compGui;
+				compGui.serializedComponent = compCache;
+				compGui.liveComponent = component;
+				compGui.fieldLabel = fieldLabel;
+				compGui.inputText = inputField;
+				compGui.Load();
+
+				componentGui.push_back(compGui);
+
+				index++;
+			}
+		}
+	}
+}
+
+void EditorScene::DeselectObject(){
+	selectedObj = nullptr;
+
+	componentGui.clear();
+
+	GuiElement* compPanel = editorGui.FindGUIElement("components_panel");
+	editorGui.ClearElementChildren(compPanel);
 }
 
 void EditorScene::EditorGUI(){

@@ -14,12 +14,10 @@ uniform vec4 _color;
 
 uniform vec3 lightVectors[MAX_NUM_LIGHTS];
 uniform int lightIsDirectional[MAX_NUM_LIGHTS];
-uniform int numLights;
+uniform float numLights;
 
 void main()
 {
-	//if(abs(dot(tangent, normal)) > 0.01){discard;}
-	
 	vec4 texCol  = texture2D(_mainTex, uv_coord.st);
 	vec4 bumpCol = texture2D(_bumpMap, uv_coord.st);
 	texCol.a = 1.0;
@@ -28,9 +26,11 @@ void main()
 	vec3 actualTangent = normalize(tangent - dot(tangent, normal) * normal);
 	bumpCol = bumpCol * 2.0 - vec4(1.0,1.0,1.0,0.0);
 	vec3 usedNormal = normal * bumpCol.b + actualTangent * bumpCol.g + cross(normal, actualTangent) * bumpCol.r;
+	//usedNormal = normalize(usedNormal);
 	
-	float lighting = 0.1;
-	for(int i = 0; i < numLights; i++){
+	lowp float lighting = 0.1;
+	for(int i = 0; i < int(numLights + 0.5); i++){
+		lowp float thisLighting = 0.0;
 		if(lightIsDirectional[i] != 0){
 			lighting += (dot(usedNormal, lightVectors[i]) + 1)/2;
 		}
@@ -39,7 +39,7 @@ void main()
 			float distance = length(difference);
 			float normalDot = dot(usedNormal, difference/distance);
 			float clampedDist = min(distance, 5);
-			float thisLighting = max(0, (normalDot+1)/2 * (5 - clampedDist));
+			thisLighting = max(0, (normalDot+1)/2 * (5 - clampedDist));
 			lighting += thisLighting;
 		}
 	}

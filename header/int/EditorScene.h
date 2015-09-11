@@ -3,6 +3,7 @@
 
 #include "Scene.h"
 #include "PhysicsSim.h"
+#include "EditorComponentGui.h"
 
 enum struct TransformMode{
 	Translation,
@@ -23,6 +24,8 @@ struct EditorScene : Scene{
 	GuiSystem editorGui;
 	//vector<GuiElement*> editorGui;
 
+	vector<EditorComponentGui> componentGui; 
+
 	GameObject* selectedObj;
 	int selectedAxis;
 	TransformMode transformMode;
@@ -35,6 +38,9 @@ struct EditorScene : Scene{
 		static EditorScene instance = EditorScene(argc, argv);
 		return instance;
 	}
+
+	void SelectObject(GameObject* obj);
+	void DeselectObject();
 
 	virtual void Start();
 
