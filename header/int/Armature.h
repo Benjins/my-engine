@@ -51,7 +51,8 @@ struct Armature{
 	void BlendTo(const string& animName, float time);
 	void BlendToIndex(int animIndex, float time);
 
-	//void Parse
+	void ParseStateString(const string& states);
+	string EncodeStateString();
 };
 
 #endif

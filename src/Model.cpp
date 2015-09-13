@@ -738,6 +738,8 @@ void Model::ImportAnimationLibrary(const XMLElement& elem){
 			}
 		}
 	}
+
+	armature->anim[0].stateName = "_base";
 }
 
 void Model::ImportFromModelFile(const string& fileName){

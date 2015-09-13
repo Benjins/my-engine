@@ -7,6 +7,7 @@
 #include "../header/int/UserComps.h"
 #include "../header/int/RigidBody.h"
 #include "../header/int/CubeMap.h"
+#include "../header/int/Armature.h"
 #include "../header/ext/simple-xml.h"
 
 struct FireGun;
@@ -31,6 +32,7 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(BulletComponent)
 	DEFINE_USER_COMPONENT(PlayerComponent)
 	DEFINE_USER_COMPONENT(DoorComponent)
+	DEFINE_USER_COMPONENT(AnimationControlTest)
 
 	return nullptr;
 }
@@ -266,11 +268,15 @@ GameObject* Scene::LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvent
 			}
 		}
 		else if(child.name == "Mesh"){
-			for(auto iter2 = child.attributes.begin(); iter2 != child.attributes.end(); iter2++){
-				XMLAttribute attr = *iter2;
-				if(attr.name == "source"){
-					go->mesh = resources.LoadMesh(attr.data);
-				}
+
+			auto iter = child.attributeMap.find("source");
+			if(iter != child.attributeMap.end()){
+				go->mesh = resources.LoadMesh(iter->second);
+			}
+
+			iter = child.attributeMap.find("anim");
+			if(iter != child.attributeMap.end()){
+				go->mesh->armature->ParseStateString(iter->second);
 			}
 		}
 		else if(child.name == "Camera"){
@@ -457,6 +463,11 @@ void Scene::SaveScene(string fileName){
 			XMLElement mesh;
 			mesh.name = "Mesh";
 			mesh.attributes.push_back(XMLAttribute("source",model->name));
+			
+			if(model->armature != nullptr && model->armature->animCount > 0){
+				mesh.AddAttribute("anim", model->armature->EncodeStateString());
+			}
+
 			elem.children.push_back(mesh);
 		}
 

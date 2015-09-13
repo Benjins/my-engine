@@ -90,21 +90,22 @@ void Armature::Update(float deltaTime){
 
 	if(currentBlendTime >= blendTime){
 		currentAnimIndex = targetAnimIndex;
+		time = currentBlendTime;
 	}
 
-	bool isBlending = currentAnimIndex == targetAnimIndex;
+	bool isBlending = currentAnimIndex != targetAnimIndex;
 
 	for(int i = 0; i < boneCount; i++){
 		Vector3 currentPos    = anim[currentAnimIndex].boneAnims[i].positionAnim.Evaluate(time);
 		Quaternion currentRot = anim[currentAnimIndex].boneAnims[i].rotationAnim.Evaluate(time);
 
-		if(isBlending){
+		if(!isBlending){
 			bones[i].position = currentPos;
 			bones[i].rotation = currentRot;
 		}
 		else{
-			Vector3 targetPos    = anim[targetAnimIndex].boneAnims[i].positionAnim.Evaluate(time);
-			Quaternion targetRot = anim[targetAnimIndex].boneAnims[i].rotationAnim.Evaluate(time);
+			Vector3 targetPos    = anim[targetAnimIndex].boneAnims[i].positionAnim.Evaluate(currentBlendTime);
+			Quaternion targetRot = anim[targetAnimIndex].boneAnims[i].rotationAnim.Evaluate(currentBlendTime);
 
 			float blendWeight = currentBlendTime / blendTime;
 			Vector3 blendedPos    = currentPos * (1 - blendWeight) + targetPos * blendWeight;
@@ -142,7 +143,7 @@ void Armature::BlendTo(const string& animName, float time){
 		BlendToIndex(index, time);
 	}
 	else{
-		cout << "\n\nError: trying to blend to invalid state: " << animName << endl;
+		cout << "\n\nError: trying to blend to invalid state: '" << animName << "'" << endl;
 	}
 }
 
@@ -153,3 +154,70 @@ void Armature::BlendToIndex(int animIndex, float time){
 		currentBlendTime = 0;
 	}
 }
+
+void Armature::ParseStateString(const string& states){
+	vector<string> stateList = SplitStringByDelimiter(states, ",");
+	int stateCount = 1;
+	for(const string& state : stateList){
+		vector<string> parsedState = SplitStringByDelimiter(state, ":");
+		if(parsedState.size() != 2){
+			cout << "Warning: Invalid state description: '" << state << "'" << endl;
+		}
+		else{
+			const string& stateName = parsedState[0];
+			const string& stateTimes = parsedState[1];
+			vector<string> stateTimesSplit = SplitStringByDelimiter(stateTimes, "-");
+			if(stateTimesSplit.size() != 2){
+				cout << "Warning: Invalid state times: '" << stateTimes << "'" << endl;
+				break;
+			}
+
+			float timeMin = atof(stateTimesSplit[0].c_str());
+			float timeMax = atof(stateTimesSplit[1].c_str());
+
+			anim[stateCount].stateName = stateName;
+			for(int i = 0; i < boneCount; i++){
+				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMin), timeMin);
+				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMax), timeMax);
+				for(KeyFrame<Vector3> frame : anim[0].boneAnims[i].positionAnim.keyFrames){
+					if(frame.time > timeMin && frame.time < timeMax){
+						anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(frame.value, frame.time);
+					}
+				}
+
+				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMin), timeMin);
+				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMax), timeMax);
+				for(KeyFrame<Quaternion> frame : anim[0].boneAnims[i].rotationAnim.keyFrames){
+					if(frame.time > timeMin && frame.time < timeMax){
+						anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(frame.value, frame.time);
+					}
+				}
+			}
+
+			stateCount++;
+		}
+	}
+
+	animCount = stateCount;
+}
+
+string Armature::EncodeStateString(){
+	string encoded="";
+	bool first = true;
+	for(int i = 1; i < animCount; i++){
+		if(!first){
+			encoded += ",";
+		}
+
+		encoded += (anim[i].stateName + ":");
+
+		float start = anim[i].boneAnims[0].positionAnim.keyFrames[0].time;
+		float end = start + anim[i].boneAnims[0].positionAnim.Length();
+
+		encoded += (to_string(start) + "-" + to_string(end));
+		first = false;
+	}
+
+	return encoded;
+}
+

@@ -11,6 +11,7 @@
 #include "Scene.h"
 #include "LoadingUtilities.h"
 #include "Animation.h"
+#include "Armature.h"
 #include "AudioSystem.h"
 #include "../ext/simple-xml.h"
 #include "3DUtilities.h"
@@ -79,6 +80,39 @@ struct PlayerComponent : Component{
 	//virtual void OnCollision(Collider* col) override{
 		
 	//}
+};
+
+struct AnimationControlTest : Component{
+	Armature* armature;
+	float timeOut;
+	Timer timer;
+	bool isIdle;
+	Input* input;
+
+	virtual void OnAwake(){
+		armature = gameObject->mesh->armature;
+		timeOut = 1.0f;
+		timer.Reset();
+		isIdle = true;
+		armature->BlendTo("idle", 0.0f);
+		input = &gameObject->scene->input;
+	}
+
+	virtual void OnUpdate(){
+		if(armature != nullptr){
+			if(input->GetKeyUp('m')){
+				timer.Reset();
+				isIdle = false;
+				armature->BlendTo("attack", 0.2f);
+			}
+
+			if(!isIdle && timer.GetTimeSince() >= timeOut){
+				armature->BlendTo("idle", 0.2f);
+				timer.Reset();
+				isIdle = true;
+			}
+		}
+	}
 };
 
 struct AudioComponent : Component{
