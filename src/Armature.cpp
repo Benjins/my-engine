@@ -86,10 +86,33 @@ void Armature::DebugRender(){
 
 void Armature::Update(float deltaTime){
 	time += deltaTime;
+	currentBlendTime += deltaTime;
+
+	if(currentBlendTime >= blendTime){
+		currentAnimIndex = targetAnimIndex;
+	}
+
+	bool isBlending = currentAnimIndex == targetAnimIndex;
 
 	for(int i = 0; i < boneCount; i++){
-		bones[i].position = anim[currentAnimIndex].boneAnims[i].positionAnim.Evaluate(time);
-		bones[i].rotation = anim[currentAnimIndex].boneAnims[i].rotationAnim.Evaluate(time);
+		Vector3 currentPos    = anim[currentAnimIndex].boneAnims[i].positionAnim.Evaluate(time);
+		Quaternion currentRot = anim[currentAnimIndex].boneAnims[i].rotationAnim.Evaluate(time);
+
+		if(isBlending){
+			bones[i].position = currentPos;
+			bones[i].rotation = currentRot;
+		}
+		else{
+			Vector3 targetPos    = anim[targetAnimIndex].boneAnims[i].positionAnim.Evaluate(time);
+			Quaternion targetRot = anim[targetAnimIndex].boneAnims[i].rotationAnim.Evaluate(time);
+
+			float blendWeight = currentBlendTime / blendTime;
+			Vector3 blendedPos    = currentPos * (1 - blendWeight) + targetPos * blendWeight;
+			Quaternion blendedRot = currentRot * (1 - blendWeight) + targetRot * blendWeight;
+
+			bones[i].position = blendedPos;
+			bones[i].rotation = blendedRot;
+		}
 	}
 }
 
@@ -115,12 +138,18 @@ int Armature::GetAnimationIndexByName(const string& name){
 
 void Armature::BlendTo(const string& animName, float time){
 	int index = GetAnimationIndexByName(animName);
-	BlendToIndex(index, time);
+	if(index != -1){
+		BlendToIndex(index, time);
+	}
+	else{
+		cout << "\n\nError: trying to blend to invalid state: " << animName << endl;
+	}
 }
 
 void Armature::BlendToIndex(int animIndex, float time){
 	if(targetAnimIndex != animIndex){
 		targetAnimIndex = animIndex;
 		blendTime = time;
+		currentBlendTime = 0;
 	}
 }

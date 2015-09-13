@@ -21,6 +21,7 @@ struct Armature{
 
 	int currentAnimIndex;
 	int targetAnimIndex;
+	float currentBlendTime;
 	float blendTime;
 
 	Model* model;
@@ -35,6 +36,7 @@ struct Armature{
 	, currentAnimIndex(0)
 	, targetAnimIndex(0)
 	, blendTime(0.0f)
+	, currentBlendTime(0.0f)
 	, model(nullptr){
 	}
 
@@ -48,6 +50,8 @@ struct Armature{
 	int GetAnimationIndexByName(const string& name);
 	void BlendTo(const string& animName, float time);
 	void BlendToIndex(int animIndex, float time);
+
+	//void Parse
 };
 
 #endif
