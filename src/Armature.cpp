@@ -88,11 +88,8 @@ void Armature::Update(float deltaTime){
 	time += deltaTime;
 
 	for(int i = 0; i < boneCount; i++){
-		float posTime = fmodf(time, anim[0].boneAnims[i].positionAnim.Length());
-		float rotTime = fmodf(time, anim[0].boneAnims[i].rotationAnim.Length());
-
-		bones[i].position = anim[0].boneAnims[i].positionAnim.Evaluate(posTime);
-		bones[i].rotation = anim[0].boneAnims[i].rotationAnim.Evaluate(rotTime);
+		bones[i].position = anim[currentAnimIndex].boneAnims[i].positionAnim.Evaluate(time);
+		bones[i].rotation = anim[currentAnimIndex].boneAnims[i].rotationAnim.Evaluate(time);
 	}
 }
 
@@ -104,4 +101,26 @@ BoneTransform* Armature::GetBoneByName(const string& name){
 	}
 
 	return nullptr;
+}
+
+int Armature::GetAnimationIndexByName(const string& name){
+	for(int i = 0; i < animCount; i++){
+		if(anim[i].stateName == name){
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void Armature::BlendTo(const string& animName, float time){
+	int index = GetAnimationIndexByName(animName);
+	BlendToIndex(index, time);
+}
+
+void Armature::BlendToIndex(int animIndex, float time){
+	if(targetAnimIndex != animIndex){
+		targetAnimIndex = animIndex;
+		blendTime = time;
+	}
 }

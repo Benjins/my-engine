@@ -39,8 +39,12 @@ struct KeyFrame{
 
 template<typename T>
 struct Animation{
+	bool loop;
 	//keyFrames is sorted in chronological order
 	vector<KeyFrame<T>> keyFrames;
+
+	Animation() : loop(true){
+	}
 
 	void AddKeyFrame(T val, float time){
 		if(IsEmpty()){
@@ -63,8 +67,15 @@ struct Animation{
 	}
 
 	T Evaluate(float time) const{
+		float length = Length();
+
+		float evalTime = time;
+		if(evalTime > length){
+			evalTime = (loop ? fmodf(evalTime, length) : length);
+		}
+
 		for(int i = 0; i < keyFrames.size(); i++){
-			if(keyFrames[i].time > time){
+			if(keyFrames[i].time > evalTime){
 				int postIndex = i;
 				int preIndex = i-1;
 
@@ -76,7 +87,7 @@ struct Animation{
 					T postVal = keyFrames[postIndex].value;
 
 					float interpolationLength = keyFrames[postIndex].time - keyFrames[preIndex].time;
-					float evalPosition = time - keyFrames[preIndex].time;
+					float evalPosition = evalTime - keyFrames[preIndex].time;
 					float weight = evalPosition / interpolationLength;
 
 					return preVal * (1 - weight) + postVal * weight;

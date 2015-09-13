@@ -19,14 +19,22 @@ struct Armature{
 	Mat4x4 bindPoses[MAX_BONE_COUNT];
 	ArmatureAnimation anim[MAX_ANIM_COUNT];
 
+	int currentAnimIndex;
+	int targetAnimIndex;
+	float blendTime;
+
 	Model* model;
 	int boneCount;
+	int animCount;
 
 	float time;
 
 	Armature()
 	: boneCount(0)
 	, time(0.0f)
+	, currentAnimIndex(0)
+	, targetAnimIndex(0)
+	, blendTime(0.0f)
 	, model(nullptr){
 	}
 
@@ -37,6 +45,9 @@ struct Armature{
 	void Update(float deltaTime);
 
 	BoneTransform* GetBoneByName(const string& name);
+	int GetAnimationIndexByName(const string& name);
+	void BlendTo(const string& animName, float time);
+	void BlendToIndex(int animIndex, float time);
 };
 
 #endif

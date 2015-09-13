@@ -633,22 +633,23 @@ struct AnimationComponent : Component{
 		float length = 0;
 		if(animType == AnimationType::Float){
 			length = floatAnim.Length();
+			floatAnim.loop = loop;
 		}
 		else if(animType == AnimationType::Vector2){
 			length = vec2Anim.Length();
+			vec2Anim.loop = loop;
 		}
 		else if(animType == AnimationType::Vector3){
 			length = vec3Anim.Length();
+			vec3Anim.loop = loop;
 		}
 		else if(animType == AnimationType::Quaternion){
 			length = quatAnim.Length();
+			quatAnim.loop = loop;
 		}
 
 		if(isPlaying){
 			currentTime += gameObject->scene->deltaTime;
-			if(loop && currentTime >= length){
-				currentTime -= length;
-			}
 		}
 
 		if(animTarget == AnimationTarget::Position){
