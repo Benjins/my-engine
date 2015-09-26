@@ -211,6 +211,13 @@ void Scene::Start(){
 
 		double total = ((double)afterSwap - start)/CLOCKS_PER_SEC;
 
+
+		double totalMSToWait = (0.01667 - total)*1000;
+		int msToWait = (int)(totalMSToWait + 0.5f);
+		if(msToWait > 0){
+			printf("Waiting %d ms.\n", msToWait);
+			Sleep(msToWait);
+		} 
 		//printf("event: %.1f, updt: %.1f, rend: %.1f, flush: %.1f, swap: %.1f, total: %.1f\n", loopEventTime * 1000, 1000 * updateTime, renderTime * 1000, finishTime * 1000, swapTime * 1000, total * 1000);
 
 		GLenum err = glGetError();

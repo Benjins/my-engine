@@ -2,16 +2,19 @@
 #include "../header/int/Texture.h"
 #include "../header/int/Material.h"
 #include "../header/int/Model.h"
+#include "../header/int/FontBMPMaker.h"
 
 
 MaterialManager::MaterialManager(int matCount){
 	matAlloc = matCount;
 	texAlloc = 20;
 	meshAlloc = 20;
+	fontUVAlloc = 10;
 	
 	materials = new Material[matAlloc];
 	textures = new Texture[texAlloc];
 	models = new Model[meshAlloc];
+	fontUVs = new FUV[fontUVAlloc];
 }
 
 Material* MaterialManager::GetMaterialByName(string name){
@@ -112,6 +115,35 @@ Model* MaterialManager::GetMeshByName(const string& name){
 	return nullptr;
 }
 
+FUV* MaterialManager::LoadFUV(const string& fileName, bool forceInstance /*= false*/){
+	if(!forceInstance){
+		for(int i = 0; i < fontUVAlloc; i++){
+			if(fontUVs[i].fileName == fileName){
+				return &fontUVs[i];
+			}
+		}
+	}
+
+	for(int i = 0; i < fontUVAlloc; i++){
+		if(fontUVs[i].fileName == ""){
+			ImportFUV(fileName, fontUVs[i]);
+			return &fontUVs[i];
+		}
+	}
+
+	return nullptr;
+}
+
+FUV* MaterialManager::GetFUVByName(const string& name){
+	for(int i = 0; i < fontUVAlloc; i++){
+		if(fontUVs[i].fileName == name){
+			return &fontUVs[i];
+		}
+	}
+
+	return nullptr;
+}
+
 void MaterialManager::Clear(){
 	if(materials != NULL){
 		delete[] materials;
@@ -131,5 +163,9 @@ MaterialManager::~MaterialManager(){
 
 	if(models != nullptr){
 		delete[] models;
+	}
+
+	if(fontUVs != nullptr){
+		delete[] fontUVs;
 	}
 }

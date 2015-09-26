@@ -135,6 +135,8 @@ void ImportFUV(const string& fileName, FUV& readInto){
 		return;
 	}
 
+	readInto.fileName = fileName;
+
 	char buffer[4];
 	fileIn.read(buffer, 4); //"FUV\0"
 	if(strcmp(buffer, "FUV") != 0){

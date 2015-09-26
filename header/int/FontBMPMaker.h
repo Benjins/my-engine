@@ -47,11 +47,21 @@ struct LetterUV{
 //The structure that holds the bitmap of the font, as well as the UV information
 //needed to render each character on it
 struct FUV{
+	LetterUV uvs[128];
+	string fileName;
 	RGBA* pixels;
 	int imageSize;
 	int fontSize;
 
-	LetterUV uvs[128];
+	FUV(){
+		pixels = nullptr;
+	}
+
+	~FUV(){
+		if(pixels != nullptr){
+			delete[] pixels;
+		}
+	}
 };
 
 //Place an image on another image

@@ -119,10 +119,6 @@ GuiElement::~GuiElement(){
 }
 
 GuiText::~GuiText(){
-	if(fuv.pixels != NULL){
-		delete[] fuv.pixels;
-		fuv.pixels = NULL;
-	}
 }
 
 GuiText::GuiText(MaterialManager* resources, const string& _fuvFileName) 
@@ -131,7 +127,7 @@ GuiText::GuiText(MaterialManager* resources, const string& _fuvFileName)
 {
 	textScale = Vector2(1,1);
 	text = "";
-	ImportFUV(fuvFileName, fuv);
+	fuv = resources->LoadFUV(_fuvFileName);
 
 	Material* textMat = resources->GetMaterialByName("gui-txt");
 	guiProgram = textMat->shaderProgram;
@@ -139,7 +135,7 @@ GuiText::GuiText(MaterialManager* resources, const string& _fuvFileName)
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &texObj);
 	glBindTexture(GL_TEXTURE_2D, texObj);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fuv.imageSize, fuv.imageSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, fuv.pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fuv->imageSize, fuv->imageSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, fuv->pixels);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
  
@@ -185,13 +181,13 @@ void GuiText::OnGui() const{
 		char letter = text[i];
 		if(letter == '\n' || letter == '\r'){
 			x = position.x;
-			y += sy * fuv.fontSize; 
+			y += sy * fuv->fontSize; 
 			continue;
 		}
 
-		LetterUV uv = fuv.uvs[letter];
-		float xSize = (uv.xMax - uv.xMin) * fuv.imageSize * sx;
-		float ySize = (uv.yMax - uv.yMin) * fuv.imageSize * sy;
+		LetterUV uv = fuv->uvs[letter];
+		float xSize = (uv.xMax - uv.xMin) * fuv->imageSize * sx;
+		float ySize = (uv.yMax - uv.yMin) * fuv->imageSize * sy;
 
 		float x2 = x + uv.left * sx;
 		float y2 = y - uv.top * sy;

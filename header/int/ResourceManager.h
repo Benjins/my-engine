@@ -5,17 +5,19 @@
 
 using std::string;
 
-struct Texture; struct Material; struct Model; struct GameObject;
+struct Texture; struct Material; struct Model; struct GameObject; struct FUV;
 
 
 struct MaterialManager{
 	Material* materials;
 	Texture* textures;
 	Model* models;
+	FUV* fontUVs;
 
 	unsigned int matAlloc;
 	unsigned int texAlloc;
 	unsigned int meshAlloc;
+	unsigned int fontUVAlloc;
 
 public:
 	MaterialManager(int matCount = 40);
@@ -32,6 +34,9 @@ public:
 
 	Model* LoadMesh(const string& fileName, bool forceInstance = false);
 	Model* GetMeshByName(const string& name);
+
+	FUV* LoadFUV(const string& fileName, bool forceInstance = false);
+	FUV* GetFUVByName(const string& name);
 
 	void Clear();
 

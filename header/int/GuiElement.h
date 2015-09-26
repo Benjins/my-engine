@@ -89,7 +89,7 @@ struct GuiSlider : GuiElement{
 
 struct GuiText : GuiElement{
 	string text;
-	FUV fuv;
+	FUV* fuv;
 	GLuint texObj;
 	string fuvFileName;
 	Vector2 textScale;
