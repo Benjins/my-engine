@@ -832,7 +832,7 @@ struct FireGun : Component{
 	float bulletForce;
 
 	FireGun(){
-		bulletForce = 20000.0f;
+		bulletForce = 100000.0f;
 	}
 
 	virtual XMLElement Serialize(){
