@@ -127,6 +127,7 @@ void Scene::RemoveObject(GameObject* obj){
 void Scene::DestroyObject(GameObject* obj){
 	//We remove the child from its parent, which causes issue if we do that while iterating over the children list
 	vector<GameObject*> childrenCopy; 
+	childrenCopy.reserve(obj->transform.children.size());
 	for(SC_Transform* child : obj->transform.children){
 		childrenCopy.push_back(child->gameObject);
 	}
@@ -211,14 +212,16 @@ void Scene::Start(){
 
 		double total = ((double)afterSwap - start)/CLOCKS_PER_SEC;
 
-
-		double totalMSToWait = (0.01667 - total)*1000;
+		double totalMSToWait = ((1.0f/60) - deltaTime)*1000;
 		int msToWait = (int)(totalMSToWait + 0.5f);
 		if(msToWait > 0){
-			printf("Waiting %d ms.\n", msToWait);
+			//printf("Waiting     %d ms.\n", msToWait);
 			Sleep(msToWait);
 		} 
-		//printf("event: %.1f, updt: %.1f, rend: %.1f, flush: %.1f, swap: %.1f, total: %.1f\n", loopEventTime * 1000, 1000 * updateTime, renderTime * 1000, finishTime * 1000, swapTime * 1000, total * 1000);
+		else{
+			//printf("Not waiting %d ms.\n", msToWait);
+		}
+		printf("update time total: %.1f\n", deltaTime * 1000);
 
 		GLenum err = glGetError();
 		if(err != 0){

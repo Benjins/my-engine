@@ -7,7 +7,7 @@ in vec2 uv_coord;
 in vec3 normal;
 in vec3 pos;
 
-uniform float reflectiveLevel = 0.5;
+uniform float reflectiveLevel = 0.3;
 
 uniform sampler2D _mainTex;
 uniform sampler2D _bumpMap;
@@ -24,5 +24,5 @@ void main()
 	
 	vec4 reflectiveSample = texture(_cubeMap, sampleVec);
 	
-	FragColor = mix(texCol, reflectiveSample, length(texCol) * reflectiveLevel);
+	FragColor = mix(texCol, reflectiveSample, reflectiveLevel);
 }

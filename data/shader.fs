@@ -26,18 +26,18 @@ void main()
 	vec3 actualTangent = normalize(tangent - dot(tangent, normal) * normal);
 	bumpCol = bumpCol * 2.0 - vec4(1.0,1.0,1.0,0.0);
 	lowp vec3 usedNormal = normal * bumpCol.b + actualTangent * bumpCol.g + cross(normal, actualTangent) * bumpCol.r;
-	//usedNormal = normalize(usedNormal);
 	
 	lowp float lighting = 0.1;
+	
 	for(int i = 0; i < int(numLights + 0.5); i++){
 		lowp float thisLighting = 0.0;
 		if(lightIsDirectional[i] != 0){
-			lighting += (dot(usedNormal, lightVectors[i]) + 1)/2;
+			lighting += (dot(normal, lightVectors[i]) + 1)/2;
 		}
 		else{
 			lowp vec3 difference = lightVectors[i] - pos;
 			lowp float distance = length(difference);
-			lowp float normalDot = dot(usedNormal, difference/distance);
+			lowp float normalDot = dot(normal, difference/distance);
 			lowp float clampedDist = min(distance, 5.0);
 			thisLighting = max(0, (normalDot+1)/2 * (5 - clampedDist));
 			lighting += thisLighting;

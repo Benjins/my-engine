@@ -22,7 +22,7 @@ struct XMLElement;
 struct Armature;
 struct CubeMap;
 
-#define FPS_SMOOTHING_FACTOR 10
+#define FPS_SMOOTHING_FACTOR 30
 
 struct Scene{
 	SC_Transform* camera;

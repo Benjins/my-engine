@@ -22,6 +22,7 @@ void main()
 	vec4 color = mix(texCol, _color, 0.5);
 	
 	lowp float lighting = 0.1;
+	
 	for(int i = 0; i < int(numLights + 0.5); i++){
 		lowp float thisLighting = 0.0;
 		if(lightIsDirectional[i] != 0){
@@ -36,6 +37,7 @@ void main()
 			lighting += thisLighting;
 		}
 	}
+	
 	
 	FragColor = color * lighting;
 }
