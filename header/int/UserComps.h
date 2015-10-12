@@ -1,6 +1,7 @@
 #ifndef USERCOMPS_H
 #define USERCOMPS_H
 #include "Component.h"
+#include "RigidBody.h"
 #include "Collider.h"
 #include "RaycastHit.h"
 #include "PhysicsSim.h"
@@ -222,6 +223,7 @@ struct CameraControl : Component{
 	GuiElement* slider;
 	GuiText* healthBar;
 	AudioComponent* audioComp;
+
 	float speed;
 	float velocity;
 
@@ -826,8 +828,11 @@ struct FireGun : Component{
 	PhysicsSim* physicsSim;
 	SC_Transform* camera;
 
+	GameObject* bulletPrefab;
+	float bulletForce;
+
 	FireGun(){
-		
+		bulletForce = 20000.0f;
 	}
 
 	virtual XMLElement Serialize(){
@@ -843,6 +848,8 @@ struct FireGun : Component{
 		input = &gameObject->scene->input;
 		physicsSim = gameObject->scene->physicsSim;
 		camera = gameObject->scene->camera;
+
+		bulletPrefab = gameObject->scene->FindPrefab("bullet-rb");
 	}
 
 	virtual Component* Clone(){
@@ -851,6 +858,10 @@ struct FireGun : Component{
 
 	virtual void OnUpdate(){
 		if(input->GetMouseUp(GLUT_LEFT_BUTTON)){
+			GameObject* bulletIntance = gameObject->scene->Instantiate(bulletPrefab, Vector3(0,0,0));
+			bulletIntance->GetComponent<RigidBody>()->state.position = gameObject->transform.GlobalPosition() + gameObject->transform.Forward();
+			bulletIntance->GetComponent<RigidBody>()->AddForce(gameObject->transform.Forward() * bulletForce);
+
 			RaycastHit hit = physicsSim->Raycast(camera->GlobalPosition(), camera->Forward());
 			if(hit.hit){
 				HitComponent* hitComp = hit.col->gameObject->GetComponent<HitComponent>();

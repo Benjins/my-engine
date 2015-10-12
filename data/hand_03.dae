@@ -636,13 +636,13 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="Armature" name="Armature" type="NODE">
-        <translate sid="location">-2.145002 -3.71854e-7 2.76762</translate>
+        <translate sid="location">0 0 0</translate>
         <rotate sid="rotationZ">0 0 1 0</rotate>
         <rotate sid="rotationY">0 1 0 0</rotate>
         <rotate sid="rotationX">1 0 0 0</rotate>
         <scale sid="scale">1 1 1</scale>
         <node id="arm" name="arm" sid="arm" type="JOINT">
-          <matrix sid="transform">0.999471 -0.02630337 -0.01912329 -0.1542578 0.02382277 0.9924836 -0.1200368 -0.05083616 0.02213693 0.1195178 0.9925852 -0.004477262 0 0 0 1</matrix>
+          <matrix sid="transform">0.999471 -0.02630337 -0.01912329 -0.1542578 0.02382277 0.9924836 -0.1200368 -0.05083616 0.02213693 0.1195178 0.9925852 -0.004477262 -2.145002 -3.71854e-7 2.76762 1</matrix>
           <node id="wrist" name="wrist" sid="wrist" type="JOINT">
             <matrix sid="transform">0.9990965 -0.03603495 0.02253205 0 0.03234956 0.9886507 0.1467085 2.269218 -0.02756294 -0.1458471 0.9889231 0 0 0 0 1</matrix>
             <node id="hand" name="hand" sid="hand" type="JOINT">

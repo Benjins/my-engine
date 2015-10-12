@@ -31,6 +31,13 @@
     <BulletComponent speed='6.000000'/>
     <RigidBody mass='0.100000' isKinematic='F'/>
   </Prefab>
+  <Prefab name='bullet-rb'>
+    <Transform position='0.120000,3.000000,-0.400000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
+    <Material name='floorMat'/>
+    <Mesh source='data/test.obj'/>
+    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
+    <RigidBody mass='0.100000' isKinematic='T'/>
+  </Prefab>
   <GameObject name='test2-obj'>
     <Transform position='1.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.200000,0.200000,0.200000'/>
     <Material name='worm-arm'/>
@@ -43,7 +50,7 @@
     <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
   </GameObject>
   <GameObject name='mainCam'>
-    <Transform position='-0.130018,0.710166,-2.909658' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+    <Transform position='-0.130018,2.710166,-2.909658' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
     <BoxCollider position='0.000000,0.000000,0.000000' size='0.200000,0.200000,0.200000'/>
     <RigidBody mass='1.000000' isKinematic='F'/>
   </GameObject>
@@ -57,9 +64,8 @@
   <GameObject name='hand3'>
     <Transform parent='mainCamSub' position='0.000000,0.010000,0.020000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.020000,0.020000,0.020000'/>
     <Material name='worm-arm'/>
-    <Mesh source='data/hand_03.dae.mdf'/>
+    <Mesh source='data/hand_03.dae'/>
   </GameObject>
-  
   <GameObject name='light1'>
     <Transform position='0.000000,1.121765,3.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
     <LightComponent intensity='1.000000' isDirectional='F'/>

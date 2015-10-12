@@ -80,7 +80,8 @@ void RigidBody::StepForward(float deltaTime){
 
 	state.position = state.position + dxdt * deltaTime;
 	transform->position = state.position;
-	state.velocity = state.velocity + dvdt * deltaTime;
+	state.velocity = state.velocity + dvdt * deltaTime + Vector3(0, -12.0f, 0) * deltaTime;
+	state.force = Vector3(0,0,0);
 }
 
 RBDeriv Evaluate(const RBState& init, float dt, const RBDeriv& d){

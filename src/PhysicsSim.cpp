@@ -81,6 +81,11 @@ void PhysicsSim::StepForward(){
 				GameObject* obj1 = rb->col->gameObject;
 				GameObject* obj2 = (*iter2)->gameObject;
 
+				Vector3 normalProj = VectorProject(rb->state.velocity * -1, collision.normal) * -1;
+				Vector3 newVelocity = normalProj + (normalProj - rb->state.velocity);
+				rb->state.velocity = newVelocity * -0.8f;
+				rb->state.position = rb->state.position + collision.normal * collision.depth * 1.001f;
+
 				obj1->OnCollision(*iter2);
 				obj2->OnCollision(rb->col);
 			}
