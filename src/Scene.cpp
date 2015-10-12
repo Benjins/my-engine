@@ -213,6 +213,7 @@ void Scene::Start(){
 		double total = ((double)afterSwap - start)/CLOCKS_PER_SEC;
 
 		double totalMSToWait = ((1.0f/60) - deltaTime)*1000;
+#if defined(_WIN32) || defined(_WIN64)
 		int msToWait = (int)(totalMSToWait + 0.5f);
 		if(msToWait > 0){
 			//printf("Waiting     %d ms.\n", msToWait);
@@ -221,6 +222,7 @@ void Scene::Start(){
 		else{
 			//printf("Not waiting %d ms.\n", msToWait);
 		}
+#endif
 		printf("update time total: %.1f\n", deltaTime * 1000);
 
 		GLenum err = glGetError();
