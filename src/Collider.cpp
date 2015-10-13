@@ -2,6 +2,7 @@
 #include "../header/int/GameObject.h"
 #include "../header/int/SCTransform.h"
 #include "../header/int/Mat4.h"
+#include "../header/int/Vector4.h"
 #include "../header/int/Collider.h"
 #include "../header/int/Scene.h"
 #include "../header/int/AABB.h"
@@ -325,7 +326,9 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 			if(potentialCollision.depth < checkDepthCollision.depth){
 				//cout << "Changed depth from: " << checkDepthCollision.depth << " to: " << potentialCollision.depth << endl;
 				checkDepthCollision.depth = potentialCollision.depth;
-				checkDepthCollision.normal = potentialCollision.normal;
+				Mat4x4 col1ToGlobal = col1->gameObject->transform.LocalToGlobalMatrix();
+				col1ToGlobal.SetColumn(3, Vector4(0,0,0,1));
+				checkDepthCollision.normal = col1ToGlobal * potentialCollision.normal;
 			}
 		}
 	}
@@ -357,6 +360,7 @@ Collision SeparateAxisTheorem(Vector3 axis, Vector3* points1, Vector3* points2){
 		Collision x;
 		x.collide = true;
 		x.normal = axis; //TODO: Convert to global coords
+		x.normal = x.normal * (point2Min > point1Min ? -1 : 1);
 		x.depth = minMax - maxMin;
 		return x;
 	}

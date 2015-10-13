@@ -33,10 +33,8 @@ Scene::Scene(){
 }
 
 Scene::Scene(int argc, char** argv){
-	drawCalls = vector<DrawCall>();
 	camera = NULL;
 	physicsSim = new PhysicsSim();
-	input = Input();
 	pathfinding.scene = this;
 
 	skyBox = nullptr;
@@ -223,7 +221,7 @@ void Scene::Start(){
 			//printf("Not waiting %d ms.\n", msToWait);
 		}
 #endif
-		printf("update time total: %.1f\n", deltaTime * 1000);
+		//printf("update time total: %.1f\n", deltaTime * 1000);
 
 		GLenum err = glGetError();
 		if(err != 0){

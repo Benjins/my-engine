@@ -67,6 +67,18 @@ void PhysicsSim::StepForward(){
 				GameObject* obj1 = rb->col->gameObject;
 				GameObject* obj2 = rb2->col->gameObject;
 
+				Vector3 normalProj = VectorProject(rb->state.velocity * -1, collision.normal) * -1;
+				Vector3 newVelocity = normalProj + (normalProj - rb->state.velocity);
+				if(abs(newVelocity.Magnitude() - rb->state.velocity.Magnitude()) > 0.001f){
+					_CrtDbgBreak();
+				}
+				rb->state.velocity = newVelocity * -0.6f;
+				rb->state.position = rb->state.position + collision.normal * collision.depth * 1.001f;
+
+				if(rb->state.velocity.MagnitudeSquared() < 0.3f){
+					rb->state.velocity = Vector3(0,0,0);
+				}
+
 				obj1->OnCollision(rb2->col);
 				obj2->OnCollision(rb->col);
 			}
@@ -83,8 +95,16 @@ void PhysicsSim::StepForward(){
 
 				Vector3 normalProj = VectorProject(rb->state.velocity * -1, collision.normal) * -1;
 				Vector3 newVelocity = normalProj + (normalProj - rb->state.velocity);
-				rb->state.velocity = newVelocity * -0.8f;
+				if(abs(newVelocity.Magnitude() - rb->state.velocity.Magnitude()) > 0.001f){
+					_CrtDbgBreak();
+				}
+				rb->state.velocity = newVelocity * -0.6f;
 				rb->state.position = rb->state.position + collision.normal * collision.depth * 1.001f;
+				//printf("Col normal: (%.3f, %.3f, %.3f)\n", collision.normal.x, collision.normal.y, collision.normal.z);
+
+				if(rb->state.velocity.MagnitudeSquared() < 0.3f){
+					rb->state.velocity = Vector3(0,0,0);
+				}
 
 				obj1->OnCollision(*iter2);
 				obj2->OnCollision(rb->col);
