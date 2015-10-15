@@ -326,8 +326,11 @@ Collision DetectCollision(const BoxCollider* col1, const BoxCollider* col2){
 			if(potentialCollision.depth < checkDepthCollision.depth){
 				//cout << "Changed depth from: " << checkDepthCollision.depth << " to: " << potentialCollision.depth << endl;
 				checkDepthCollision.depth = potentialCollision.depth;
-				Mat4x4 col1ToGlobal = col1->gameObject->transform.LocalToGlobalMatrix();
-				col1ToGlobal.SetColumn(3, Vector4(0,0,0,1));
+				Mat4x4 col1ToGlobal;
+				if(col1->gameObject != nullptr){
+					col1ToGlobal = col1->gameObject->transform.LocalToGlobalMatrix();
+					col1ToGlobal.SetColumn(3, Vector4(0,0,0,1));
+				}
 				checkDepthCollision.normal = col1ToGlobal * potentialCollision.normal;
 			}
 		}

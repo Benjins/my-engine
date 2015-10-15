@@ -247,22 +247,6 @@ int RunAllTests(){
 		obj->AddComponent<Component>();
 		obj->AddComponent<Component>();
 		obj->AddComponent<Component>();
-		obj->AddMesh("test.obj");
-		delete obj;
-	}
-
-	//Scoping
-	{
-		CrtCheckMemory memCheck;
-
-		GameObject* obj = new GameObject();
-		obj->AddComponent<Component>();
-		obj->AddComponent<Component>();
-		obj->AddComponent<Component>();
-		obj->AddMesh("test.obj");
-		obj->material = new Material();
-		obj->material->mainTexture = new Texture(GL_TEXTURE_2D, "texture.bmp");
-		delete obj->material;
 		delete obj;
 	}
 
