@@ -215,7 +215,7 @@ void Scene::Start(){
 		int msToWait = (int)(totalMSToWait + 0.5f);
 		if(msToWait > 0){
 			//printf("Waiting     %d ms.\n", msToWait);
-			Sleep(msToWait);
+			//Sleep(msToWait);
 		} 
 		else{
 			//printf("Not waiting %d ms.\n", msToWait);
