@@ -1,6 +1,8 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
+#pragma once
+
 struct GameObject;
 struct Collider;
 struct XMLElement;

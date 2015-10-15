@@ -1,6 +1,8 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#pragma once
+
 #include <string>
 #ifdef __APPLE__
 #include <OpenGL/gl.h>

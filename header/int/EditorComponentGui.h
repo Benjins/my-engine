@@ -1,6 +1,8 @@
 #ifndef EDITORCOMPONENTGUI_H
 #define EDITORCOMPONENTGUI_H
 
+#pragma once
+
 #include "../ext/simple-xml.h"
 
 struct GuiText; struct GuiTextField; struct Component;

@@ -1,6 +1,8 @@
 #ifndef RAYCAST_HIT_H
 #define RAYCAST_HIT_H
 
+#pragma once
+
 #include "../ext/Vector3.h"
 #include "../ext/Vector2.h"
 

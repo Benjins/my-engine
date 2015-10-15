@@ -1,5 +1,8 @@
 #ifndef USERCOMPS_H
 #define USERCOMPS_H
+
+#pragma once
+
 #include "Component.h"
 #include "RigidBody.h"
 #include "Collider.h"

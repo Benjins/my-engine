@@ -1,21 +1,13 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+#pragma once
+
 #include <time.h>
 
 #if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 #include <sys/time.h>
 #endif 
-
-/*
-#if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
-	timeval start;
-	gettimeofday(&start, NULL);
-	prevTime = start.tv_sec*1000 + start.tv_usec/1000;
-#else
-	prevTime = clock();
-#endif
-*/
 
 struct Timer{
 	clock_t startTime;

@@ -1,6 +1,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#pragma once
+
 #define MAX_NUMBER_OF_UNIFORMS 12
 
 #include <string>

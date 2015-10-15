@@ -1,6 +1,8 @@
 #ifndef PATHFINDING_H
 #define PATHFINDING_H
 
+#pragma once
+
 #include <vector>
 #include <map>
 #include "../ext/Vector3.h"

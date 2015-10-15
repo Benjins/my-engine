@@ -1,6 +1,8 @@
 #ifndef ARMATURE_H
 #define ARMATURE_H
 
+#pragma once
+
 #include "BoneTransform.h"
 #include "Mat4.h"
 #include "ArmatureAnimation.h"

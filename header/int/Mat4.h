@@ -1,6 +1,7 @@
-
 #ifndef MAT4X4_H
 #define MAT4X4_H
+
+#pragma once
 
 struct Vector3;
 struct Vector4;

@@ -1,6 +1,8 @@
 #ifndef _3DUTILITIES_H
 #define _3DUTILITIES_H
 
+#pragma once
+
 #include "../ext/Quaternion.h"
 
 /*

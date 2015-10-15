@@ -1,6 +1,8 @@
 #ifndef GUI_ELEMENT_H
 #define GUI_ELEMENT_H
 
+#pragma once
+
 #include "../ext/Vector2.h"
 #include "FontBMPMaker.h"
 #include "Texture.h"

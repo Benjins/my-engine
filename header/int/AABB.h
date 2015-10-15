@@ -1,6 +1,8 @@
 #ifndef AABB_H
 #define AABB_H
 
+#pragma once
+
 #include "../ext/Vector3.h"
 
 struct Mat4x4;

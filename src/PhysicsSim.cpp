@@ -69,9 +69,7 @@ void PhysicsSim::StepForward(){
 
 				Vector3 normalProj = VectorProject(rb->state.velocity * -1, collision.normal) * -1;
 				Vector3 newVelocity = normalProj + (normalProj - rb->state.velocity);
-				if(abs(newVelocity.Magnitude() - rb->state.velocity.Magnitude()) > 0.001f){
-					_CrtDbgBreak();
-				}
+
 				rb->state.velocity = newVelocity * -0.6f;
 				rb->state.position = rb->state.position + collision.normal * collision.depth * 1.001f;
 
@@ -95,9 +93,7 @@ void PhysicsSim::StepForward(){
 
 				Vector3 normalProj = VectorProject(rb->state.velocity * -1, collision.normal) * -1;
 				Vector3 newVelocity = normalProj + (normalProj - rb->state.velocity);
-				if(abs(newVelocity.Magnitude() - rb->state.velocity.Magnitude()) > 0.001f){
-					_CrtDbgBreak();
-				}
+
 				rb->state.velocity = newVelocity * -0.6f;
 				rb->state.position = rb->state.position + collision.normal * collision.depth * 1.001f;
 				//printf("Col normal: (%.3f, %.3f, %.3f)\n", collision.normal.x, collision.normal.y, collision.normal.z);

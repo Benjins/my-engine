@@ -1,6 +1,8 @@
 #ifndef GUISYSTEM_H
 #define GUISYSTEM_H
 
+#pragma once
+
 #include "GuiElement.h"
 
 #include <vector>

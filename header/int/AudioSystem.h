@@ -1,6 +1,8 @@
 #ifndef AUDIOSYSTEM_H
 #define AUDIOSYSTEM_H
 
+#pragma once
+
 #include "../ext/AL/al.h"
 #include "../ext/AL/alc.h"
 

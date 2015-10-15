@@ -1,6 +1,8 @@
 #ifndef FONT_BMP_MAKER_H
 #define FONT_BMP_MAKER_H
 
+#pragma once
+
 #define CURRENT_FUV_VERSION 1
 
 #include <string>

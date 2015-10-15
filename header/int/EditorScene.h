@@ -1,6 +1,8 @@
 #ifndef EDITORSCENE_H
 #define EDITORSCENE_H
 
+#pragma once
+
 #include "Scene.h"
 #include "PhysicsSim.h"
 #include "EditorComponentGui.h"

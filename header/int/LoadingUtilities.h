@@ -1,6 +1,8 @@
 #ifndef LOADINGUTILITIES_H
 #define LOADINGUTILITIES_H
 
+#pragma once
+
 #include <string>
 #include "../ext/Vector3.h"
 #include "../ext/Vector2.h"

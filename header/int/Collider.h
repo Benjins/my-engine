@@ -1,6 +1,8 @@
 #ifndef COLLIDER_H
 #define COLLIDER_H
 
+#pragma once
+
 #include "Component.h"
 #include  "../ext/Vector3.h"
 

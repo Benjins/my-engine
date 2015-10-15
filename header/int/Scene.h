@@ -1,6 +1,8 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#pragma once
+
 #include <list>
 #include "GameObject.h"
 #include "SCTransform.h"

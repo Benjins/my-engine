@@ -1,6 +1,8 @@
 #ifndef DRAWCALL_H
 #define DRAWCALL_H
 
+#pragma once
+
 #include "Model.h"
 #ifdef __APPLE__
 #include <OpenGL/gl.h>

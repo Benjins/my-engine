@@ -1,6 +1,8 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
+#pragma once
+
 #include <list>
 #include <cstdlib>
 #include "SCTransform.h"

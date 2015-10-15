@@ -1,6 +1,8 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
+#pragma once
+
 #include <vector>
 #include <iostream>
 #include <cmath>

@@ -1,6 +1,8 @@
 #ifndef VECTOR4_H
 #define VECTOR4_H
 
+#pragma once
+
 struct Vector3;
 
 struct Vector4{

@@ -1,6 +1,8 @@
 #ifndef PHYSICS_SIM_H
 #define PHYSICS_SIM_H
 
+#pragma once
+
 #include <vector>
 
 using std::vector;

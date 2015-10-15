@@ -1,6 +1,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#pragma once
+
 #include <vector>
 #include <string>
 #include "../ext/Vector2.h"

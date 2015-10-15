@@ -1,6 +1,8 @@
 #ifndef CUBEMAP_H
 #define CUBEMAP_H
 
+#pragma once
+
 #include <string>
 #include "Texture.h"
 

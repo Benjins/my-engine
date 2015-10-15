@@ -1,6 +1,8 @@
 #ifndef SC_TRANSFORM_H
 #define SC_TRANSFORM_H
 
+#pragma once
+
 #include "../ext/3dbasics.h"
 #include <vector>
 

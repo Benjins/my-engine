@@ -1,6 +1,8 @@
 #ifndef RIGIDBODY_H
 #define RIGIDBODY_H
 
+#pragma once
+
 #include "../ext/3dbasics.h"
 #include "Component.h"
 
