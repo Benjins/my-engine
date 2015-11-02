@@ -22,5 +22,4 @@ Quaternion ParseQuaternion(string encoded);
 AnimationType ParseAnimationType(string encoded);
 AnimationTarget ParseAnimationTarget(string encoded);
 
-
 #endif

@@ -129,6 +129,8 @@ public:
 	virtual ~Scene();
 };
 
+void ProcessAssetFile(const string& assetFileName);
+
 static std::default_random_engine myRandom;
 
 static void RenderScene();

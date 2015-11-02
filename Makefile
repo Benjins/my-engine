@@ -8,6 +8,10 @@ testing: src/*.cpp test/testing.cpp
 	$(CXX) -std=c++11 -DTESTING -g -fprofile-arcs -ftest-coverage -Iheader/ext/freetype2 src/*.cpp test/testing.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine-test
 	./build/my-engine-test
 	
+assets: src/*.cpp data/*.*
+	$(CXX) -std=c++11 -DASSETS -Iheader/ext/freetype2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine-assets
+	./build/my-engine-assets Assets.xml
+	
 engine_mac: src/*.cpp
 	$(CXX) -std=c++11 -Iheader/ext/freetype2 src/*.cpp 3dbasics/*.cpp -framework OpenGL -framework GLUT -L/usr/local/Cellar/freetype/2.6_1/lib -lfreetype -framework OpenAL -o ./build/my-engine
 
@@ -17,6 +21,10 @@ editor_mac: src/*.cpp
 testing_mac: src/*.cpp test/testing.cpp
 	$(CXX) -std=c++11 -DTESTING -g -fprofile-arcs -ftest-coverage -Iheader/ext/freetype2 src/*.cpp test/testing.cpp 3dbasics/*.cpp -framework OpenGL -framework GLUT -L/usr/local/Cellar/freetype/2.6_1/lib -lfreetype -framework OpenAL -o ./build/my-engine-test
 	./build/my-engine-test
+	
+assets_mac: src/*.cpp data/*.*
+	$(CXX) -std=c++11 -DASSETS -Iheader/ext/freetype2 src/*.cpp lib/*.a -framework OpenGL -framework GLUT -L/usr/local/Cellar/freetype/2.6_1/lib -lfreetype -framework OpenAL -o ./build/my-engine-assets
+	./build/my-engine-assets Assets.xml
 
 engine_debug: src/*.cpp
 	$(CXX) -std=c++11 -g -Iheader/ext/freetype2 src/*.cpp lib/*.a -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine_debug

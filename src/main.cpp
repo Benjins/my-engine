@@ -43,6 +43,16 @@ int main(int argc, char** argv){
 	
 //#define EDITOR
 
+#if defined(ASSETS)
+	if(argc < 2){
+		cout << "\nError: Please supply name of asset file.\n";
+		return -1;
+	}
+	ProcessAssetFile(string(argv[1]));
+
+	return 0;
+#endif
+
 #if !defined(EDITOR)
 	Scene& x = Scene::getInstance(argc, argv);
 #else

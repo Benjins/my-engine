@@ -535,3 +535,49 @@ void Scene::SaveScene(string fileName){
 	SaveXMLDoc(doc, fileName);
 }
 
+void ProcessAssetFile(const string& assetFileName){
+	XMLDocument assetDoc;
+	LoadXMLDoc(assetDoc, assetFileName);
+
+	if(assetDoc.contents.size() != 1){
+		cout << "\n\nError: asset file '" << assetFileName << "' was not properly formatted.\n";
+		return;
+	}
+
+	XMLElement rootElem = assetDoc.contents[0];
+	if(rootElem.name != "Assets"){
+		cout << "\n\nError: asset file '" << assetFileName << "' was not properly formatted.\n";
+		return;
+	}
+
+	for(const XMLElement& childElem : rootElem.children){
+		if(childElem.name == "FUV"){
+			
+			FUV fuv;
+
+			int size =  atoi(childElem.attributeMap.find("size")->second.c_str());
+			string trueTypeFileName = childElem.attributeMap.find("fontFile")->second;
+
+			cout << "Rendering truetype file '" << trueTypeFileName << "' at size " << size << ".\n";
+
+			ConvertTrueTypeToFUV(trueTypeFileName, size, fuv);
+
+			string fuvFileName = childElem.attributeMap.find("out")->second;
+
+			ExportFUV(fuv, fuvFileName);
+		}
+		else if(childElem.name == "Model"){
+			Model mod;
+			string  inModelName = childElem.attributeMap.find("in")->second;
+			string outModelName = childElem.attributeMap.find("out")->second;
+
+			cout << "Importing model '" << inModelName << "'.\n";
+
+			mod.ImportFromFile(inModelName);
+			mod.ExportToModelFile(outModelName);
+		}
+		else{
+			cout << "\nError: unrecognised asset type '" << childElem.name << "'.\n";
+		}
+	}
+}

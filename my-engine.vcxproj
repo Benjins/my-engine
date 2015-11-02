@@ -81,7 +81,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>TESTING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MEM_CHECK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <AdditionalIncludeDirectories>C:\projects\my-engine\nupengl.core.0.0.0.1\build\native\include;$(ProjectDir)header\ext;$(ProjectDir)header\ext\freetype2\freetype;$(ProjectDir)header\ext\freetype2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
