@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 void ParseSourceFiles(char** sourceFileNames, int sourceFileCount){
 	
 	char* generatedSource = (char*)malloc(1024*1024*4);
@@ -15,7 +14,13 @@ void ParseSourceFiles(char** sourceFileNames, int sourceFileCount){
 	genCursor += sprintf(genCursor, "#define META_TYPES_H\n");
 	genCursor += sprintf(genCursor, "#include \"../header/int/Macros.h\"\n");
 	genCursor += sprintf(genCursor, "#include \"../header/int/MetaTypeInfo.h\"\n");
+
+	genCursor += sprintf(genCursor, "#if defined(_MSC_VER)\n");
 	genCursor += sprintf(genCursor, "#define OFFSET_OF(type,field) static_cast<int>((size_t)&(((type*)0)->field))\n");
+	genCursor += sprintf(genCursor, "#else\n");
+	genCursor += sprintf(genCursor, "#include <stddef.h>\n");
+	genCursor += sprintf(genCursor, "#define OFFSET_OF offsetof\n");
+	genCursor += sprintf(genCursor, "#endif\n");
 
 	vector<Token> additionalMetaTypes;
 	vector<Token> additionalMetaTypesWithoutFields;
