@@ -12,6 +12,10 @@ assets: src/*.cpp data/*.*
 	$(CXX) -std=c++11 -DASSETS -Iheader/ext/freetype2 src/*.cpp 3dbasics/*.cpp -lGL -lGLU -lglut -lGLEW -lfreetype -lopenal -o ./build/my-engine-assets
 	./build/my-engine-assets Assets.xml
 	
+source_parsing: src/*.cpp header/int/*.h
+	$(CXX) -std=c++11 -DINTROSPECTION src/main.cpp src/SourceParser.cpp -o ./build/my-engine-introspect
+	./build/my-engine-introspect header/int/UserComps.h header/int/Collider.h header/int/RigidBody.h
+	
 engine_mac: src/*.cpp
 	$(CXX) -std=c++11 -Iheader/ext/freetype2 src/*.cpp 3dbasics/*.cpp -framework OpenGL -framework GLUT -L/usr/local/Cellar/freetype/2.6_1/lib -lfreetype -framework OpenAL -o ./build/my-engine
 
