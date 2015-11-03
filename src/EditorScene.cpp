@@ -9,6 +9,10 @@
 #include "../header/int/Vector4.h"
 #include "../header/int/Mat4.h"
 
+#include "../header/int/MetaTypeInfo.h"
+
+extern MetaStructInfo genMetaStructInfo[];
+
 #include <sstream>
 #include <iomanip>
 #include <cfloat>
@@ -451,23 +455,25 @@ void EditorScene::SelectObject(GameObject* obj){
 
 	int index = 0;
 	for(Component* component : selectedObj->components){
-		XMLElement compCache = component->Serialize();
-		if(compCache.name != ""){
+		MetaStructInfo info = genMetaStructInfo[component->metaType];
+
+		if(info.memberCount > 0){
+			//info.name
 			GuiText* guiTxt = new GuiText(&resources, "data/arial_16.fuv");
 			guiTxt->position = Vector2(0.8f, 0.25f - 0.03f * index);
 			guiTxt->scale = Vector2(0.1f, 0.04f);
-			guiTxt->text = compCache.name + ":";
+			guiTxt->text = info.name;
 
 			editorGui.elements.push_back(guiTxt);
 			guiTxt->SetParent(compPanel);
 
 			index++;
 
-			for(const XMLAttribute& attr : compCache.attributes){
+			for(int memIdx = 0; memIdx < info.memberCount; memIdx++){
 				GuiText* fieldLabel = new GuiText(&resources, "data/arial_16.fuv");
 				fieldLabel->position = Vector2(0.8f, 0.25f - 0.03f * index);
 				fieldLabel->scale = Vector2(0.08f, 0.03f);
-				fieldLabel->text = attr.name;
+				fieldLabel->text = info.members[memIdx].name;
 
 				editorGui.elements.push_back(fieldLabel);
 				fieldLabel->SetParent(guiTxt);
@@ -475,14 +481,13 @@ void EditorScene::SelectObject(GameObject* obj){
 				GuiTextField* inputField = new GuiTextField(&resources, "data/arial_16.fuv");
 				inputField->position = Vector2(0.9f, 0.25f - 0.03f * index);
 				inputField->scale = Vector2(0.1f, 0.03f);
-				inputField->text = attr.data;
 
 				editorGui.elements.push_back(inputField);
 				inputField->SetParent(guiTxt);
 
 				EditorComponentGui compGui;
-				compGui.serializedComponent = compCache;
-				compGui.liveComponent = component;
+				compGui.type = static_cast<MetaType>(info.members[memIdx].type);
+				compGui.memberPtr = ((char*)component) + info.members[memIdx].offset;
 				compGui.fieldLabel = fieldLabel;
 				compGui.inputText = inputField;
 				compGui.Load();

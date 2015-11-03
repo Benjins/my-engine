@@ -2,44 +2,65 @@
 #include "../header/int/GuiElement.h"
 #include "../header/int/Component.h"
 #include "../header/int/Collider.h"
+#include "../header/int/LoadingUtilities.h"
 
 #include <algorithm>
 
 EditorComponentGui::EditorComponentGui(){
-	liveComponent = nullptr;
+	memberPtr = nullptr;
 	fieldLabel = nullptr;
 	inputText = nullptr;
-}
-
-void EditorComponentGui::Load(){
-	serializedComponent = liveComponent->Serialize();
-	for(const XMLAttribute& attr : serializedComponent.attributes){
-		if(attr.name == fieldLabel->text){
-			inputText->text = attr.data;
-			cachedInputText = inputText->text;
-			commaCount = std::count(cachedInputText.begin(), cachedInputText.end(), ',');
-			break;
-		}
-	}	
 }
 
 void EditorComponentGui::Save(){
 	if(cachedInputText != inputText->text){
 		cachedInputText = inputText->text;
-		int currentCommaCount = std::count(cachedInputText.begin(), cachedInputText.end(), ',');
-
-		if(currentCommaCount == commaCount){
-			serializedComponent = liveComponent->Serialize();
-			for(auto iter = serializedComponent.attributes.begin(); iter !=  serializedComponent.attributes.end(); ++iter){
-				if(iter->name == fieldLabel->text){
-					serializedComponent.attributes.erase(iter);
-					break;
-				}
+		if(type == MetaType_bool){
+			*((bool*)(memberPtr)) = (inputText->text == "T");
+		}
+		else if(type == MetaType_int){
+			*((int*)(memberPtr)) = atoi(inputText->text.c_str());
+		}
+		else if(type == MetaType_float){
+			*((float*)(memberPtr)) = atof(inputText->text.c_str());
+		}
+		else if(type == MetaType_string){
+			*((string*)(memberPtr)) = inputText->text;
+		}
+		else if(type == MetaType_Vector2){
+			if(std::count(inputText->text.begin(), inputText->text.end(), ',') == 1){
+				*((Vector2*)(memberPtr)) = ParseVector2(inputText->text);
 			}
-
-			serializedComponent.AddAttribute(fieldLabel->text, inputText->text);
-			liveComponent->Deserialize(serializedComponent);
+		}
+		else if(type == MetaType_Vector3){
+			if(std::count(inputText->text.begin(), inputText->text.end(), ',') == 2){
+				*((Vector3*)(memberPtr)) = ParseVector3(inputText->text);
+			}
 		}
 	}
+}
+
+void EditorComponentGui::Load(){
+	if(type == MetaType_bool){
+		inputText->text = (*(bool*)memberPtr) ? "T" : "F";
+	}
+	else if(type == MetaType_int){
+		inputText->text = to_string(*(int*)memberPtr);
+	}
+	else if(type == MetaType_float){
+		inputText->text = to_string(*(float*)memberPtr);
+	}
+	else if(type == MetaType_string){
+			inputText->text = *((string*)memberPtr);
+	}
+	else if(type == MetaType_Vector2){
+		inputText->text = EncodeVector2(*(Vector2*)memberPtr);
+	}
+	else if(type == MetaType_Vector3){
+		inputText->text = EncodeVector3(*(Vector3*)memberPtr);
+	}
+
+	cachedInputText = inputText->text;
+	
 }
 

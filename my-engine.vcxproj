@@ -166,6 +166,7 @@
     <ClCompile Include="src\SceneLoading.cpp" />
     <ClCompile Include="src\SCTransform.cpp" />
     <ClCompile Include="src\simple-xml.cpp" />
+    <ClCompile Include="src\SourceParser.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Vector4.cpp" />
     <ClCompile Include="test\testing.cpp" />
@@ -221,8 +222,10 @@
     <ClInclude Include="header\int\Interval.h" />
     <ClInclude Include="header\int\Light.h" />
     <ClInclude Include="header\int\LoadingUtilities.h" />
+    <ClInclude Include="header\int\Macros.h" />
     <ClInclude Include="header\int\Mat4.h" />
     <ClInclude Include="header\int\Material.h" />
+    <ClInclude Include="header\int\MetaTypeInfo.h" />
     <ClInclude Include="header\int\Model.h" />
     <ClInclude Include="header\int\Pathfinding.h" />
     <ClInclude Include="header\int\PhysicsSim.h" />
@@ -232,6 +235,7 @@
     <ClInclude Include="header\int\RigidBody.h" />
     <ClInclude Include="header\int\Scene.h" />
     <ClInclude Include="header\int\SCTransform.h" />
+    <ClInclude Include="header\int\SourceParser.h" />
     <ClInclude Include="header\int\Texture.h" />
     <ClInclude Include="header\int\Timer.h" />
     <ClInclude Include="header\int\UserComps.h" />

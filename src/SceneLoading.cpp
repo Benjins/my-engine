@@ -9,10 +9,12 @@
 #include "../header/int/CubeMap.h"
 #include "../header/int/Armature.h"
 #include "../header/ext/simple-xml.h"
+#include "../header/int/Component.h"
+#include "../gen/MetaTypes.h"
 
 struct FireGun;
 
-#define DEFINE_USER_COMPONENT(compName) else if(name == #compName){return new compName ();}
+#define DEFINE_USER_COMPONENT(compName) else if(name == #compName){compName* newComp = new compName (); newComp->metaType = metaStruct_##compName; return newComp;}
 
 Component* GetUserDefinedComp(const string& name){
 	if(name == ""){
@@ -33,6 +35,7 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(PlayerComponent)
 	DEFINE_USER_COMPONENT(DoorComponent)
 	DEFINE_USER_COMPONENT(AnimationControlTest)
+	
 
 	return nullptr;
 }

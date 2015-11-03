@@ -4,17 +4,16 @@
 #pragma once
 
 #include "../ext/simple-xml.h"
+#include "../int/MetaTypeInfo.h"
 
 struct GuiText; struct GuiTextField; struct Component;
 
 struct EditorComponentGui{
-	XMLElement serializedComponent;
-	string cachedInputText;
-	Component* liveComponent;
+	MetaType type;
+	void* memberPtr;
 	GuiText* fieldLabel;
 	GuiTextField* inputText;
-
-	int commaCount;
+	string cachedInputText;
 
 	EditorComponentGui();
 

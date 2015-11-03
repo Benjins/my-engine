@@ -21,6 +21,7 @@
 #include "3DUtilities.h"
 #include <iostream>
 #include <assert.h>
+#include "Macros.h"
 
 using std::cout; using std::endl;
 
@@ -800,7 +801,7 @@ struct SimpleAnimation : Component{
 	}
 };
 
-struct HitComponent : Component{
+struct HitComponent : Component {
 
 	virtual void OnHit(RaycastHit hitInfo, GameObject* sender) = 0;
 
@@ -911,8 +912,8 @@ struct RotateConstantly : Component{
 };
 
 struct EnemyComp : HitComponent{
-	Vector3 currentTarget;
-	Vector3 longTermGoal;
+	DontSerialize Vector3 currentTarget;
+	DontSerialize Vector3 longTermGoal;
 	float speed;
 	PhysicsSim* physics;
 	Pathfinding* pathing;
@@ -924,10 +925,10 @@ struct EnemyComp : HitComponent{
 	int health;
 	int maxHealth;
 
-	float reloadTimeCounter;
+	DontSerialize float reloadTimeCounter;
 	float reloadTime;
 
-	bool pathNeedsUpdate;
+	DontSerialize bool pathNeedsUpdate;
 
 	EnemyComp(){
 		speed = 2;

@@ -10,6 +10,8 @@ struct XMLElement;
 struct Component{
 	const static bool isComponent = true;
 	GameObject* gameObject;
+
+	int metaType;
 	
 	Component();
 	
