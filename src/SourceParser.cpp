@@ -1,8 +1,8 @@
 #include "../header/int/SourceParser.h"
 #include "../header/int/Macros.h"
-//#include <string>
 
-//using std::string;
+#include <stdio.h>
+#include <stdlib.h>
 
 
 void ParseSourceFiles(char** sourceFileNames, int sourceFileCount){
