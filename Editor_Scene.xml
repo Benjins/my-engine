@@ -44,7 +44,7 @@
     <Mesh source='data/char_03.mdf'/>
   </GameObject>
   <GameObject name='myObj'>
-    <Transform position='0.121761,3.061710,-0.396604' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
+    <Transform position='0.121761,3.299059,-0.360763' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
     <Material name='floorMat'/>
     <Mesh source='data/test.obj'/>
     <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
@@ -52,7 +52,6 @@
   <GameObject name='mainCam'>
     <Transform position='-0.130018,2.710166,-2.909658' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
     <BoxCollider position='0.000000,0.000000,0.000000' size='0.200000,0.200000,0.200000'/>
-    <?<RigidBody mass='1.000000' isKinematic='F'/>?>
   </GameObject>
   <GameObject name='mainCamSub'>
     <Transform parent='mainCam' position='0.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
@@ -75,12 +74,10 @@
       <KeyFrame time='2.000000' value='0.000000,1.100000,3.000000'/>
     </AnimationComponent>
   </GameObject>
-  
   <GameObject name='light2'>
     <Transform position='0.000000,-5.000000,0.000000' rotation='0.906308,0.000000,0.422618,0.000000' scale='1.000000,1.000000,1.000000'/>
     <LightComponent intensity='1.000000' isDirectional='T'/>
   </GameObject>
-  
   <GameObject name='reticle'>
     <Transform parent='mainCamSub' position='0.000000,0.000000,0.050000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.000600,0.000600,0.000600'/>
     <Material name='myMat2'/>
@@ -128,7 +125,7 @@
     <Transform position='-6.427332,0.246075,2.078232' rotation='-0.250467,-0.311520,-0.786969,-0.470003' scale='1.000000,1.000000,1.000000'/>
     <Material name='reflective'/>
     <Mesh source='data/sphere.obj'/>
-    <SphereCollider position='0.000000,0.000000,0.000000' radius='1.100000'/>
+    <SphereCollider position='0.000000,0.000000,0.000000' radius='1.010000'/>
   </GameObject>
   <GameObject name='worm'>
     <Transform position='-3.487024,5.153775,-5.078232' rotation='0.136925,-0.044099,-0.941950,-0.303372' scale='1.000000,1.000000,1.000000'/>

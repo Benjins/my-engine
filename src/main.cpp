@@ -42,8 +42,6 @@ int main(int argc, char** argv){
 #ifdef TESTING 
 	int retVal = RunAllTests();
 #else
-	
-#define EDITOR
 
 #if defined(ASSETS)
 	if(argc < 2){
