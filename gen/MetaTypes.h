@@ -2,7 +2,12 @@
 #define META_TYPES_H
 #include "../header/int/Macros.h"
 #include "../header/int/MetaTypeInfo.h"
-#define OFFSET_OF(type,field) (int)&(((type*)0)->field)
+#if defined(_MSC_VER)
+#define OFFSET_OF(type,field) static_cast<int>((size_t)&(((type*)0)->field))
+#else
+#include <stddef.h>
+#define OFFSET_OF offsetof
+#endif
 MetaMemberInfo memberInfo_DoorComponent[] = {
 	{"isLocked", OFFSET_OF(DoorComponent, isLocked), MetaType_bool},
 	{"isOpen", OFFSET_OF(DoorComponent, isOpen), MetaType_bool},
