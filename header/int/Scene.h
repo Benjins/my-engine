@@ -14,6 +14,7 @@
 #include "Light.h"
 #include "AudioSystem.h"
 #include "Timer.h"
+#include "ParticleSystem.h"
 #include <random>
 
 using std::list;
@@ -37,6 +38,7 @@ struct Scene{
 	AudioSystem audio;
 	GuiSystem guiSystem;
 	vector<Light> lights;
+	vector<ParticleSystem> particles;
 
 	Armature* testArmature;
 

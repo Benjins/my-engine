@@ -227,6 +227,7 @@
     <ClInclude Include="header\int\Material.h" />
     <ClInclude Include="header\int\MetaTypeInfo.h" />
     <ClInclude Include="header\int\Model.h" />
+    <ClInclude Include="header\int\ParticleSystem.h" />
     <ClInclude Include="header\int\Pathfinding.h" />
     <ClInclude Include="header\int\PhysicsSim.h" />
     <ClInclude Include="header\int\PostProcessor.h" />

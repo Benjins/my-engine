@@ -174,6 +174,16 @@ void Scene::Start(){
 		prevDeltaTime[i] = 0.0f;
 	}
 
+	ParticleSystem sys;
+	sys.maxLifetime = 2.4f;
+	sys.maxParticleCount = 10000;
+	sys.particlesPerSec = 40.0f;
+	sys.particleScale = 0.1f;
+	sys.gravityFactor = 0.1f;
+	particles.push_back(sys);
+	particles[0].tex = resources.GetTextureByFileName("data/Worm_Diff.bmp");
+	particles[0].Start();
+
 	running = true;
 	while(running){
 		clock_t start = clock();
@@ -262,6 +272,10 @@ void Scene::OnUpdate(){
 		(*iter)->OnUpdate();
 	}
 
+	for(auto& sys : particles){
+		sys.Update(deltaTime);
+	}
+
 	for(GameObject* obj : spawnedObjects){
 		AddObjectAndDescendants(obj);
 	}
@@ -345,6 +359,50 @@ void Scene::Render(){
 
 			iter->Draw();	
 		//}
+	}
+
+	
+	Material* particleMat = resources.GetMaterialByName("particle");
+	glUseProgram(particleMat->shaderProgram);
+	GLint texLoc = particleMat->GetUniformByName("_particleTex"); 
+	glUniform1i(texLoc, 0);
+
+	particleMat->SetMat4Uniform("_perspMatrix", perspMatrix);
+	particleMat->SetMat4Uniform("_cameraMatrix", camMatrix);
+	particleMat->SetMat4Uniform("_objectMatrix", Mat4x4());
+
+	GLint particleAttribLocs[2] = {
+		glGetAttribLocation(particleMat->shaderProgram, "Position"), 
+		glGetAttribLocation(particleMat->shaderProgram, "UV")
+	};
+
+	int dataSizes[2] = {3, 2};
+	
+	for(auto& particleSystem : particles){
+		particleSystem.FillGLData(camera);
+
+		if(particleSystem.positions.size() > 0){
+			particleSystem.tex->Bind(GL_TEXTURE0);
+
+			void*  bufferData[2]  = {particleSystem.positions.data(), particleSystem.uvs.data()};
+			size_t bufferSize = particleSystem.positions.size();
+
+			GLuint buffers[2];
+			glGenBuffers(2, buffers);
+
+			for(int i = 0 ; i< 2; i++){
+				glEnableVertexAttribArray(particleAttribLocs[i]);
+				glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
+				glBufferData(GL_ARRAY_BUFFER, dataSizes[i]*4*bufferSize, bufferData[i], GL_DYNAMIC_DRAW);
+				glVertexAttribPointer(particleAttribLocs[i], dataSizes[i], GL_FLOAT, GL_FALSE, 0, 0);
+			}
+
+			glDrawArrays(GL_QUADS, 0, bufferSize);
+
+			for(int i = 0; i < 2; i++){
+				glDisableVertexAttribArray(particleAttribLocs[i]);
+			}
+		}
 	}
 	
 
