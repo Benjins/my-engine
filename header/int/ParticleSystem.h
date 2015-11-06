@@ -14,9 +14,11 @@ struct Particle{
 	float age;
 };
 
+struct SC_Transform;
 
 struct ParticleSystem{
 	Particle* particles;
+	SC_Transform* transform;
 	int maxParticleCount;
 	int particleCount;
 
@@ -38,6 +40,7 @@ struct ParticleSystem{
 	vector<Vector2> uvs;
 
 	ParticleSystem(){
+		transform = nullptr;
 		maxParticleCount = 10000;
 		particleScale = 1.0f;
 		particleCount = 0;
@@ -126,11 +129,10 @@ struct ParticleSystem{
 			positions.push_back(particlePos - up*particles[i].size - right*particles[i].size);
 			positions.push_back(particlePos - up*particles[i].size + right*particles[i].size);
 			
-
-			uvs.push_back(Vector2(1, 1));
 			uvs.push_back(Vector2(1, 0));
-			uvs.push_back(Vector2(0, 1));
 			uvs.push_back(Vector2(0, 0));
+			uvs.push_back(Vector2(0, 1));
+			uvs.push_back(Vector2(1, 1));
 		}
 	}
 

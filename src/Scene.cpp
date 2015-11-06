@@ -175,13 +175,12 @@ void Scene::Start(){
 	}
 
 	ParticleSystem sys;
-	sys.maxLifetime = 2.4f;
+	sys.maxLifetime = 8.4f;
 	sys.maxParticleCount = 10000;
 	sys.particlesPerSec = 40.0f;
 	sys.particleScale = 0.1f;
-	sys.gravityFactor = 0.1f;
+	sys.gravityFactor = 0.02f;
 	particles.push_back(sys);
-	particles[0].tex = resources.GetTextureByFileName("data/Worm_Diff.bmp");
 	particles[0].Start();
 
 	running = true;
@@ -314,7 +313,8 @@ void Scene::Render(){
 	float fieldOfView = 90;
 	float nearZ = 0.01;
 	float farZ = 1000;
-	                                                                    
+	                   
+	glDepthMask(GL_TRUE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Mat4x4 perspMatrix = GetPerspectiveMatrix(aspectRatio,fieldOfView, nearZ, farZ);
 
@@ -322,6 +322,7 @@ void Scene::Render(){
 
 	glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 	glEnable(GL_DEPTH_TEST);
+	
 	glDisable(GL_BLEND);
 
 	Vector3 lightVectors[6];
@@ -361,7 +362,10 @@ void Scene::Render(){
 		//}
 	}
 
-	
+	if(skyBox != nullptr){
+		skyBox->Render(camMatrix, perspMatrix);
+	}
+
 	Material* particleMat = resources.GetMaterialByName("particle");
 	glUseProgram(particleMat->shaderProgram);
 	GLint texLoc = particleMat->GetUniformByName("_particleTex"); 
@@ -369,7 +373,6 @@ void Scene::Render(){
 
 	particleMat->SetMat4Uniform("_perspMatrix", perspMatrix);
 	particleMat->SetMat4Uniform("_cameraMatrix", camMatrix);
-	particleMat->SetMat4Uniform("_objectMatrix", Mat4x4());
 
 	GLint particleAttribLocs[2] = {
 		glGetAttribLocation(particleMat->shaderProgram, "Position"), 
@@ -378,11 +381,23 @@ void Scene::Render(){
 
 	int dataSizes[2] = {3, 2};
 	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glDepthMask(GL_FALSE);
+
 	for(auto& particleSystem : particles){
 		particleSystem.FillGLData(camera);
 
+		if(particleSystem.transform != nullptr){
+			particleMat->SetMat4Uniform("_objectMatrix", particleSystem.transform->LocalToGlobalMatrix());
+		}
+		else{
+			particleMat->SetMat4Uniform("_objectMatrix", Mat4x4());
+		}
+
 		if(particleSystem.positions.size() > 0){
-			particleSystem.tex->Bind(GL_TEXTURE0);
+			particleMat->mainTexture->Bind(GL_TEXTURE0);
+			//particleSystem.tex->Bind(GL_TEXTURE0);
 
 			void*  bufferData[2]  = {particleSystem.positions.data(), particleSystem.uvs.data()};
 			size_t bufferSize = particleSystem.positions.size();
@@ -404,12 +419,6 @@ void Scene::Render(){
 			}
 		}
 	}
-	
-
-	if(skyBox != nullptr){
-		skyBox->Render(camMatrix, perspMatrix);
-	}
-
 	
 	//Gui and gizmos stuff 
 	glDisable(GL_DEPTH_TEST);
