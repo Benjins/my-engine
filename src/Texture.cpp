@@ -90,6 +90,9 @@ void Texture::Load(GLenum TextureTarget, GLenum textureType, bool apply){
 	if(imageDataSize == 0){
 		imageDataSize = header.imageHeight * header.imageWidth * header.bitDepth / 8;
 	}
+
+	fseek(bmpFile, header.imageDataOffset - sizeof(header), SEEK_CUR);
+
 	unsigned char* imgBuffer = new unsigned char[imageDataSize];
 	fread(imgBuffer, 1, imageDataSize, bmpFile);
 	fclose(bmpFile);

@@ -175,11 +175,26 @@ void Scene::Start(){
 	}
 
 	ParticleSystem sys;
-	sys.maxLifetime = 8.4f;
+	sys.maxLifetime = 15.4f;
 	sys.maxParticleCount = 10000;
-	sys.particlesPerSec = 40.0f;
-	sys.particleScale = 0.1f;
-	sys.gravityFactor = 0.02f;
+	sys.particlesPerSec = 60.0f;
+	sys.startScale = 0.4f;
+	sys.endScale = 0.1f;
+	sys.gravityFactor = 0.08f;
+	sys.spawnAngle = 90;
+	sys.startVelocity = 0.5;
+
+	CollisionPlane plane1 = {Vector3(0.0f, 0.1f, 0.0f), Vector3(0,1.0f,0)};
+	CollisionPlane plane2 = {Vector3(0.0f, 1.6f, 0.4f), Vector3(0,0.6f,0.8f)};
+	//CollisionPlane plane2 = {Vector3(0.0f, 0.7f, 1.2f), Vector3(0, 0.6f,0.8f)};
+	//CollisionPlane plane3 = {Vector3(0.0f, 1.4f, 2.1f), Vector3(0,-0.6f,0.8f)};
+	sys.AddCollisionPlane(plane1);
+	//sys.AddCollisionPlane(plane2);
+	//sys.AddCollisionPlane(plane3);
+
+	sys.startCol = Vector4(1.0f, 0.9f, 0.1f, 1.0f);
+	sys.endCol   = Vector4(0.8f, 0.2f, 0.1f, 0.0f);
+
 	particles.push_back(sys);
 	particles[0].Start();
 
@@ -239,10 +254,6 @@ void Scene::Start(){
 
 		input.EndFrame();
 	}
-}
-
-void Scene::UpdateVertexBuffer(){
-
 }
 
 void Scene::OnUpdate(){
@@ -366,6 +377,36 @@ void Scene::Render(){
 		skyBox->Render(camMatrix, perspMatrix);
 	}
 
+	Material* colMat = resources.GetMaterialByName("color");
+	glUseProgram(colMat->shaderProgram);
+	colMat->SetMat4Uniform("_perspMatrix", perspMatrix);
+	colMat->SetMat4Uniform("_cameraMatrix", camMatrix);
+	colMat->SetVec4Uniform("_color", Vector4(0.8f, 0.8f, 0.8f, 1.0f));
+
+#if 0
+	glBegin(GL_QUADS);
+	for(ParticleSystem& sys : particles){
+		for(CollisionPlane& plane : sys.collisionPlanes){
+			Vector3 temp = plane.normal;
+			float tempX = temp.x;
+			temp.x = -temp.y;
+			temp.y = tempX;
+
+			Vector3 left = CrossProduct(plane.normal, temp) * 5;
+			Vector3 up = CrossProduct(plane.normal, left) * 5;
+
+			Vector3 verts[4] = {plane.center + left + up,
+								plane.center - left + up,
+								plane.center - left - up,
+								plane.center + left - up};
+			for(int i = 0; i < 4; i++){
+				glVertex3f(verts[i].x, verts[i].y, verts[i].z);
+			}
+		}
+	}
+	glEnd();
+#endif
+
 	Material* particleMat = resources.GetMaterialByName("particle");
 	glUseProgram(particleMat->shaderProgram);
 	GLint texLoc = particleMat->GetUniformByName("_particleTex"); 
@@ -374,12 +415,13 @@ void Scene::Render(){
 	particleMat->SetMat4Uniform("_perspMatrix", perspMatrix);
 	particleMat->SetMat4Uniform("_cameraMatrix", camMatrix);
 
-	GLint particleAttribLocs[2] = {
+	GLint particleAttribLocs[3] = {
 		glGetAttribLocation(particleMat->shaderProgram, "Position"), 
-		glGetAttribLocation(particleMat->shaderProgram, "UV")
+		glGetAttribLocation(particleMat->shaderProgram, "UV"),
+		glGetAttribLocation(particleMat->shaderProgram, "col")
 	};
 
-	int dataSizes[2] = {3, 2};
+	int dataSizes[3] = {3, 2, 4};
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -399,13 +441,13 @@ void Scene::Render(){
 			particleMat->mainTexture->Bind(GL_TEXTURE0);
 			//particleSystem.tex->Bind(GL_TEXTURE0);
 
-			void*  bufferData[2]  = {particleSystem.positions.data(), particleSystem.uvs.data()};
+			void*  bufferData[3]  = {particleSystem.positions.data(), particleSystem.uvs.data(), particleSystem.colors.data()};
 			size_t bufferSize = particleSystem.positions.size();
 
-			GLuint buffers[2];
-			glGenBuffers(2, buffers);
+			GLuint buffers[3];
+			glGenBuffers(3, buffers);
 
-			for(int i = 0 ; i< 2; i++){
+			for(int i = 0 ; i< 3; i++){
 				glEnableVertexAttribArray(particleAttribLocs[i]);
 				glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
 				glBufferData(GL_ARRAY_BUFFER, dataSizes[i]*4*bufferSize, bufferData[i], GL_DYNAMIC_DRAW);
@@ -414,9 +456,11 @@ void Scene::Render(){
 
 			glDrawArrays(GL_QUADS, 0, bufferSize);
 
-			for(int i = 0; i < 2; i++){
+			for(int i = 0; i < 3; i++){
 				glDisableVertexAttribArray(particleAttribLocs[i]);
 			}
+
+			glDeleteBuffers(3, buffers);
 		}
 	}
 	
