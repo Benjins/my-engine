@@ -87,7 +87,9 @@ void GameObject::OnUpdate(){
 	if(mesh != nullptr){
 		Armature* armature = mesh->armature;
 		if(armature != nullptr){
-			armature->Update(scene->deltaTime);
+			if(scene->input.GetKeyDown(']')){
+				armature->Update(0.02f);
+			}
 		}
 	}
 

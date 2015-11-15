@@ -174,30 +174,6 @@ void Scene::Start(){
 		prevDeltaTime[i] = 0.0f;
 	}
 
-	ParticleSystem sys;
-	sys.maxLifetime = 15.4f;
-	sys.maxParticleCount = 10000;
-	sys.particlesPerSec = 60.0f;
-	sys.startScale = 0.4f;
-	sys.endScale = 0.1f;
-	sys.gravityFactor = 0.08f;
-	sys.spawnAngle = 90;
-	sys.startVelocity = 0.5;
-
-	CollisionPlane plane1 = {Vector3(0.0f, 0.1f, 0.0f), Vector3(0,1.0f,0)};
-	CollisionPlane plane2 = {Vector3(0.0f, 1.6f, 0.4f), Vector3(0,0.6f,0.8f)};
-	//CollisionPlane plane2 = {Vector3(0.0f, 0.7f, 1.2f), Vector3(0, 0.6f,0.8f)};
-	//CollisionPlane plane3 = {Vector3(0.0f, 1.4f, 2.1f), Vector3(0,-0.6f,0.8f)};
-	sys.AddCollisionPlane(plane1);
-	//sys.AddCollisionPlane(plane2);
-	//sys.AddCollisionPlane(plane3);
-
-	sys.startCol = Vector4(1.0f, 0.9f, 0.1f, 1.0f);
-	sys.endCol   = Vector4(0.8f, 0.2f, 0.1f, 0.0f);
-
-	particles.push_back(sys);
-	particles[0].Start();
-
 	running = true;
 	while(running){
 		clock_t start = clock();
@@ -461,6 +437,15 @@ void Scene::Render(){
 			}
 
 			glDeleteBuffers(3, buffers);
+		}
+	}
+
+	for(auto iter = particles.begin(); iter != particles.end();){
+		if(iter->IsOver()){
+			iter = particles.erase(iter);
+		}
+		else{
+			iter++;
 		}
 	}
 	

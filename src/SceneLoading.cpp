@@ -35,6 +35,7 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(PlayerComponent)
 	DEFINE_USER_COMPONENT(DoorComponent)
 	DEFINE_USER_COMPONENT(AnimationControlTest)
+	DEFINE_USER_COMPONENT(ParticleComponent)
 	
 
 	return nullptr;

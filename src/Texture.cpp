@@ -5,7 +5,7 @@
 
 using std::cout;
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_MSC_VER)
 
 #pragma pack(1)
 struct BitMapHeader{

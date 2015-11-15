@@ -83,6 +83,10 @@ struct ParticleSystem{
 		randomEngine.seed(seed);
 	}
 
+	bool IsOver(){
+		return time >= systemLifetime && particleCount == 0;
+	}
+
 	void AddParticle(){
 		particles[particleCount].position = Vector3(2,1.5f,1);
 
