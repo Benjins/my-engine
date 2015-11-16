@@ -816,8 +816,9 @@ void Model::ImportFromModelFile(const string& fileName){
 				int boneNameLength;
 				fread(&boneNameLength, 4, 1, fileIn);
 
-				char* buffer = new char[boneNameLength];
+				char* buffer = new char[boneNameLength+1];
 				fread(buffer, 1, boneNameLength, fileIn);
+				buffer[boneNameLength] = '\0';
 				armature->bones[i].name = string(buffer);
 
 				delete[] buffer;

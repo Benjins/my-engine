@@ -59,6 +59,8 @@ int main(int argc, char** argv){
 	return 0;
 #endif
 
+#define EDITOR
+
 #if !defined(EDITOR)
 	Scene& x = Scene::getInstance(argc, argv);
 #else

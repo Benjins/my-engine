@@ -16,6 +16,12 @@ using std::vector; using std::string;
 
 struct Model;
 
+struct IKConstraint{
+	int boneIndex;
+	int constraintLength;
+	Vector3 position;
+};
+
 struct Armature{
 	BoneTransform bones[MAX_BONE_COUNT];
 	Mat4x4 bindPoses[MAX_BONE_COUNT];
@@ -31,6 +37,8 @@ struct Armature{
 	int animCount;
 
 	float time;
+
+	vector<IKConstraint> ikConstraints;
 
 	Armature()
 	: boneCount(0)
@@ -52,6 +60,8 @@ struct Armature{
 	int GetAnimationIndexByName(const string& name);
 	void BlendTo(const string& animName, float time);
 	void BlendToIndex(int animIndex, float time);
+
+	void IKPass();
 
 	void ParseStateString(const string& states);
 	string EncodeStateString();

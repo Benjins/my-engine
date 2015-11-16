@@ -39,13 +39,17 @@
     <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.000000,1.000000'/>
     <RigidBody mass='0.100000' isKinematic='T'/>
   </Prefab>
-  <?
   <GameObject name='test2-obj'>
-    <Transform position='1.000000,0.000000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.200000,0.200000,0.200000'/>
+    <Transform position='1.000000,-0.047670,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.200000,0.200000,0.200000'/>
     <Material name='worm-arm'/>
     <Mesh source='data/char_03.mdf'/>
   </GameObject>
-  ?>
+  <GameObject name='testIk'>
+    <Transform position='1.434078,2.046152,0.566903' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
+    <Material name='reflective'/>
+    <Mesh source='data/sphere.obj'/>
+    <IKAnimTestComp/>
+  </GameObject>
   <GameObject name='myObj'>
     <Transform position='0.121761,3.299059,-0.360763' rotation='0.986200,0.165557,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
     <Material name='floorMat'/>
@@ -67,7 +71,7 @@
     <Transform parent='mainCamSub' position='0.060000,-0.020000,0.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.020000,0.020000,0.020000'/>
     <Material name='worm-arm'/>
     <Mesh source='data/hand_03.dae' anim='idle:0-2,atk:2.5-3.33'/>
-	<AnimationControlTest/>
+    <AnimationControlTest/>
   </GameObject>
   <GameObject name='light1'>
     <Transform position='0.000000,1.121765,3.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
@@ -99,7 +103,7 @@
     </AnimationComponent>
   </GameObject>
   <GameObject name='particleSys'>
-	<Transform position='2.000000,1.000000,1.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1,1,1'/>
+    <Transform position='2.000000,1.000000,1.000000' rotation='1.000000,0.000000,0.000000,0.000000' scale='1.000000,1.000000,1.000000'/>
 	<ParticleComponent/>
   </GameObject>
   <GameObject name='myObj2'>
@@ -140,19 +144,6 @@
     <Material name='worm'/>
     <Mesh source='data/Worm.obj'/>
   </GameObject>
-  <?
-  <GameObject name='wall1'>
-    <Transform position='-2.000000,0.882326,1.000000' rotation='0.890998,0.000000,0.454008,0.000000' scale='1.000000,1.000000,1.000000'/>
-    <Material name='floorMat'/>
-    <Mesh source='data/test.obj'/>
-    <BoxCollider position='0.000000,0.000000,0.000000' size='1.000000,1.100000,1.000000'/>
-    <AnimationComponent type='quaternion' target='rotation' loop='T' autoplay='T'>
-      <KeyFrame time='0.000000' value='0.906308,0.000000,0.000000,0.422618'/>
-      <KeyFrame time='1.000000' value='1.000000,0.000000,0.000000,0.000000'/>
-      <KeyFrame time='2.000000' value='0.906308,0.000000,0.000000,0.422618'/>
-    </AnimationComponent>
-  </GameObject>
-  ?>
   <GameObject name='wall_room1'>
     <Transform position='12.590041,0.618957,-4.064484' rotation='0.852412,0.000000,-0.522871,0.000000' scale='5.000000,1.000000,0.200000'/>
     <Material name='wall'/>

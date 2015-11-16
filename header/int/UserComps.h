@@ -107,6 +107,49 @@ struct DoorComponent : Component{
 	}
 };
 
+struct IKAnimTestComp : Component{
+
+	Armature* arm;
+
+	bool doIk;
+
+	virtual void OnAwake(){
+		arm = nullptr;
+		doIk = false;
+	}
+
+	virtual void OnUpdate() override{
+		if(arm == nullptr){
+			arm = gameObject->scene->FindGameObject("test2-obj")->mesh->armature;
+			IKConstraint ik;
+			BoneTransform* handR = arm->GetBoneByName("hand_R");
+			ik.boneIndex = (handR - arm->bones);
+			ik.constraintLength = 2;
+			arm->ikConstraints.push_back(ik);
+		}
+
+		arm->ikConstraints[0].position = gameObject->transform.GlobalPosition();
+	}
+
+	virtual void OnEditorUpdate() override{
+		OnUpdate();
+	
+		if(gameObject->scene->input.GetKeyUp(']')){
+			doIk = !doIk;
+		}
+
+		if(doIk){
+			arm->IKPass();
+		}
+	}
+
+	virtual XMLElement Serialize() override{
+		XMLElement elem;
+		elem.name = "IKAnimTestComp";
+		return elem;
+	}
+};
+
 struct PlayerComponent : Component{
 	//virtual void OnCollision(Collider* col) override{
 		
