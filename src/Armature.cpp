@@ -89,6 +89,7 @@ void Armature::Update(float deltaTime){
 	currentBlendTime += deltaTime;
 
 	if(currentBlendTime >= blendTime && currentAnimIndex != targetAnimIndex){
+		printf("Stope blending at CBT='%0.3f'\n", currentBlendTime);
 		currentAnimIndex = targetAnimIndex;
 		blendTime = 0;
 		time = currentBlendTime;

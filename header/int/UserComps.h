@@ -122,10 +122,10 @@ struct AnimationControlTest : Component{
 
 	virtual void OnAwake(){
 		armature = gameObject->mesh->armature;
-		timeOut = 1.0f;
+		timeOut = 3.5f;
 		timer.Reset();
 		isIdle = true;
-		armature->BlendTo("atk", 0.0f);
+		armature->BlendTo("idle", 0.0f);
 		input = &gameObject->scene->input;
 	}
 
@@ -134,11 +134,11 @@ struct AnimationControlTest : Component{
 			if(input->GetKeyUp('m')){
 				timer.Reset();
 				isIdle = false;
-				armature->BlendTo("idle", 0.2f);
+				armature->BlendTo("atk", 3.2f);
 			}
 
 			if(!isIdle && timer.GetTimeSince() >= timeOut){
-				armature->BlendTo("atk", 0.2f);
+				armature->BlendTo("idle", 3.2f);
 				timer.Reset();
 				isIdle = true;
 			}

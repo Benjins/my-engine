@@ -87,12 +87,13 @@ void GameObject::OnUpdate(){
 	if(mesh != nullptr){
 		Armature* armature = mesh->armature;
 		if(armature != nullptr){
-			//armature->Update(scene->deltaTime);
+			armature->Update(scene->deltaTime);
 			
+			/*
 			if(scene->input.GetKey(']')){
 				printf("armature blend time: %.3f\n", fmodf(armature->currentBlendTime, armature->anim[armature->currentAnimIndex].boneAnims[0].positionAnim.Length()));
 				armature->Update(0.02f);
-			}
+			}*/
 			
 		}
 	}
