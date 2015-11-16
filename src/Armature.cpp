@@ -182,19 +182,19 @@ void Armature::ParseStateString(const string& states){
 
 			anim[stateCount].stateName = stateName;
 			for(int i = 0; i < boneCount; i++){
-				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMin), timeMin);
-				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMax), timeMax);
+				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMin), 0);
+				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMax), timeMax - timeMin);
 				for(KeyFrame<Vector3> frame : anim[0].boneAnims[i].positionAnim.keyFrames){
 					if(frame.time > timeMin && frame.time < timeMax){
-						anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(frame.value, frame.time);
+						anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(frame.value, frame.time - timeMin);
 					}
 				}
 
-				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMin), timeMin);
-				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMax), timeMax);
+				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMin), 0);
+				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMax), timeMax - timeMin);
 				for(KeyFrame<Quaternion> frame : anim[0].boneAnims[i].rotationAnim.keyFrames){
 					if(frame.time > timeMin && frame.time < timeMax){
-						anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(frame.value, frame.time);
+						anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(frame.value, frame.time - timeMin);
 					}
 				}
 			}

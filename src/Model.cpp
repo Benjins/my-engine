@@ -905,7 +905,6 @@ void Model::ImportFromModelFile(const string& fileName){
 	fclose(fileIn);
 
 	if(armature != nullptr){
-		int xwy= 0;
 		armature->model = this;
 	}
 
