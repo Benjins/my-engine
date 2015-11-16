@@ -88,8 +88,9 @@ void Armature::Update(float deltaTime){
 	time += deltaTime;
 	currentBlendTime += deltaTime;
 
-	if(currentBlendTime >= blendTime){
+	if(currentBlendTime >= blendTime && currentAnimIndex != targetAnimIndex){
 		currentAnimIndex = targetAnimIndex;
+		blendTime = 0;
 		time = currentBlendTime;
 	}
 
@@ -100,6 +101,7 @@ void Armature::Update(float deltaTime){
 		Quaternion currentRot = anim[currentAnimIndex].boneAnims[i].rotationAnim.Evaluate(time);
 
 		if(!isBlending){
+			//printf("Non-blending eval at %.3f out of %.3f\n", time, anim[currentAnimIndex].boneAnims[i].positionAnim.Length());
 			bones[i].position = currentPos;
 			bones[i].rotation = currentRot;
 		}
@@ -107,6 +109,9 @@ void Armature::Update(float deltaTime){
 			Vector3 targetPos    = anim[targetAnimIndex].boneAnims[i].positionAnim.Evaluate(currentBlendTime);
 			Quaternion targetRot = anim[targetAnimIndex].boneAnims[i].rotationAnim.Evaluate(currentBlendTime);
 
+			if(i == 2){
+				printf("Blending CBT:%0.2f, time:%0.2f, blendTime:%0.2f\n", currentBlendTime, time, blendTime);
+			}
 			float blendWeight = currentBlendTime / blendTime;
 			Vector3 blendedPos    = currentPos * (1 - blendWeight) + targetPos * blendWeight;
 			Quaternion blendedRot = currentRot * (1 - blendWeight) + targetRot * blendWeight;

@@ -125,7 +125,7 @@ struct AnimationControlTest : Component{
 		timeOut = 1.0f;
 		timer.Reset();
 		isIdle = true;
-		armature->BlendTo("idle", 0.0f);
+		armature->BlendTo("atk", 0.0f);
 		input = &gameObject->scene->input;
 	}
 
@@ -134,11 +134,11 @@ struct AnimationControlTest : Component{
 			if(input->GetKeyUp('m')){
 				timer.Reset();
 				isIdle = false;
-				armature->BlendTo("attack", 0.2f);
+				armature->BlendTo("idle", 0.2f);
 			}
 
 			if(!isIdle && timer.GetTimeSince() >= timeOut){
-				armature->BlendTo("idle", 0.2f);
+				armature->BlendTo("atk", 0.2f);
 				timer.Reset();
 				isIdle = true;
 			}
