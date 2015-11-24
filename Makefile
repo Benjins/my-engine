@@ -13,7 +13,7 @@ assets: src/*.cpp  gen/*.cpp data/*.*
 	./build/my-engine-assets Assets.xml
 	
 source_parsing: src/*.cpp header/int/*.h
-	$(CXX) -std=c++11 src/SourceParser.cpp src/SourceParserMain.cpp -o ./build/my-engine-introspect
+	$(CXX) -std=c++11 src/SourceParser.cpp src/SourceParser/SourceParserMain.cpp -o ./build/my-engine-introspect
 	./build/my-engine-introspect header/int/UserComps.h header/int/Collider.h header/int/RigidBody.h
 	
 engine_mac: src/*.cpp
