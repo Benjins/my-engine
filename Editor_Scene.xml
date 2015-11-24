@@ -46,7 +46,7 @@
   </GameObject>
   <GameObject name='testIk'>
     <Transform position='1.434078,2.046152,0.566903' rotation='1.000000,0.000000,0.000000,0.000000' scale='0.100000,0.100000,0.100000'/>
-    <Material name='reflective'/>
+    <Material name='wall'/>
     <Mesh source='data/sphere.obj'/>
     <IKAnimTestComp/>
   </GameObject>

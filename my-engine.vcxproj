@@ -136,6 +136,7 @@
     <ClCompile Include="3dbasics\Triangle.cpp" />
     <ClCompile Include="3dbasics\Vector2.cpp" />
     <ClCompile Include="3dbasics\Vector3.cpp" />
+    <ClCompile Include="gen\Serialization.cpp" />
     <ClCompile Include="src\3DUtilities.cpp" />
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Armature.cpp" />

@@ -37,29 +37,6 @@ void RigidBody::OnAwake(){
 	state.position = transform->position;
 }
 
-XMLElement RigidBody::Serialize(){
-	XMLElement elem;
-	elem.name = "RigidBody";
-	elem.attributes.emplace_back("mass", to_string(mass));
-	elem.attributes.emplace_back("isKinematic", (isKinematic ? "T" : "F"));
-
-	return elem;
-}
-
-void RigidBody::Deserialize(const XMLElement& elem){
-	for(const XMLAttribute& attr : elem.attributes){
-		if(attr.name == "mass"){
-			mass = atof(attr.data.c_str());
-			state.invMass = 1/mass;
-		}
-		else if(attr.name == "isKinematic"){
-			isKinematic = attr.data == "T";
-		}
-	}
-
-	cout << "Rigidbody " << (isKinematic ? "is" : " isn't") << " kinematic.\n";
-}
-
 void RigidBody::StepForward(float deltaTime){
 	RBDeriv a,b,c,d,initial;
 

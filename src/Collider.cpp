@@ -50,35 +50,6 @@ void BoxCollider::OnAwake(){
 	}
 }
 
-Component* BoxCollider::Clone(){
-	BoxCollider* newBox = new BoxCollider();
-	newBox->position = position;
-	newBox->size = size;
-
-	return newBox;
-}
-
-XMLElement BoxCollider::Serialize(){
-	XMLElement elem;
-	elem.name = "BoxCollider";
-	elem.AddAttribute("position", EncodeVector3(position));
-	elem.AddAttribute("size", EncodeVector3(size));
-
-	return elem;
-}
-
-void BoxCollider::Deserialize(const XMLElement& elem){
-	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
-		XMLAttribute attr = *iter;
-		if(attr.name == "position"){
-			position = ParseVector3(attr.data);
-		}
-		else if(attr.name == "size"){
-			size = ParseVector3(attr.data);
-		}
-	}
-}
-
 BoxCollider::~BoxCollider(){
 	if(gameObject != nullptr && gameObject->scene != nullptr){
 		vector<BoxCollider*>& boxBodies = gameObject->scene->physicsSim->staticBoxBodies;
@@ -118,35 +89,6 @@ void SphereCollider::AddToSim(PhysicsSim* sim){
 void SphereCollider::OnAwake(){
 	if(gameObject->scene != NULL){
 		AddToSim(gameObject->scene->physicsSim);
-	}
-}
-
-Component* SphereCollider::Clone(){
-	SphereCollider* newSphere = new SphereCollider();
-	newSphere->position = position;
-	newSphere->radius = radius;
-
-	return newSphere;
-}
-
-XMLElement SphereCollider::Serialize(){
-	XMLElement elem;
-	elem.name = "SphereCollider";
-	elem.AddAttribute("position", EncodeVector3(position));
-	elem.AddAttribute("radius", to_string(radius));
-
-	return elem;
-}
-
-void SphereCollider::Deserialize(const XMLElement& elem){
-	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
-		XMLAttribute attr = *iter;
-		if(attr.name == "position"){
-			position = ParseVector3(attr.data);
-		}
-		else if(attr.name == "radius"){
-			radius = atof(attr.data.c_str());
-		}
 	}
 }
 

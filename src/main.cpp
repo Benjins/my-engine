@@ -10,8 +10,6 @@
 #include "../header/int/Vector4.h"
 #include <iomanip>
 
-#include "../header/int/SourceParser.h"
-
 #if defined(MEM_CHECK) || defined(TESTING)
 #if defined(_WIN32) || defined(_WIN64)
 #  define _CRTDBG_MAP_ALLOC
@@ -52,14 +50,6 @@ int main(int argc, char** argv){
 
 	return 0;
 #endif
-
-#if defined(INTROSPECTION)
-	ParseSourceFiles(&argv[1], argc-1);
-
-	return 0;
-#endif
-
-#define EDITOR
 
 #if !defined(EDITOR)
 	Scene& x = Scene::getInstance(argc, argv);

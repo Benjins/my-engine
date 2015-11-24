@@ -547,6 +547,7 @@ void EditorScene::EditorGUI(){
 	glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 0.4f, 0.4f, 1);
 	glEnable(GL_DEPTH_TEST);
 
+#if 0
 	for(PathNode& node : pathfinding.nodes){
 		Vector3 pos = node.position;
 		Vector3 verts[4] = {pos + Vector3(0.2f,  0,  0.2f), pos + Vector3( 0.2f, 0, -0.2f), 
@@ -579,6 +580,8 @@ void EditorScene::EditorGUI(){
 		glEnd();
 		prevPos = pos;
 	}
+
+#endif
 
 	glDisable(GL_DEPTH_TEST);
 

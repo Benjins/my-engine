@@ -12,6 +12,9 @@ MetaMemberInfo memberInfo_DoorComponent[] = {
 	{"isLocked", OFFSET_OF(DoorComponent, isLocked), MetaType_bool},
 	{"isOpen", OFFSET_OF(DoorComponent, isOpen), MetaType_bool},
 };
+MetaMemberInfo memberInfo_IKAnimTestComp[] = {
+	{"doIk", OFFSET_OF(IKAnimTestComp, doIk), MetaType_bool},
+};
 MetaMemberInfo memberInfo_AnimationControlTest[] = {
 	{"timeOut", OFFSET_OF(AnimationControlTest, timeOut), MetaType_float},
 	{"isIdle", OFFSET_OF(AnimationControlTest, isIdle), MetaType_bool},
@@ -93,6 +96,7 @@ MetaMemberInfo memberInfo_RigidBody[] = {
 };
 enum MetaStructTypes {
 metaStruct_DoorComponent,
+metaStruct_IKAnimTestComp,
 metaStruct_AnimationControlTest,
 metaStruct_AudioComponent,
 metaStruct_CameraControl,
@@ -110,7 +114,6 @@ metaStruct_BoxCollider,
 metaStruct_SphereCollider,
 metaStruct_RigidBody,
 metaStruct_ParticleComponent,
-metaStruct_IKAnimTestComp,
 metaStruct_PlayerComponent,
 metaStruct_TestComp,
 metaStruct_HitComponent,
@@ -119,6 +122,7 @@ metaStruct_Collider,
 };
 MetaStructInfo genMetaStructInfo[] = {
 {"DoorComponent", memberInfo_DoorComponent, ARRAY_COUNT(memberInfo_DoorComponent)},
+{"IKAnimTestComp", memberInfo_IKAnimTestComp, ARRAY_COUNT(memberInfo_IKAnimTestComp)},
 {"AnimationControlTest", memberInfo_AnimationControlTest, ARRAY_COUNT(memberInfo_AnimationControlTest)},
 {"AudioComponent", memberInfo_AudioComponent, ARRAY_COUNT(memberInfo_AudioComponent)},
 {"CameraControl", memberInfo_CameraControl, ARRAY_COUNT(memberInfo_CameraControl)},
@@ -136,7 +140,6 @@ MetaStructInfo genMetaStructInfo[] = {
 {"SphereCollider", memberInfo_SphereCollider, ARRAY_COUNT(memberInfo_SphereCollider)},
 {"RigidBody", memberInfo_RigidBody, ARRAY_COUNT(memberInfo_RigidBody)},
 {"ParticleComponent", nullptr, 0},
-{"IKAnimTestComp", nullptr, 0},
 {"PlayerComponent", nullptr, 0},
 {"TestComp", nullptr, 0},
 {"HitComponent", nullptr, 0},

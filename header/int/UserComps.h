@@ -62,25 +62,11 @@ struct DoorComponent : Component{
 		isOpen = false;
 	}
 
-	virtual XMLElement Serialize() override{
-		XMLElement elem;
-		elem.name = "DoorComponent";
-		elem.attributes.emplace_back("isLocked", (isLocked ? "T" : "F"));
-		elem.attributes.emplace_back("isOpen",   (isOpen   ? "T" : "F"));
+	virtual XMLElement Serialize();
 
-		return elem;
-	}
+	virtual void Deserialize(const XMLElement& elem);
 
-	virtual void Deserialize(const XMLElement& elem) override{
-		for(const XMLAttribute& attr : elem.attributes){
-			if(attr.name == "isLocked"){
-				isLocked = (attr.data == "T");
-			}
-			else if(attr.name == "isOpen"){
-				isOpen = (attr.data == "T");
-			}
-		}
-	}
+	virtual Component* Clone();
 
 	virtual void OnAwake() override{
 		player = gameObject->scene->FindGameObject("mainCam");
