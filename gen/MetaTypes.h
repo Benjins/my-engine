@@ -44,9 +44,6 @@ MetaMemberInfo memberInfo_BulletComponent[] = {
 	{"time", OFFSET_OF(BulletComponent, time), MetaType_float},
 	{"timeLimit", OFFSET_OF(BulletComponent, timeLimit), MetaType_float},
 };
-MetaMemberInfo memberInfo_PathNodeComponent[] = {
-	{"nodeId", OFFSET_OF(PathNodeComponent, nodeId), MetaType_int},
-};
 MetaMemberInfo memberInfo_AnimationComponent[] = {
 	{"currentTime", OFFSET_OF(AnimationComponent, currentTime), MetaType_float},
 	{"loop", OFFSET_OF(AnimationComponent, loop), MetaType_bool},
@@ -55,7 +52,6 @@ MetaMemberInfo memberInfo_AnimationComponent[] = {
 };
 MetaMemberInfo memberInfo_LightComponent[] = {
 	{"intensity", OFFSET_OF(LightComponent, intensity), MetaType_float},
-	{"id", OFFSET_OF(LightComponent, id), MetaType_int},
 	{"isDirectional", OFFSET_OF(LightComponent, isDirectional), MetaType_bool},
 };
 MetaMemberInfo memberInfo_SimpleAnimation[] = {
@@ -101,7 +97,6 @@ metaStruct_AnimationControlTest,
 metaStruct_AudioComponent,
 metaStruct_CameraControl,
 metaStruct_BulletComponent,
-metaStruct_PathNodeComponent,
 metaStruct_AnimationComponent,
 metaStruct_LightComponent,
 metaStruct_SimpleAnimation,
@@ -115,6 +110,7 @@ metaStruct_SphereCollider,
 metaStruct_RigidBody,
 metaStruct_ParticleComponent,
 metaStruct_PlayerComponent,
+metaStruct_PathNodeComponent,
 metaStruct_TestComp,
 metaStruct_HitComponent,
 metaStruct_MatChangeOnHit,
@@ -127,7 +123,6 @@ MetaStructInfo genMetaStructInfo[] = {
 {"AudioComponent", memberInfo_AudioComponent, ARRAY_COUNT(memberInfo_AudioComponent)},
 {"CameraControl", memberInfo_CameraControl, ARRAY_COUNT(memberInfo_CameraControl)},
 {"BulletComponent", memberInfo_BulletComponent, ARRAY_COUNT(memberInfo_BulletComponent)},
-{"PathNodeComponent", memberInfo_PathNodeComponent, ARRAY_COUNT(memberInfo_PathNodeComponent)},
 {"AnimationComponent", memberInfo_AnimationComponent, ARRAY_COUNT(memberInfo_AnimationComponent)},
 {"LightComponent", memberInfo_LightComponent, ARRAY_COUNT(memberInfo_LightComponent)},
 {"SimpleAnimation", memberInfo_SimpleAnimation, ARRAY_COUNT(memberInfo_SimpleAnimation)},
@@ -141,6 +136,7 @@ MetaStructInfo genMetaStructInfo[] = {
 {"RigidBody", memberInfo_RigidBody, ARRAY_COUNT(memberInfo_RigidBody)},
 {"ParticleComponent", nullptr, 0},
 {"PlayerComponent", nullptr, 0},
+{"PathNodeComponent", nullptr, 0},
 {"TestComp", nullptr, 0},
 {"HitComponent", nullptr, 0},
 {"MatChangeOnHit", nullptr, 0},
