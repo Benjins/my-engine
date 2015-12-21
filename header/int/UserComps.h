@@ -25,6 +25,27 @@
 
 using std::cout; using std::endl;
 
+struct CameraControl;
+
+struct LadderComponent : Component{
+
+	GameObject* playerObj;
+	CameraControl* playerControl;
+	BoxCollider* col;
+
+	virtual XMLElement Serialize();
+	virtual void Deserialize(const XMLElement& elem);
+	virtual Component* Clone();
+
+	virtual void OnAwake(){
+		playerObj = gameObject->scene->FindGameObject("mainCam");
+		playerControl = playerObj->transform.children[0]->gameObject->GetComponent<CameraControl>();
+		col = gameObject->GetComponent<BoxCollider>();
+	}
+
+	virtual void OnUpdate() override;
+};
+
 struct ParticleComponent : Component{
 	
 	virtual void OnAwake(){
@@ -117,7 +138,7 @@ struct IKAnimTestComp : Component{
 		arm->ikConstraints[0].position = gameObject->transform.GlobalPosition();
 	}
 
-	virtual void OnEditorUpdate() override{
+	virtual void OnEditorUpdate(bool isSelected) override{
 		OnUpdate();
 	
 		if(gameObject->scene->input.GetKeyUp(']')){
@@ -207,8 +228,6 @@ struct AudioComponent : Component{
 	}
 
 	virtual void OnUpdate(){
-		gameObject->scene->debugDraw.Cube(gameObject->transform.GlobalPosition(), Vector3(2,2,2));
-
 		Vector3 place = gameObject->transform.GlobalPosition();
 		ALfloat placeData[] = {place.x, place.y, place.z};
 		alSourcefv(source, AL_POSITION, placeData);
@@ -272,6 +291,10 @@ struct CameraControl : Component{
 	float xRot;
 	float yRot;
 
+	float ladderSpeed;
+
+	LadderComponent* currentLadder;
+
 	CameraControl(){
 		speed = 5;
 		prevX = 0;
@@ -285,6 +308,8 @@ struct CameraControl : Component{
 		stepDelay = 0.6f;
 		characterHeight = 0.4f;
 		groundedAdjustment = 0.05f;
+		ladderSpeed = 0.8f;
+		currentLadder = nullptr;
 	}
 
 	virtual XMLElement Serialize();
@@ -313,22 +338,36 @@ struct CameraControl : Component{
 
 		prevX = input->GetMouseX();
 		prevY = input->GetMouseY();
+
 		Vector3 moveVec(0,0,0);
-		if(input->GetKey('w')){
-			moveVec = moveVec + camera->Forward();
+		if(currentLadder == nullptr || true){
+			if(input->GetKey('w')){
+				moveVec = moveVec + camera->Forward();
+			}
+			if(input->GetKey('s')){
+				moveVec = moveVec + camera->Forward() * -1; 
+			}
+			if(input->GetKey('a')){
+				moveVec = moveVec + camera->Right() * -1;
+			}
+			if(input->GetKey('d')){
+				moveVec = moveVec + camera->Right();
+			}
+			if(input->GetKeyDown(' ') && (isGrounded || currentLadder != nullptr)){
+				currentLadder = nullptr;
+				velocity = 4;
+				isGrounded = false;
+			}
+			printf("Ladder is null.\n");
 		}
-		if(input->GetKey('s')){
-			moveVec = moveVec + camera->Forward() * -1; 
-		}
-		if(input->GetKey('a')){
-			moveVec = moveVec + camera->Right() * -1;
-		}
-		if(input->GetKey('d')){
-			moveVec = moveVec + camera->Right();
-		}
-		if(input->GetKeyDown(' ') && isGrounded){
-			velocity = 4;
-			isGrounded = false;
+		else{
+			printf("Ladder is not null.\n");
+			if(input->GetKey('w')){
+				moveVec = moveVec + Y_AXIS * ladderSpeed;
+			}
+			if(input->GetKey('s')){
+				moveVec = moveVec - Y_AXIS * ladderSpeed;
+			}
 		}
 
 		//health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
@@ -338,7 +377,9 @@ struct CameraControl : Component{
 			healthBar->text = "Health: " + to_string((int)(health*100));
 		}
 
-		moveVec.y = 0;
+		if(currentLadder == nullptr){
+			moveVec.y = 0;
+		}
 		if(moveVec.MagnitudeSquared() > 0){
 			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
 
@@ -381,8 +422,10 @@ struct CameraControl : Component{
 			velocity = 0;
 		}
 
-		velocity -= gameObject->scene->deltaTime * 5;
-		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
+		if(currentLadder == nullptr){
+			velocity -= gameObject->scene->deltaTime * 5;
+			camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
+		}
 		if(camera->GetParent()->position.y <= floorHeight + (isGrounded ? characterHeight + groundedAdjustment : characterHeight)){
 			camera->GetParent()->position.y = floorHeight + characterHeight;
 			velocity = 0;
@@ -396,6 +439,13 @@ struct CameraControl : Component{
 			audioComp->Play();
 			timeMoving = 0;
 		}
+
+		currentLadder = nullptr;
+	}
+
+	void AttachToLadder(LadderComponent* ladder){
+		//printf("Attach to ladder.\n");
+		currentLadder = ladder;
 	}
 
 	virtual ~CameraControl(){}
@@ -454,7 +504,7 @@ struct PathNodeComponent : Component{
 	virtual XMLElement Serialize();
 	virtual Component* Clone();
 
-	virtual void OnEditorUpdate(){
+	virtual void OnEditorUpdate(bool isSelected){
 		for(PathNode& node : gameObject->scene->pathfinding.nodes){
 			if(node.id == nodeId){
 				node.position = gameObject->transform.GlobalPosition();
@@ -713,7 +763,7 @@ struct LightComponent : Component{
 		}
 	}
 
-	virtual void OnEditorUpdate(){
+	virtual void OnEditorUpdate(bool isSelected){
 		OnUpdate();
 	}
 

@@ -19,16 +19,18 @@ struct Collision{
 };
 
 struct Collider : Component{
+	bool isTrigger;
 	Collider();
 
 	virtual Collision CollisionWith(const Collider* col) const;
+	virtual bool Contains(const Vector3& point) const = 0;
 	virtual Collision CollisionWith(const BoxCollider* col) const;
 	virtual Collision CollisionWith(const SphereCollider* col) const;
 	virtual RaycastHit Raycast(const Vector3& origin, const Vector3& direction);
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
 	virtual void OnUpdate(){}
-	virtual void OnEditorUpdate() override{}
+	virtual void OnEditorUpdate(bool isSelected) override{}
 
 	virtual Component* Clone() = 0;
 	virtual XMLElement Serialize() = 0;
@@ -45,6 +47,8 @@ struct BoxCollider : Collider{
 
 	AABB GetBounds(bool globalSpace = true) const;
 
+	virtual bool Contains(const Vector3& point) const;
+
 	virtual Collision CollisionWith(const Collider* col) const;
 	virtual Collision CollisionWith(const BoxCollider* col) const;
 	virtual Collision CollisionWith(const SphereCollider* col) const;
@@ -52,7 +56,7 @@ struct BoxCollider : Collider{
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
 	virtual void OnUpdate(){}
-	virtual void OnEditorUpdate() override;
+	virtual void OnEditorUpdate(bool isSelected) override;
 
 	virtual Component* Clone();
 	virtual XMLElement Serialize();
@@ -66,6 +70,8 @@ struct SphereCollider : Collider{
 	float radius;
 
 	SphereCollider(Vector3 _position = Vector3(0,0,0), float _radius = 0.5f);
+
+	virtual bool Contains(const Vector3& point) const{return false;}
 
 	virtual Collision CollisionWith(const Collider* col) const;
 	virtual Collision CollisionWith(const BoxCollider* col) const;

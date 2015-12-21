@@ -38,6 +38,7 @@ MetaMemberInfo memberInfo_CameraControl[] = {
 	{"prevY", OFFSET_OF(CameraControl, prevY), MetaType_int},
 	{"xRot", OFFSET_OF(CameraControl, xRot), MetaType_float},
 	{"yRot", OFFSET_OF(CameraControl, yRot), MetaType_float},
+	{"ladderSpeed", OFFSET_OF(CameraControl, ladderSpeed), MetaType_float},
 };
 MetaMemberInfo memberInfo_BulletComponent[] = {
 	{"speed", OFFSET_OF(BulletComponent, speed), MetaType_float},
@@ -76,11 +77,16 @@ MetaMemberInfo memberInfo_OscillateUp[] = {
 	{"time", OFFSET_OF(OscillateUp, time), MetaType_float},
 	{"frameCount", OFFSET_OF(OscillateUp, frameCount), MetaType_int},
 };
+MetaMemberInfo memberInfo_Collider[] = {
+	{"isTrigger", OFFSET_OF(Collider, isTrigger), MetaType_bool},
+};
 MetaMemberInfo memberInfo_BoxCollider[] = {
+	{"isTrigger", OFFSET_OF(BoxCollider, isTrigger), MetaType_bool},
 	{"position", OFFSET_OF(BoxCollider, position), MetaType_Vector3},
 	{"size", OFFSET_OF(BoxCollider, size), MetaType_Vector3},
 };
 MetaMemberInfo memberInfo_SphereCollider[] = {
+	{"isTrigger", OFFSET_OF(SphereCollider, isTrigger), MetaType_bool},
 	{"position", OFFSET_OF(SphereCollider, position), MetaType_Vector3},
 	{"radius", OFFSET_OF(SphereCollider, radius), MetaType_float},
 };
@@ -105,16 +111,17 @@ metaStruct_FireGun,
 metaStruct_RotateConstantly,
 metaStruct_EnemyComp,
 metaStruct_OscillateUp,
+metaStruct_Collider,
 metaStruct_BoxCollider,
 metaStruct_SphereCollider,
 metaStruct_RigidBody,
+metaStruct_LadderComponent,
 metaStruct_ParticleComponent,
 metaStruct_PlayerComponent,
 metaStruct_PathNodeComponent,
 metaStruct_TestComp,
 metaStruct_HitComponent,
 metaStruct_MatChangeOnHit,
-metaStruct_Collider,
 };
 MetaStructInfo genMetaStructInfo[] = {
 {"DoorComponent", memberInfo_DoorComponent, ARRAY_COUNT(memberInfo_DoorComponent)},
@@ -131,16 +138,17 @@ MetaStructInfo genMetaStructInfo[] = {
 {"RotateConstantly", memberInfo_RotateConstantly, ARRAY_COUNT(memberInfo_RotateConstantly)},
 {"EnemyComp", memberInfo_EnemyComp, ARRAY_COUNT(memberInfo_EnemyComp)},
 {"OscillateUp", memberInfo_OscillateUp, ARRAY_COUNT(memberInfo_OscillateUp)},
+{"Collider", memberInfo_Collider, ARRAY_COUNT(memberInfo_Collider)},
 {"BoxCollider", memberInfo_BoxCollider, ARRAY_COUNT(memberInfo_BoxCollider)},
 {"SphereCollider", memberInfo_SphereCollider, ARRAY_COUNT(memberInfo_SphereCollider)},
 {"RigidBody", memberInfo_RigidBody, ARRAY_COUNT(memberInfo_RigidBody)},
+{"LadderComponent", nullptr, 0},
 {"ParticleComponent", nullptr, 0},
 {"PlayerComponent", nullptr, 0},
 {"PathNodeComponent", nullptr, 0},
 {"TestComp", nullptr, 0},
 {"HitComponent", nullptr, 0},
 {"MatChangeOnHit", nullptr, 0},
-{"Collider", nullptr, 0},
 };
 
 #endif

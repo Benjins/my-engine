@@ -37,6 +37,7 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(AnimationControlTest)
 	DEFINE_USER_COMPONENT(ParticleComponent)
 	DEFINE_USER_COMPONENT(IKAnimTestComp)
+	DEFINE_USER_COMPONENT(LadderComponent)
 	
 
 	return nullptr;

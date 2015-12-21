@@ -19,7 +19,7 @@ struct Component{
 	
 	virtual void OnUpdate();
 
-	virtual void OnEditorUpdate(){}
+	virtual void OnEditorUpdate(bool isSelected){}
 
 	virtual Component* Clone(){return new Component();}
 

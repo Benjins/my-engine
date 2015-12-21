@@ -30,6 +30,8 @@ void ParseSourceFiles(char** sourceFileNames, int sourceFileCount){
 
 	vector<Token> additionalMetaTypes;
 	vector<Token> additionalMetaTypesWithoutFields;
+	
+	vector<std::pair<Token, vector<std::pair<Token, Token>>>> metaTypeData;
 
 	char* fundamentalTypes[] = {"int", "float", "Vector2", "Vector3", "string", "bool"};
 
@@ -60,23 +62,17 @@ void ParseSourceFiles(char** sourceFileNames, int sourceFileCount){
 			if(memcmp(token.start, "struct", 6) == 0){
 				if(memcmp(tokens[i+2].start, ":", 1) == 0){
 					bool inheritsFromComponent = false;
+					int parentTypeIndex = -1;
 
-					for(Token additionalType : additionalMetaTypes){
-						if(tokens[i+3].length == additionalType.length
-						&& memcmp(tokens[i+3].start, additionalType.start, additionalType.length) == 0){
+					int idx = 0;
+					for(auto iter : metaTypeData){
+						if(tokens[i+3].length == iter.first.length
+						&& memcmp(tokens[i+3].start, iter.first.start, iter.first.length) == 0){
 							inheritsFromComponent = true;
+							parentTypeIndex = idx;
 							break;
 						}
-					}
-
-					if(!inheritsFromComponent){
-						for(Token additionalType : additionalMetaTypesWithoutFields){
-							if(tokens[i+3].length == additionalType.length
-							&& memcmp(tokens[i+3].start, additionalType.start, additionalType.length) == 0){
-								inheritsFromComponent = true;
-								break;
-							}
-						}
+						idx++;
 					}
 
 					if(memcmp(tokens[i+3].start, "Component", 9) == 0 || inheritsFromComponent){
@@ -90,6 +86,12 @@ void ParseSourceFiles(char** sourceFileNames, int sourceFileCount){
 							genCursor += sprintf(genCursor, "MetaMemberInfo memberInfo_%.*s[] = {\n", compTypeToken.length, compTypeToken.start);
 
 							vector<std::pair<Token, Token>> fieldNamesAndTypes;
+
+							if(inheritsFromComponent){
+								for(auto dataItr : metaTypeData[parentTypeIndex].second){
+									fieldNamesAndTypes.push_back(dataItr);
+								}
+							}
 
 							int methodsToGen = 0;
 							int braceCount = 1;
@@ -121,12 +123,6 @@ void ParseSourceFiles(char** sourceFileNames, int sourceFileCount){
 											hasFields = true;
 
 											fieldNamesAndTypes.emplace_back(typeName, fieldName);
-
-											genCursor += sprintf(genCursor, "\t{\"%.*s\", OFFSET_OF(%.*s, %.*s), MetaType_%.*s},\n",
-												fieldName.length, fieldName.start, 
-												compTypeToken.length, compTypeToken.start,
-												fieldName.length, fieldName.start,
-												typeName.length, typeName.start);
 										}
 									}
 
@@ -176,6 +172,13 @@ void ParseSourceFiles(char** sourceFileNames, int sourceFileCount){
 							}
 
 							if(hasFields){
+								for(auto iter : fieldNamesAndTypes){
+									genCursor += sprintf(genCursor, "\t{\"%.*s\", OFFSET_OF(%.*s, %.*s), MetaType_%.*s},\n",
+														 iter.second.length, iter.second.start, 
+														 compTypeToken.length, compTypeToken.start,
+														 iter.second.length, iter.second.start,
+														 iter.first.length, iter.first.start);
+								}
 								genCursor += sprintf(genCursor, "};\n");
 								additionalMetaTypes.push_back(compTypeToken);
 							}
@@ -300,6 +303,8 @@ void ParseSourceFiles(char** sourceFileNames, int sourceFileCount){
 
 								serialCursor += sprintf(serialCursor, "return newComp;\n}\n");
 							}
+
+							metaTypeData.emplace_back(compTypeToken, fieldNamesAndTypes);
 						}
 					}
 				}

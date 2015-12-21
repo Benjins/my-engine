@@ -168,8 +168,8 @@
     <ClCompile Include="src\SceneLoading.cpp" />
     <ClCompile Include="src\SCTransform.cpp" />
     <ClCompile Include="src\simple-xml.cpp" />
-    <ClCompile Include="src\SourceParser.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\UserComps.cpp" />
     <ClCompile Include="src\Vector4.cpp" />
     <ClCompile Include="test\testing.cpp" />
   </ItemGroup>

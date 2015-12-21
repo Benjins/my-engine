@@ -352,6 +352,11 @@ void EditorScene::EditorUpdate(){
 			if(transformMode == TransformMode::Translation){
 				float amount = DotProduct(orthoPart, axis);
 				Vector3 delta = axis * amount;
+				if(selectedObj->transform.GetParent() != nullptr){
+					Mat4x4 glob2loc = selectedObj->transform.GetParent()->GlobalToLocalMatrix();
+					delta = glob2loc*delta - glob2loc*Vector3(0,0,0);
+				}
+				
 				if(globalManipulator){
 					//delta = selectedObj->transform.GlobalToLocal(delta);
 				}
@@ -421,7 +426,7 @@ void EditorScene::EditorUpdate(){
 
 	for(GameObject* obj : objects){
 		for(Component* comp : obj->components){
-			comp->OnEditorUpdate();
+			comp->OnEditorUpdate(selectedObj == obj);
 		}
 	}
 

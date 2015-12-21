@@ -1,5 +1,17 @@
 #include "../header/int/UserComps.h"
 
+XMLElement LadderComponent::Serialize(){
+XMLElement elem;
+elem.name = "LadderComponent";
+return elem;
+}
+void LadderComponent::Deserialize(const XMLElement& elem){
+auto iter = elem.attributeMap.begin();
+}
+Component* LadderComponent::Clone(){
+LadderComponent* newComp = new LadderComponent();
+return newComp;
+}
 XMLElement DoorComponent::Serialize(){
 XMLElement elem;
 elem.name = "DoorComponent";
@@ -87,6 +99,7 @@ elem.AddAttribute("prevX", to_string(prevX));
 elem.AddAttribute("prevY", to_string(prevY));
 elem.AddAttribute("xRot", to_string(xRot));
 elem.AddAttribute("yRot", to_string(yRot));
+elem.AddAttribute("ladderSpeed", to_string(ladderSpeed));
 return elem;
 }
 void CameraControl::Deserialize(const XMLElement& elem){
@@ -114,6 +127,8 @@ iter = elem.attributeMap.find("xRot");
 if(iter != elem.attributeMap.end()){xRot = atof(iter->second.c_str());}
 iter = elem.attributeMap.find("yRot");
 if(iter != elem.attributeMap.end()){yRot = atof(iter->second.c_str());}
+iter = elem.attributeMap.find("ladderSpeed");
+if(iter != elem.attributeMap.end()){ladderSpeed = atof(iter->second.c_str());}
 
 }
 Component* CameraControl::Clone(){
@@ -130,6 +145,7 @@ newComp->prevX = prevX;
 newComp->prevY = prevY;
 newComp->xRot = xRot;
 newComp->yRot = yRot;
+newComp->ladderSpeed = ladderSpeed;
 return newComp;
 }
 XMLElement BulletComponent::Serialize(){
@@ -241,12 +257,15 @@ return newComp;
 XMLElement BoxCollider::Serialize(){
 XMLElement elem;
 elem.name = "BoxCollider";
+elem.AddAttribute("isTrigger", (isTrigger ? "T" : "F"));
 elem.AddAttribute("position", EncodeVector3(position));
 elem.AddAttribute("size", EncodeVector3(size));
 return elem;
 }
 void BoxCollider::Deserialize(const XMLElement& elem){
-auto iter = elem.attributeMap.begin();iter = elem.attributeMap.find("position");
+auto iter = elem.attributeMap.begin();iter = elem.attributeMap.find("isTrigger");
+if(iter != elem.attributeMap.end()){isTrigger = iter->second == "T";}
+iter = elem.attributeMap.find("position");
 if(iter != elem.attributeMap.end()){position = ParseVector3(iter->second);}
 iter = elem.attributeMap.find("size");
 if(iter != elem.attributeMap.end()){size = ParseVector3(iter->second);}
@@ -254,6 +273,7 @@ if(iter != elem.attributeMap.end()){size = ParseVector3(iter->second);}
 }
 Component* BoxCollider::Clone(){
 BoxCollider* newComp = new BoxCollider();
+newComp->isTrigger = isTrigger;
 newComp->position = position;
 newComp->size = size;
 return newComp;
@@ -261,12 +281,15 @@ return newComp;
 XMLElement SphereCollider::Serialize(){
 XMLElement elem;
 elem.name = "SphereCollider";
+elem.AddAttribute("isTrigger", (isTrigger ? "T" : "F"));
 elem.AddAttribute("position", EncodeVector3(position));
 elem.AddAttribute("radius", to_string(radius));
 return elem;
 }
 void SphereCollider::Deserialize(const XMLElement& elem){
-auto iter = elem.attributeMap.begin();iter = elem.attributeMap.find("position");
+auto iter = elem.attributeMap.begin();iter = elem.attributeMap.find("isTrigger");
+if(iter != elem.attributeMap.end()){isTrigger = iter->second == "T";}
+iter = elem.attributeMap.find("position");
 if(iter != elem.attributeMap.end()){position = ParseVector3(iter->second);}
 iter = elem.attributeMap.find("radius");
 if(iter != elem.attributeMap.end()){radius = atof(iter->second.c_str());}
@@ -274,6 +297,7 @@ if(iter != elem.attributeMap.end()){radius = atof(iter->second.c_str());}
 }
 Component* SphereCollider::Clone(){
 SphereCollider* newComp = new SphereCollider();
+newComp->isTrigger = isTrigger;
 newComp->position = position;
 newComp->radius = radius;
 return newComp;

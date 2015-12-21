@@ -49,9 +49,10 @@ void XMLDocument::Print() const{
 	}
 }
 
-vector<string> Tokenize(const string& document){
-	vector<string> tokens;
-	string memoryString = "";
+vector<Token> Tokenize(const string& document){
+	vector<Token> tokens;
+	Token currToken = {nullptr, 0};
+	//string memoryString = "";
 	bool inString = false;
 	bool inTag=false;
 	bool inComment = false;
@@ -68,7 +69,10 @@ vector<string> Tokenize(const string& document){
 			continue;
 		}
 		if(inString && character != '\''  && character != '"'){
-			memoryString += character;
+			if(currToken.length == 0){
+				currToken.start = &document.c_str()[i];
+			}
+			currToken.length++;
 		}
 		else if(character == '<' || character == '>' || character == '/' || character == '='){
 			if(character == '<'){
@@ -82,60 +86,68 @@ vector<string> Tokenize(const string& document){
 				inTag = false;
 				//cout << "inTag false.\n";
 			}
-			if(memoryString != ""){
-				tokens.push_back(memoryString);
-				memoryString = "";
+			if(currToken.length != 0){
+				tokens.push_back(currToken);
+				currToken.length = 0;
 			}
-			string str = "-";
-			str[0] = character;
-			tokens.push_back(str);
+			currToken.start = &document.c_str()[i];
+			currToken.length = 1;
+			tokens.push_back(currToken);
+			currToken.length = 0;
 		}
 		else if(character == '\'' || character == '"'){
 			if(!inTag){
-				memoryString += character;
+				if(currToken.length == 0){
+					currToken.start = &document.c_str()[i];
+				}
+				currToken.length++;
 				inString = !inString;
 			}
-			else if(memoryString != "" || inString){
-				tokens.push_back(memoryString);
-				memoryString = "";
+			else if(currToken.length != 0 || inString){
+				tokens.push_back(currToken);
+				currToken.length = 0;
 			}
 			inString = !inString;
 		}
 		else if(character == ' ' || character == '\n' ||  character == '\t' || character == '\r'){
 			if(character == ' ' && !inTag){
 				bool justWhitespace = true;
-				for(int i = 0; i < memoryString.size(); i++){
-					if(memoryString[i] != ' '){
+				for(int j = 0; j < currToken.length; j++){
+					if(currToken.start[j] != ' '){
 						justWhitespace = false;
 						break;
 					}
 				}
 				if(!justWhitespace){
-					memoryString += character;
+					if(currToken.length == 0){
+						currToken.start = &document.c_str()[i];
+					}
+					currToken.length++;
 				}
 			}
-			else if(memoryString != ""){
-				tokens.push_back(memoryString);
-				memoryString = "";
+			else if(currToken.length != 0){
+				tokens.push_back(currToken);
+				currToken.length = 0;
 			}
 		}
 		else{
-			memoryString += character;
+			if(currToken.length == 0){
+				currToken.start = &document.c_str()[i];
+			}
+			currToken.length++;
 		}
 	}
 
 	return tokens;
 }
 
-XMLDocument ParseTokens(vector<string>& tokens){
-	XMLDocument doc;
-
-	Stack<string> tokenStack;
+void ParseTokens(vector<Token>& tokens, XMLDocument& outDoc){
+	Stack<Token> tokenStack;
 	Stack<XMLElement> elementStack;
 	bool inTag = false;
 
 	for(auto iter = tokens.begin(); iter != tokens.end(); iter++){
-		string token = *iter;
+		Token token = *iter;
 		//cout << "Parsing token: |" << token << "|" << endl;
 		if(token == "<"){
 			inTag = true;
@@ -146,7 +158,7 @@ XMLDocument ParseTokens(vector<string>& tokens){
 				//Add the element to the doc
 				XMLElement elem = elementStack.Pop();
 				if(elementStack.count == 0){
-					doc.contents.push_back(elem);
+					outDoc.contents.push_back(elem);
 				}
 				else{
 					elementStack.Top().children.push_back(elem);
@@ -167,7 +179,7 @@ XMLDocument ParseTokens(vector<string>& tokens){
 				tokenStack.Pop();
 			}
 
-			string currToken = tokenStack.Pop();
+			Token currToken = tokenStack.Pop();
 			XMLAttribute attr;
 			attr.data = attr.name = "";
 			bool gotData = false;
@@ -176,12 +188,12 @@ XMLDocument ParseTokens(vector<string>& tokens){
 					//do nothing
 				}
 				else if(!gotData){
-					attr.data = currToken;
+					attr.data = currToken.ToString();
 					gotData = true;
 				}
 				else{
-					attr.name = currToken;
-					elementStack.Top().AddAttribute(std::move(attr.name), std::move(attr.data));
+					attr.name = currToken.ToString();
+					elementStack.Top().AddAttribute(attr.name, attr.data);
 					attr.data = attr.name = "";
 					gotData = false;
 				}
@@ -191,7 +203,7 @@ XMLDocument ParseTokens(vector<string>& tokens){
 			if(!startList){
 				XMLElement elem = elementStack.Pop();
 				if(elementStack.count == 0){
-					doc.contents.push_back(elem);
+					outDoc.contents.push_back(elem);
 				}
 				else{
 					elementStack.Top().children.push_back(elem);
@@ -202,9 +214,9 @@ XMLDocument ParseTokens(vector<string>& tokens){
 			if(!inTag){
 				XMLElement elem;
 				elem.name = "__plaintext__";
-				elem.AddAttribute("val", std::move(token));
+				elem.AddAttribute("val", token.ToString());
 				if(elementStack.count == 0){
-					doc.contents.push_back(elem);
+					outDoc.contents.push_back(elem);
 				}
 				else{
 					elementStack.Top().children.push_back(elem);
@@ -213,7 +225,7 @@ XMLDocument ParseTokens(vector<string>& tokens){
 			}
 			else if(tokenStack.Top() == "<"){
 				XMLElement elem;
-				elem.name = token;
+				elem.name = token.ToString();
 				//cout << "Pushing to element stack: " << token << endl;
 				elementStack.Push(elem);
 			}
@@ -221,8 +233,6 @@ XMLDocument ParseTokens(vector<string>& tokens){
 			tokenStack.Push(token);
 		}
 	}
-
-	return doc;
 }
 
 void SaveXMLDoc(XMLDocument& doc, string fileName){
@@ -262,9 +272,10 @@ void LoadXMLDoc(XMLDocument& doc, string fileName){
 		fileContents = fileContents + line + "\n";
 	}
 
-	vector<string> tokens = Tokenize(fileContents);
+	vector<Token> tokens = Tokenize(fileContents);
 	for(auto iter = tokens.begin(); iter != tokens.end(); iter++){
-		//cout << "|" << *iter << "|\n";
+		//printf("Token: |%.*s|\n", iter->length, iter->start);
 	}
-	doc = ParseTokens(tokens);
+
+	ParseTokens(tokens, doc);
 }

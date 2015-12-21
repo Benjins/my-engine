@@ -12,6 +12,17 @@
 #include "../header/int/DebugDraw.h"
 #include <cfloat>
 
+bool BoxCollider::Contains(const Vector3& point) const{
+	Vector3 pt = point;
+	if(gameObject != nullptr){
+		pt = gameObject->transform.GlobalToLocalMatrix() * pt;
+	}
+
+	pt = pt - position;
+	return RangeCheck(-size.x, pt.x, size.x) 
+		&& RangeCheck(-size.y, pt.y, size.y) 
+		&& RangeCheck(-size.z, pt.z, size.z);
+}
 
 Collision BoxCollider::CollisionWith(const Collider* col) const{
 	return col->CollisionWith(this);
@@ -29,6 +40,7 @@ RaycastHit BoxCollider::Raycast(const Vector3& origin, const Vector3& direction)
 
 Collider::Collider(){
 	gameObject = NULL;
+	isTrigger = false;
 }
 
 BoxCollider::BoxCollider(Vector3 _position, Vector3 _size){
@@ -51,13 +63,15 @@ void BoxCollider::OnAwake(){
 	}
 }
 
-void BoxCollider::OnEditorUpdate(){
-	Mat4x4 objectMat = gameObject->transform.LocalToGlobalMatrix();
-	Vector3 pos = objectMat * Vector3(0,0,0);
-	gameObject->scene->debugDraw.Cube(objectMat * position, 
-									  objectMat * (Y_AXIS * size.y) - pos,
-									  objectMat * (X_AXIS * size.x) - pos,
-									  objectMat * (Z_AXIS * size.z) - pos);
+void BoxCollider::OnEditorUpdate(bool isSelected){
+	if(isSelected){
+		Mat4x4 objectMat = gameObject->transform.LocalToGlobalMatrix();
+		Vector3 pos = objectMat * Vector3(0,0,0);
+		gameObject->scene->debugDraw.Cube(objectMat * position, 
+										  objectMat * (Y_AXIS * size.y) - pos,
+										  objectMat * (X_AXIS * size.x) - pos,
+										  objectMat * (Z_AXIS * size.z) - pos);
+	}
 }
 
 BoxCollider::~BoxCollider(){
