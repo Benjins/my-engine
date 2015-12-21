@@ -89,7 +89,7 @@ void Armature::Update(float deltaTime){
 	currentBlendTime += deltaTime;
 
 	if(currentBlendTime >= blendTime && currentAnimIndex != targetAnimIndex){
-		printf("Stope blending at CBT='%0.3f'\n", currentBlendTime);
+		//printf("Stope blending at CBT='%0.3f'\n", currentBlendTime);
 		currentAnimIndex = targetAnimIndex;
 		blendTime = 0;
 		time = currentBlendTime;
@@ -111,7 +111,7 @@ void Armature::Update(float deltaTime){
 			Quaternion targetRot = anim[targetAnimIndex].boneAnims[i].rotationAnim.Evaluate(currentBlendTime);
 
 			if(i == 2){
-				printf("Blending CBT:%0.2f, time:%0.2f, blendTime:%0.2f\n", currentBlendTime, time, blendTime);
+				//printf("Blending CBT:%0.2f, time:%0.2f, blendTime:%0.2f\n", currentBlendTime, time, blendTime);
 			}
 			float blendWeight = currentBlendTime / blendTime;
 			Vector3 blendedPos    = currentPos * (1 - blendWeight) + targetPos * blendWeight;
@@ -190,7 +190,7 @@ void Armature::IKPass(){
 				float newDeltaMag = newDelta.MagnitudeSquared();
 
 				if(newDeltaMag < prevDeltaMag){
-					printf("Iteration[%d]: Found better set of rotations.\n", iteration);
+					//printf("Iteration[%d]: Found better set of rotations.\n", iteration);
 					break;
 				}
 				else{

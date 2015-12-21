@@ -27,6 +27,8 @@ struct Collider : Component{
 	virtual RaycastHit Raycast(const Vector3& origin, const Vector3& direction);
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
+	virtual void OnUpdate(){}
+	virtual void OnEditorUpdate() override{}
 
 	virtual Component* Clone() = 0;
 	virtual XMLElement Serialize() = 0;
@@ -49,6 +51,8 @@ struct BoxCollider : Collider{
 	virtual RaycastHit Raycast(const Vector3& origin, const Vector3& direction);
 	virtual void AddToSim(PhysicsSim* sim);
 	virtual void OnAwake();
+	virtual void OnUpdate(){}
+	virtual void OnEditorUpdate() override;
 
 	virtual Component* Clone();
 	virtual XMLElement Serialize();

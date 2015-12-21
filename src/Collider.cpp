@@ -9,6 +9,7 @@
 #include "../header/int/RaycastHit.h"
 #include "../header/ext/simple-xml.h"
 #include "../header/int/LoadingUtilities.h"
+#include "../header/int/DebugDraw.h"
 #include <cfloat>
 
 
@@ -48,6 +49,15 @@ void BoxCollider::OnAwake(){
 	if(gameObject != NULL && gameObject->scene != NULL){
 		AddToSim(gameObject->scene->physicsSim);
 	}
+}
+
+void BoxCollider::OnEditorUpdate(){
+	Mat4x4 objectMat = gameObject->transform.LocalToGlobalMatrix();
+	Vector3 pos = objectMat * Vector3(0,0,0);
+	gameObject->scene->debugDraw.Cube(objectMat * position, 
+									  objectMat * (Y_AXIS * size.y) - pos,
+									  objectMat * (X_AXIS * size.x) - pos,
+									  objectMat * (Z_AXIS * size.z) - pos);
 }
 
 BoxCollider::~BoxCollider(){

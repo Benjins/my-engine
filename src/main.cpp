@@ -51,7 +51,7 @@ int main(int argc, char** argv){
 	return 0;
 #endif
 
-#if !defined(EDITOR)
+#if 0//!defined(EDITOR)
 	Scene& x = Scene::getInstance(argc, argv);
 #else
 	Scene& x = EditorScene::getInstance(argc, argv);

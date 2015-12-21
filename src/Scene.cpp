@@ -452,6 +452,8 @@ void Scene::Render(){
 	//Gui and gizmos stuff 
 	glDisable(GL_DEPTH_TEST);
 
+	debugDraw.Render(&resources);
+
 	//Gui stuff
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

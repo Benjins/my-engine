@@ -207,6 +207,8 @@ struct AudioComponent : Component{
 	}
 
 	virtual void OnUpdate(){
+		gameObject->scene->debugDraw.Cube(gameObject->transform.GlobalPosition(), Vector3(2,2,2));
+
 		Vector3 place = gameObject->transform.GlobalPosition();
 		ALfloat placeData[] = {place.x, place.y, place.z};
 		alSourcefv(source, AL_POSITION, placeData);
