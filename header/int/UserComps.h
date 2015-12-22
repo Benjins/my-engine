@@ -277,7 +277,8 @@ struct CameraControl : Component{
 	float speed;
 	float velocity;
 
-	bool isGrounded;
+	Collider* groundedCol;
+	Vector3 groundedColLastPos;
 	float health;
 
 	float stepDelay;
@@ -302,7 +303,7 @@ struct CameraControl : Component{
 		xRot = 0;
 		yRot = 0;
 		velocity = 0;
-		isGrounded = false;
+		groundedCol = nullptr;
 		health = 1;
 		timeMoving = 0;
 		stepDelay = 0.6f;
@@ -340,34 +341,22 @@ struct CameraControl : Component{
 		prevY = input->GetMouseY();
 
 		Vector3 moveVec(0,0,0);
-		if(currentLadder == nullptr || true){
-			if(input->GetKey('w')){
-				moveVec = moveVec + camera->Forward();
-			}
-			if(input->GetKey('s')){
-				moveVec = moveVec + camera->Forward() * -1; 
-			}
-			if(input->GetKey('a')){
-				moveVec = moveVec + camera->Right() * -1;
-			}
-			if(input->GetKey('d')){
-				moveVec = moveVec + camera->Right();
-			}
-			if(input->GetKeyDown(' ') && (isGrounded || currentLadder != nullptr)){
-				currentLadder = nullptr;
-				velocity = 4;
-				isGrounded = false;
-			}
-			printf("Ladder is null.\n");
+		if(input->GetKey('w')){
+			moveVec = moveVec + camera->Forward();
 		}
-		else{
-			printf("Ladder is not null.\n");
-			if(input->GetKey('w')){
-				moveVec = moveVec + Y_AXIS * ladderSpeed;
-			}
-			if(input->GetKey('s')){
-				moveVec = moveVec - Y_AXIS * ladderSpeed;
-			}
+		if(input->GetKey('s')){
+			moveVec = moveVec + camera->Forward() * -1; 
+		}
+		if(input->GetKey('a')){
+			moveVec = moveVec + camera->Right() * -1;
+		}
+		if(input->GetKey('d')){
+			moveVec = moveVec + camera->Right();
+		}
+		if(input->GetKeyDown(' ') && (groundedCol != nullptr || currentLadder != nullptr)){
+			currentLadder = nullptr;
+			velocity = 4;
+			groundedCol = nullptr;
 		}
 
 		//health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
@@ -380,8 +369,20 @@ struct CameraControl : Component{
 		if(currentLadder == nullptr){
 			moveVec.y = 0;
 		}
+
+		Vector3 colOffset;
+		if(groundedCol != nullptr){
+			Vector3 globalPos = groundedCol->gameObject->transform.GlobalPosition();
+			colOffset = (globalPos - groundedColLastPos);
+			groundedColLastPos = globalPos;
+		}
+
 		if(moveVec.MagnitudeSquared() > 0){
 			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+		}
+		if(moveVec.MagnitudeSquared() > 0 || colOffset.MagnitudeSquared() > 0){
+
+			moveVec = moveVec + colOffset;
 
 			RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), moveVec);
 			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.1f){
@@ -426,16 +427,17 @@ struct CameraControl : Component{
 			velocity -= gameObject->scene->deltaTime * 5;
 			camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
 		}
-		if(camera->GetParent()->position.y <= floorHeight + (isGrounded ? characterHeight + groundedAdjustment : characterHeight)){
+		if(camera->GetParent()->position.y <= floorHeight + (groundedCol != nullptr ? characterHeight + groundedAdjustment : characterHeight)){
 			camera->GetParent()->position.y = floorHeight + characterHeight;
 			velocity = 0;
-			isGrounded = true;
+			groundedCol = lookDown.col;
+			groundedColLastPos = groundedCol->gameObject->transform.GlobalPosition();
 		}
 		else{
-			isGrounded = false;
+			groundedCol = nullptr;
 		}
 
-		if(timeMoving > 0.8f && isGrounded){
+		if(timeMoving > 0.8f && groundedCol != nullptr){
 			audioComp->Play();
 			timeMoving = 0;
 		}

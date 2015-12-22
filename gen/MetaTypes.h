@@ -28,7 +28,7 @@ MetaMemberInfo memberInfo_AudioComponent[] = {
 MetaMemberInfo memberInfo_CameraControl[] = {
 	{"speed", OFFSET_OF(CameraControl, speed), MetaType_float},
 	{"velocity", OFFSET_OF(CameraControl, velocity), MetaType_float},
-	{"isGrounded", OFFSET_OF(CameraControl, isGrounded), MetaType_bool},
+	{"groundedColLastPos", OFFSET_OF(CameraControl, groundedColLastPos), MetaType_Vector3},
 	{"health", OFFSET_OF(CameraControl, health), MetaType_float},
 	{"stepDelay", OFFSET_OF(CameraControl, stepDelay), MetaType_float},
 	{"timeMoving", OFFSET_OF(CameraControl, timeMoving), MetaType_float},

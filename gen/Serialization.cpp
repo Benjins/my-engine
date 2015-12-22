@@ -89,7 +89,7 @@ XMLElement elem;
 elem.name = "CameraControl";
 elem.AddAttribute("speed", to_string(speed));
 elem.AddAttribute("velocity", to_string(velocity));
-elem.AddAttribute("isGrounded", (isGrounded ? "T" : "F"));
+elem.AddAttribute("groundedColLastPos", EncodeVector3(groundedColLastPos));
 elem.AddAttribute("health", to_string(health));
 elem.AddAttribute("stepDelay", to_string(stepDelay));
 elem.AddAttribute("timeMoving", to_string(timeMoving));
@@ -107,8 +107,8 @@ auto iter = elem.attributeMap.begin();iter = elem.attributeMap.find("speed");
 if(iter != elem.attributeMap.end()){speed = atof(iter->second.c_str());}
 iter = elem.attributeMap.find("velocity");
 if(iter != elem.attributeMap.end()){velocity = atof(iter->second.c_str());}
-iter = elem.attributeMap.find("isGrounded");
-if(iter != elem.attributeMap.end()){isGrounded = iter->second == "T";}
+iter = elem.attributeMap.find("groundedColLastPos");
+if(iter != elem.attributeMap.end()){groundedColLastPos = ParseVector3(iter->second);}
 iter = elem.attributeMap.find("health");
 if(iter != elem.attributeMap.end()){health = atof(iter->second.c_str());}
 iter = elem.attributeMap.find("stepDelay");
@@ -135,7 +135,7 @@ Component* CameraControl::Clone(){
 CameraControl* newComp = new CameraControl();
 newComp->speed = speed;
 newComp->velocity = velocity;
-newComp->isGrounded = isGrounded;
+newComp->groundedColLastPos = groundedColLastPos;
 newComp->health = health;
 newComp->stepDelay = stepDelay;
 newComp->timeMoving = timeMoving;
