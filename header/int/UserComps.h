@@ -308,7 +308,10 @@ struct CameraControl : Component{
 		timeMoving = 0;
 		stepDelay = 0.6f;
 		characterHeight = 0.4f;
-		groundedAdjustment = 0.05f;
+
+		//TODO: remove?
+		groundedAdjustment = 0.0f;
+
 		ladderSpeed = 0.8f;
 		currentLadder = nullptr;
 	}
@@ -379,7 +382,12 @@ struct CameraControl : Component{
 
 		if(moveVec.MagnitudeSquared() > 0){
 			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+			timeMoving += gameObject->scene->deltaTime;
 		}
+		else{
+			timeMoving = 0;
+		}
+
 		if(moveVec.MagnitudeSquared() > 0 || colOffset.MagnitudeSquared() > 0){
 
 			moveVec = moveVec + colOffset;
@@ -405,11 +413,6 @@ struct CameraControl : Component{
 					}
 				}
 			}
-
-			timeMoving += gameObject->scene->deltaTime;
-		}
-		else{
-			timeMoving = 0;
 		}
 
 		float floorHeight = -10;
