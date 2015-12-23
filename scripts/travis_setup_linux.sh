@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo apt-get update
+
 # g++4.8.1
 if [ "$1" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
 
