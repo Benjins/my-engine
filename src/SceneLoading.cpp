@@ -36,6 +36,8 @@ Component* GetUserDefinedComp(const string& name){
 	DEFINE_USER_COMPONENT(DoorComponent)
 	DEFINE_USER_COMPONENT(AnimationControlTest)
 	DEFINE_USER_COMPONENT(ParticleComponent)
+	DEFINE_USER_COMPONENT(IKAnimTestComp)
+	DEFINE_USER_COMPONENT(LadderComponent)
 	
 
 	return nullptr;
@@ -276,6 +278,7 @@ GameObject* Scene::LoadGameObjectXML(const XMLElement& elem, bool fireAwakeEvent
 			auto iter = child.attributeMap.find("source");
 			if(iter != child.attributeMap.end()){
 				go->mesh = resources.LoadMesh(iter->second);
+				go->mesh->gameObject = go;
 			}
 
 			iter = child.attributeMap.find("anim");

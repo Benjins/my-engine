@@ -56,54 +56,67 @@ void PhysicsSim::StepForward(){
 		if(rb->isKinematic){
 			rb->StepForward(timeStep);
 		}
-		for(auto iter2 = iter; iter2 != dynamicBodies.end(); iter2++){
-			RigidBody* rb2 = *iter2;
-			if(rb == rb2){
-				continue;
-			}
-
-			Collision collision = rb->col->CollisionWith(rb2->col);
-			if(collision.collide){
-				GameObject* obj1 = rb->col->gameObject;
-				GameObject* obj2 = rb2->col->gameObject;
-
-				Vector3 normalProj = VectorProject(rb->state.velocity * -1, collision.normal) * -1;
-				Vector3 newVelocity = normalProj + (normalProj - rb->state.velocity);
-
-				rb->state.velocity = newVelocity * -0.6f;
-				rb->state.position = rb->state.position + collision.normal * collision.depth * 1.001f;
-
-				if(rb->state.velocity.MagnitudeSquared() < 0.3f){
-					rb->state.velocity = Vector3(0,0,0);
+		if(!rb->col->isTrigger){
+			for(auto iter2 = iter; iter2 != dynamicBodies.end(); iter2++){
+				RigidBody* rb2 = *iter2;
+				if(rb == rb2 || rb2->col->isTrigger){
+					continue;
 				}
 
-				obj1->OnCollision(rb2->col);
-				obj2->OnCollision(rb->col);
+				Collision collision = rb->col->CollisionWith(rb2->col);
+				if(collision.collide){
+					GameObject* obj1 = rb->col->gameObject;
+					GameObject* obj2 = rb2->col->gameObject;
+
+					Vector3 normalProj = VectorProject(rb->state.velocity * -1, collision.normal) * -1;
+					Vector3 newVelocity = normalProj + (normalProj - rb->state.velocity);
+
+					rb->state.velocity = newVelocity * -0.6f;
+					rb->state.position = rb->state.position + collision.normal * collision.depth * 1.001f;
+
+					if(rb->state.velocity.MagnitudeSquared() < 0.3f){
+						rb->state.velocity = Vector3(0,0,0);
+					}
+
+					obj1->OnCollision(rb2->col);
+					obj2->OnCollision(rb->col);
+				}
 			}
-		}
-		for(auto iter2 = staticBoxBodies.begin(); iter2 != staticBoxBodies.end(); iter2++){
-			if((*iter)->col == *iter2){
-				continue;
-			}
+			for(auto iter2 = staticBoxBodies.begin(); iter2 != staticBoxBodies.end(); iter2++){
+				if((*iter)->col == *iter2){
+					continue;
+				}
+				else if((*iter2)->isTrigger){
+					Collision collision = (*iter)->col->CollisionWith(*iter2);
+					if(collision.collide){
+						GameObject* obj1 = rb->col->gameObject;
+						GameObject* obj2 = (*iter2)->gameObject;
 
-			Collision collision = (*iter)->col->CollisionWith(*iter2);
-			if(collision.collide){
-				GameObject* obj1 = rb->col->gameObject;
-				GameObject* obj2 = (*iter2)->gameObject;
-
-				Vector3 normalProj = VectorProject(rb->state.velocity * -1, collision.normal) * -1;
-				Vector3 newVelocity = normalProj + (normalProj - rb->state.velocity);
-
-				rb->state.velocity = newVelocity * -0.6f;
-				rb->state.position = rb->state.position + collision.normal * collision.depth * 1.001f;
-				//printf("Col normal: (%.3f, %.3f, %.3f)\n", collision.normal.x, collision.normal.y, collision.normal.z);
-
-				if(rb->state.velocity.MagnitudeSquared() < 0.3f){
-					rb->state.velocity = Vector3(0,0,0);
+						obj1->OnCollision(*iter2);
+						obj2->OnCollision(rb->col);
+					}
+					continue;
 				}
 
-				obj1->OnCollision(*iter2);
-				obj2->OnCollision(rb->col);
+				Collision collision = (*iter)->col->CollisionWith(*iter2);
+				if(collision.collide){
+					GameObject* obj1 = rb->col->gameObject;
+					GameObject* obj2 = (*iter2)->gameObject;
+
+					Vector3 normalProj = VectorProject(rb->state.velocity * -1, collision.normal) * -1;
+					Vector3 newVelocity = normalProj + (normalProj - rb->state.velocity);
+
+					rb->state.velocity = newVelocity * -0.6f;
+					rb->state.position = rb->state.position + collision.normal * collision.depth * 1.001f;
+					//printf("Col normal: (%.3f, %.3f, %.3f)\n", collision.normal.x, collision.normal.y, collision.normal.z);
+
+					if(rb->state.velocity.MagnitudeSquared() < 0.3f){
+						rb->state.velocity = Vector3(0,0,0);
+					}
+
+					obj1->OnCollision(*iter2);
+					obj2->OnCollision(rb->col);
+				}
 			}
 		}
 	}
@@ -126,23 +139,29 @@ RaycastHit PhysicsSim::Raycast(Vector3 origin, Vector3 direction){
 	finalHit.depth = FLT_MAX;
 
 	for(auto iter = dynamicBodies.begin(); iter != dynamicBodies.end(); iter++){
-		RaycastHit hit = (*iter)->col->Raycast(origin, direction);
-		if(hit.hit && hit.depth < finalHit.depth){
-			finalHit = hit;
+		if(!(*iter)->col->isTrigger){
+			RaycastHit hit = (*iter)->col->Raycast(origin, direction);
+			if(hit.hit && hit.depth < finalHit.depth){
+				finalHit = hit;
+			}
 		}
 	}
 
 	for(auto iter = staticBoxBodies.begin(); iter != staticBoxBodies.end(); iter++){
-		RaycastHit hit = RaycastBox(*iter, origin, direction);
-		if(hit.hit && hit.depth < finalHit.depth){
-			finalHit = hit;
+		if(!(*iter)->isTrigger){
+			RaycastHit hit = RaycastBox(*iter, origin, direction);
+			if(hit.hit && hit.depth < finalHit.depth){
+				finalHit = hit;
+			}
 		}
 	}
 
 	for(auto iter = staticSphereBodies.begin(); iter != staticSphereBodies.end(); iter++){
-		RaycastHit hit = RaycastSphere(*iter, origin, direction);
-		if(hit.hit && hit.depth < finalHit.depth){
-			finalHit = hit;
+		if(!(*iter)->isTrigger){
+			RaycastHit hit = RaycastSphere(*iter, origin, direction);
+			if(hit.hit && hit.depth < finalHit.depth){
+				finalHit = hit;
+			}
 		}
 	}
 

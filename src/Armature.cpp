@@ -89,6 +89,7 @@ void Armature::Update(float deltaTime){
 	currentBlendTime += deltaTime;
 
 	if(currentBlendTime >= blendTime && currentAnimIndex != targetAnimIndex){
+		//printf("Stope blending at CBT='%0.3f'\n", currentBlendTime);
 		currentAnimIndex = targetAnimIndex;
 		blendTime = 0;
 		time = currentBlendTime;
@@ -110,7 +111,7 @@ void Armature::Update(float deltaTime){
 			Quaternion targetRot = anim[targetAnimIndex].boneAnims[i].rotationAnim.Evaluate(currentBlendTime);
 
 			if(i == 2){
-				printf("Blending CBT:%0.2f, time:%0.2f, blendTime:%0.2f\n", currentBlendTime, time, blendTime);
+				//printf("Blending CBT:%0.2f, time:%0.2f, blendTime:%0.2f\n", currentBlendTime, time, blendTime);
 			}
 			float blendWeight = currentBlendTime / blendTime;
 			Vector3 blendedPos    = currentPos * (1 - blendWeight) + targetPos * blendWeight;
@@ -120,7 +121,90 @@ void Armature::Update(float deltaTime){
 			bones[i].rotation = blendedRot;
 		}
 	}
+
+	IKPass();
 }
+
+void Armature::IKPass(){
+	for(const IKConstraint& ik : ikConstraints){
+		vector<pair<Quaternion, int>> jointAngles;
+		jointAngles.reserve(ik.constraintLength);
+
+		Vector3 targetPos = model->gameObject->transform.GlobalToLocalMatrix() * ik.position;
+
+		BoneTransform* ikBone = &bones[ik.boneIndex];
+		BoneTransform* currBone = ikBone->GetBoneParent();
+		for(int i = 0; currBone != nullptr && i < ik.constraintLength; i++){
+			jointAngles.emplace_back(currBone->rotation, currBone - bones);
+			currBone = currBone->GetBoneParent();
+		}
+
+		float gradMult = 0.005f;
+
+		for(int iteration = 0; iteration < 10; iteration++){
+			Vector3 currPos = ikBone->GlobalPosition();
+			Vector3 deltaPos = targetPos - currPos;
+
+			vector<float> jacobian;
+			jacobian.reserve(jointAngles.size() * 4);
+			
+			for(int i = 0; i < jointAngles.size() * 4; i++){
+				Quaternion currAngle = jointAngles[i / 4].first;
+				float* angleFltCast = reinterpret_cast<float*>(&currAngle);
+
+				const float h = 0.001f;
+				float mag = 1 + angleFltCast[i % 4] * h * 2 + h*h;
+				angleFltCast[i % 4] += h;
+				currAngle = currAngle / mag;
+
+				Quaternion formerAngle = jointAngles[i / 4].first;
+				bones[jointAngles[i / 4].second].rotation = currAngle;
+
+				Vector3 newPos = ikBone->GlobalPosition();
+				Vector3 newDeltaPos = targetPos - newPos;
+				float benefit = newDeltaPos.Magnitude() - deltaPos.Magnitude();
+				float partialDeriv = benefit/h;
+				jacobian.push_back(partialDeriv);
+
+				bones[jointAngles[i / 4].second].rotation = formerAngle;	
+			}
+
+			vector<pair<Quaternion,int>> jointAnglesCopy = jointAngles;
+
+			while(gradMult > 0.00000001f){
+				for(int i = 0; i < jointAngles.size();  i++){
+					Quaternion quat = jointAngles[i].first;
+					Quaternion toAdd = Quaternion(jacobian[4*i], jacobian[4*i+1], jacobian[4*i+2], jacobian[4*i+3]); 
+				
+					Quaternion newRot = (quat - toAdd * gradMult).Normalized();
+
+					Quaternion diff = newRot - quat;
+
+					jointAngles[i].first = newRot;
+					bones[jointAngles[i].second].rotation = newRot;
+				}
+
+				Vector3 newPos = bones[ik.boneIndex].GlobalPosition();
+				Vector3 newDelta = targetPos - newPos;
+				float prevDeltaMag = deltaPos.MagnitudeSquared();
+				float newDeltaMag = newDelta.MagnitudeSquared();
+
+				if(newDeltaMag < prevDeltaMag){
+					//printf("Iteration[%d]: Found better set of rotations.\n", iteration);
+					break;
+				}
+				else{
+					for(int i = 0; i < jointAnglesCopy.size();  i++){
+						bones[jointAnglesCopy[i].second].rotation = jointAnglesCopy[i].first;
+					}
+
+					gradMult *= 0.5f;
+				}
+			}
+		}
+	}
+}
+
 
 BoneTransform* Armature::GetBoneByName(const string& name){
 	for(int i = 0; i < boneCount; i++){
@@ -182,19 +266,19 @@ void Armature::ParseStateString(const string& states){
 
 			anim[stateCount].stateName = stateName;
 			for(int i = 0; i < boneCount; i++){
-				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMin), timeMin);
-				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMax), timeMax);
+				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMin), 0);
+				anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(anim[0].boneAnims[i].positionAnim.Evaluate(timeMax), timeMax - timeMin);
 				for(KeyFrame<Vector3> frame : anim[0].boneAnims[i].positionAnim.keyFrames){
 					if(frame.time > timeMin && frame.time < timeMax){
-						anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(frame.value, frame.time);
+						anim[stateCount].boneAnims[i].positionAnim.AddKeyFrame(frame.value, frame.time - timeMin);
 					}
 				}
 
-				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMin), timeMin);
-				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMax), timeMax);
+				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMin), 0);
+				anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(anim[0].boneAnims[i].rotationAnim.Evaluate(timeMax), timeMax - timeMin);
 				for(KeyFrame<Quaternion> frame : anim[0].boneAnims[i].rotationAnim.keyFrames){
 					if(frame.time > timeMin && frame.time < timeMax){
-						anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(frame.value, frame.time);
+						anim[stateCount].boneAnims[i].rotationAnim.AddKeyFrame(frame.value, frame.time - timeMin);
 					}
 				}
 			}

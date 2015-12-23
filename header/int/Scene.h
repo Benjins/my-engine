@@ -15,6 +15,7 @@
 #include "AudioSystem.h"
 #include "Timer.h"
 #include "ParticleSystem.h"
+#include "DebugDraw.h"
 #include <random>
 
 using std::list;
@@ -37,6 +38,8 @@ struct Scene{
 	Pathfinding pathfinding;
 	AudioSystem audio;
 	GuiSystem guiSystem;
+	DebugDraw debugDraw;
+
 	vector<Light> lights;
 	vector<ParticleSystem> particles;
 

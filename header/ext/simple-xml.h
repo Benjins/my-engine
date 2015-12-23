@@ -8,6 +8,7 @@ Licensed under MIT License. See License.txt for details
 
 #include <vector>
 #include <string>
+#include <string.h>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -100,9 +101,58 @@ struct XMLDocument{
 	void Print() const;
 };
 
-vector<string> Tokenize(const string& document);
+struct Token{
+	const char* start;
+	int length;
 
-XMLDocument ParseTokens(vector<string>& tokens);
+	bool operator==(const string& param){
+		if(param.length() == length){
+			return memcmp(start, param.c_str(), length) == 0;
+		}
+
+		return false;
+	}
+
+	bool operator!=(const string& param){
+		if(param.length() == length){
+			return memcmp(start, param.c_str(), length) != 0;
+		}
+
+		return true;
+	}
+
+	bool operator==(const char* param){
+		for(int i = 0; i < length; i++){
+			if(start[i] != param[i]){
+				return false;
+			}
+		}
+
+		return param[length] == '\0';
+	}
+
+	bool operator!=(const char* param){
+		for(int i = 0; i < length; i++){
+			if(start[i] != param[i]){
+				return true;
+			}
+		}
+
+		return param[length] != '\0';
+	}
+
+	string ToString(){
+		if(length ==0){
+			return "";
+		}
+		string str = string(start, length);
+		return str;
+	}
+};
+
+vector<Token> Tokenize(const string& document);
+
+void ParseTokens(vector<Token>& tokens, XMLDocument& outDoc);
 
 void SaveXMLDoc(XMLDocument& doc, string fileName);
 

@@ -136,6 +136,7 @@
     <ClCompile Include="3dbasics\Triangle.cpp" />
     <ClCompile Include="3dbasics\Vector2.cpp" />
     <ClCompile Include="3dbasics\Vector3.cpp" />
+    <ClCompile Include="gen\Serialization.cpp" />
     <ClCompile Include="src\3DUtilities.cpp" />
     <ClCompile Include="src\AABB.cpp" />
     <ClCompile Include="src\Armature.cpp" />
@@ -144,6 +145,7 @@
     <ClCompile Include="src\Collider.cpp" />
     <ClCompile Include="src\Component.cpp" />
     <ClCompile Include="src\CubeMap.cpp" />
+    <ClCompile Include="src\DebugDraw.cpp" />
     <ClCompile Include="src\Drawcall.cpp" />
     <ClCompile Include="src\EditorComponentGui.cpp" />
     <ClCompile Include="src\EditorScene.cpp" />
@@ -166,8 +168,8 @@
     <ClCompile Include="src\SceneLoading.cpp" />
     <ClCompile Include="src\SCTransform.cpp" />
     <ClCompile Include="src\simple-xml.cpp" />
-    <ClCompile Include="src\SourceParser.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\UserComps.cpp" />
     <ClCompile Include="src\Vector4.cpp" />
     <ClCompile Include="test\testing.cpp" />
   </ItemGroup>
@@ -211,6 +213,7 @@
     <ClInclude Include="header\int\Collider.h" />
     <ClInclude Include="header\int\Component.h" />
     <ClInclude Include="header\int\CubeMap.h" />
+    <ClInclude Include="header\int\DebugDraw.h" />
     <ClInclude Include="header\int\Drawcall.h" />
     <ClInclude Include="header\int\EditorComponentGui.h" />
     <ClInclude Include="header\int\EditorScene.h" />

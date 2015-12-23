@@ -13,7 +13,7 @@ struct MetaStructInfo{
 
 struct MetaMemberInfo{
 	char* name;
-	size_t offset;
+	int offset;
 	int type;
 };
 

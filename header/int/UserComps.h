@@ -25,6 +25,27 @@
 
 using std::cout; using std::endl;
 
+struct CameraControl;
+
+struct LadderComponent : Component{
+
+	GameObject* playerObj;
+	CameraControl* playerControl;
+	BoxCollider* col;
+
+	virtual XMLElement Serialize();
+	virtual void Deserialize(const XMLElement& elem);
+	virtual Component* Clone();
+
+	virtual void OnAwake(){
+		playerObj = gameObject->scene->FindGameObject("mainCam");
+		playerControl = playerObj->transform.children[0]->gameObject->GetComponent<CameraControl>();
+		col = gameObject->GetComponent<BoxCollider>();
+	}
+
+	virtual void OnUpdate() override;
+};
+
 struct ParticleComponent : Component{
 	
 	virtual void OnAwake(){
@@ -62,25 +83,11 @@ struct DoorComponent : Component{
 		isOpen = false;
 	}
 
-	virtual XMLElement Serialize() override{
-		XMLElement elem;
-		elem.name = "DoorComponent";
-		elem.attributes.emplace_back("isLocked", (isLocked ? "T" : "F"));
-		elem.attributes.emplace_back("isOpen",   (isOpen   ? "T" : "F"));
+	virtual XMLElement Serialize();
 
-		return elem;
-	}
+	virtual void Deserialize(const XMLElement& elem);
 
-	virtual void Deserialize(const XMLElement& elem) override{
-		for(const XMLAttribute& attr : elem.attributes){
-			if(attr.name == "isLocked"){
-				isLocked = (attr.data == "T");
-			}
-			else if(attr.name == "isOpen"){
-				isOpen = (attr.data == "T");
-			}
-		}
-	}
+	virtual Component* Clone();
 
 	virtual void OnAwake() override{
 		player = gameObject->scene->FindGameObject("mainCam");
@@ -107,6 +114,46 @@ struct DoorComponent : Component{
 	}
 };
 
+struct IKAnimTestComp : Component{
+
+	Armature* arm;
+
+	bool doIk;
+
+	virtual void OnAwake(){
+		arm = nullptr;
+		doIk = false;
+	}
+
+	virtual void OnUpdate() override{
+		if(arm == nullptr){
+			arm = gameObject->scene->FindGameObject("test2-obj")->mesh->armature;
+			IKConstraint ik;
+			BoneTransform* handR = arm->GetBoneByName("hand_R");
+			ik.boneIndex = (handR - arm->bones);
+			ik.constraintLength = 2;
+			arm->ikConstraints.push_back(ik);
+		}
+
+		arm->ikConstraints[0].position = gameObject->transform.GlobalPosition();
+	}
+
+	virtual void OnEditorUpdate(bool isSelected) override{
+		OnUpdate();
+	
+		if(gameObject->scene->input.GetKeyUp(']')){
+			doIk = !doIk;
+		}
+
+		if(doIk){
+			arm->IKPass();
+		}
+	}
+
+	virtual XMLElement Serialize();
+	virtual Component* Clone();
+};
+
 struct PlayerComponent : Component{
 	//virtual void OnCollision(Collider* col) override{
 		
@@ -122,10 +169,10 @@ struct AnimationControlTest : Component{
 
 	virtual void OnAwake(){
 		armature = gameObject->mesh->armature;
-		timeOut = 1.0f;
+		timeOut = 3.5f;
 		timer.Reset();
 		isIdle = true;
-		armature->BlendTo("atk", 0.0f);
+		armature->BlendTo("idle", 0.0f);
 		input = &gameObject->scene->input;
 	}
 
@@ -134,27 +181,20 @@ struct AnimationControlTest : Component{
 			if(input->GetKeyUp('m')){
 				timer.Reset();
 				isIdle = false;
-				armature->BlendTo("idle", 0.2f);
+				armature->BlendTo("atk", 3.2f);
 			}
 
 			if(!isIdle && timer.GetTimeSince() >= timeOut){
-				armature->BlendTo("atk", 0.2f);
+				armature->BlendTo("idle", 3.2f);
 				timer.Reset();
 				isIdle = true;
 			}
 		}
 	}
 
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "AnimationControlTest";
+	virtual XMLElement Serialize();
 
-		return elem;
-	}
-
-	virtual Component* Clone(){
-		return new AnimationControlTest();
-	}
+	virtual Component* Clone();
 };
 
 struct AudioComponent : Component{
@@ -170,16 +210,6 @@ struct AudioComponent : Component{
 		volume = 1;
 		loop = false;
 		autoPlay = true;
-	}
-
-	virtual Component* Clone(){
-		AudioComponent* newAudio = new AudioComponent();
-		newAudio->clipName = clipName;
-		newAudio->volume = volume;
-		newAudio->autoPlay = autoPlay;
-		newAudio->loop = loop;
-
-		return newAudio;
 	}
 
 	virtual void OnAwake(){
@@ -225,32 +255,11 @@ struct AudioComponent : Component{
 		alSourcef(source, AL_GAIN,  volume);
 	}
 
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "AudioComponent";
-		elem.AddAttribute("clipName", clipName);
-		elem.AddAttribute("volume", to_string(volume));
-		elem.AddAttribute("loop", (loop ? "T" : "F"));
-		elem.AddAttribute("autoPlay", (autoPlay ? "T" : "F"));
-		return elem;
-	}
+	virtual XMLElement Serialize();
 
-	virtual void Deserialize(const XMLElement& elem){
-		for(const XMLAttribute& attr : elem.attributes){
-			if(attr.name == "clipName"){
-				clipName = attr.data;
-			}
-			else if(attr.name == "volume"){
-				volume = atof(attr.data.c_str());
-			}
-			else if(attr.name == "loop"){
-				loop = (attr.data == "T");
-			}
-			else if(attr.name == "autoPlay"){
-				autoPlay = (attr.data == "T");
-			}
-		}
-	}
+	virtual void Deserialize(const XMLElement& elem);
+
+	virtual Component* Clone();
 
 	virtual ~AudioComponent(){
 		alDeleteSources(1, &source);
@@ -268,7 +277,8 @@ struct CameraControl : Component{
 	float speed;
 	float velocity;
 
-	bool isGrounded;
+	Collider* groundedCol;
+	Vector3 groundedColLastPos;
 	float health;
 
 	float stepDelay;
@@ -282,6 +292,10 @@ struct CameraControl : Component{
 	float xRot;
 	float yRot;
 
+	float ladderSpeed;
+
+	LadderComponent* currentLadder;
+
 	CameraControl(){
 		speed = 5;
 		prevX = 0;
@@ -289,54 +303,24 @@ struct CameraControl : Component{
 		xRot = 0;
 		yRot = 0;
 		velocity = 0;
-		isGrounded = false;
+		groundedCol = nullptr;
 		health = 1;
 		timeMoving = 0;
 		stepDelay = 0.6f;
 		characterHeight = 0.4f;
-		groundedAdjustment = 0.05f;
+
+		//TODO: remove?
+		groundedAdjustment = 0.0f;
+
+		ladderSpeed = 0.8f;
+		currentLadder = nullptr;
 	}
 
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "CameraControl";
-		elem.AddAttribute("speed",  to_string(speed));
-		elem.AddAttribute("velocity", to_string(velocity));
-		elem.AddAttribute("isGrounded", isGrounded ? "T" : "F");
-		elem.AddAttribute("health", to_string(health));
-		elem.AddAttribute("stepDelay", to_string(stepDelay));
+	virtual XMLElement Serialize();
 
-		return elem;
-	}
+	virtual Component* Clone();
 
-	virtual Component* Clone(){
-		CameraControl* newCam = new CameraControl();
-		newCam->speed = speed;
-		newCam->health = health;
-		newCam->stepDelay = stepDelay;
-
-		return newCam;
-	}
-
-	virtual void Deserialize(const XMLElement& elem){
-		for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
-			if(iter->name == "speed"){
-				speed = atoi(iter->data.c_str());
-			}
-			else if(iter->name == "health"){
-				health = atof(iter->data.c_str());
-			}
-			else if(iter->name == "velocity"){
-				velocity = atof(iter->data.c_str());
-			}
-			else if(iter->name == "isGrounded"){
-				isGrounded = (iter->data == "T");
-			}
-			else if(iter->name == "stepDelay"){
-				stepDelay = atof(iter->data.c_str());
-			}
-		}
-	}
+	virtual void Deserialize(const XMLElement& elem);
 
 	virtual void OnAwake(){
 		input = &gameObject->scene->input;
@@ -358,6 +342,7 @@ struct CameraControl : Component{
 
 		prevX = input->GetMouseX();
 		prevY = input->GetMouseY();
+
 		Vector3 moveVec(0,0,0);
 		if(input->GetKey('w')){
 			moveVec = moveVec + camera->Forward();
@@ -371,9 +356,10 @@ struct CameraControl : Component{
 		if(input->GetKey('d')){
 			moveVec = moveVec + camera->Right();
 		}
-		if(input->GetKeyDown(' ') && isGrounded){
+		if(input->GetKeyDown(' ') && (groundedCol != nullptr || currentLadder != nullptr)){
+			currentLadder = nullptr;
 			velocity = 4;
-			isGrounded = false;
+			groundedCol = nullptr;
 		}
 
 		//health += (camera->GetParent()->position.y <= 1 ? -0.5f : 0.06f) * gameObject->scene->deltaTime;
@@ -383,9 +369,28 @@ struct CameraControl : Component{
 			healthBar->text = "Health: " + to_string((int)(health*100));
 		}
 
-		moveVec.y = 0;
+		if(currentLadder == nullptr){
+			moveVec.y = 0;
+		}
+
+		Vector3 colOffset;
+		if(groundedCol != nullptr){
+			Vector3 globalPos = groundedCol->gameObject->transform.GlobalPosition();
+			colOffset = (globalPos - groundedColLastPos);
+			groundedColLastPos = globalPos;
+		}
+
 		if(moveVec.MagnitudeSquared() > 0){
 			moveVec = moveVec.Normalized() * gameObject->scene->deltaTime * speed;
+			timeMoving += gameObject->scene->deltaTime;
+		}
+		else{
+			timeMoving = 0;
+		}
+
+		if(moveVec.MagnitudeSquared() > 0 || colOffset.MagnitudeSquared() > 0){
+
+			moveVec = moveVec + colOffset;
 
 			RaycastHit testHit = physics->Raycast(camera->GlobalPosition(), moveVec);
 			if(!testHit.hit || testHit.depth > moveVec.Magnitude() + 0.1f){
@@ -408,11 +413,6 @@ struct CameraControl : Component{
 					}
 				}
 			}
-
-			timeMoving += gameObject->scene->deltaTime;
-		}
-		else{
-			timeMoving = 0;
 		}
 
 		float floorHeight = -10;
@@ -426,21 +426,31 @@ struct CameraControl : Component{
 			velocity = 0;
 		}
 
-		velocity -= gameObject->scene->deltaTime * 5;
-		camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
-		if(camera->GetParent()->position.y <= floorHeight + (isGrounded ? characterHeight + groundedAdjustment : characterHeight)){
+		if(currentLadder == nullptr){
+			velocity -= gameObject->scene->deltaTime * 5;
+			camera->GetParent()->position.y += velocity * gameObject->scene->deltaTime;
+		}
+		if(camera->GetParent()->position.y <= floorHeight + (groundedCol != nullptr ? characterHeight + groundedAdjustment : characterHeight)){
 			camera->GetParent()->position.y = floorHeight + characterHeight;
 			velocity = 0;
-			isGrounded = true;
+			groundedCol = lookDown.col;
+			groundedColLastPos = groundedCol->gameObject->transform.GlobalPosition();
 		}
 		else{
-			isGrounded = false;
+			groundedCol = nullptr;
 		}
 
-		if(timeMoving > 0.8f && isGrounded){
+		if(timeMoving > 0.8f && groundedCol != nullptr){
 			audioComp->Play();
 			timeMoving = 0;
 		}
+
+		currentLadder = nullptr;
+	}
+
+	void AttachToLadder(LadderComponent* ladder){
+		//printf("Attach to ladder.\n");
+		currentLadder = ladder;
 	}
 
 	virtual ~CameraControl(){}
@@ -462,26 +472,10 @@ struct BulletComponent : Component{
 		player = gameObject->scene->FindGameObject("mainCam");
 	}
 
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "BulletComponent";
-		elem.AddAttribute("speed", to_string(speed));
-		return elem;
-	}
+	virtual XMLElement Serialize();
+	virtual Component* Clone();
 
-	virtual Component* Clone(){
-		BulletComponent* newBullet = new BulletComponent();
-		newBullet->speed = speed;
-		return newBullet;
-	}
-
-	virtual void Deserialize(const XMLElement& elem){
-		for(const XMLAttribute& attr : elem.attributes){
-			if(attr.name == "speed"){
-				speed = atof(attr.data.c_str());
-			}
-		}
-	}
+	virtual void Deserialize(const XMLElement& elem);
 
 	virtual void OnCollision(Collider* col){ 
 		if(col->gameObject == player){
@@ -506,19 +500,16 @@ struct BulletComponent : Component{
 
 struct PathNodeComponent : Component{
 	
-	int nodeId;
+	DontSerialize int nodeId;
 
 	virtual void OnAwake(){
 		nodeId = gameObject->scene->pathfinding.AddNode(gameObject->transform.GlobalPosition());
 	}
 
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "PathNodeComponent";
-		return elem;
-	}
+	virtual XMLElement Serialize();
+	virtual Component* Clone();
 
-	virtual void OnEditorUpdate(){
+	virtual void OnEditorUpdate(bool isSelected){
 		for(PathNode& node : gameObject->scene->pathfinding.nodes){
 			if(node.id == nodeId){
 				node.position = gameObject->transform.GlobalPosition();
@@ -754,7 +745,7 @@ struct AnimationComponent : Component{
 
 struct LightComponent : Component{
 	float intensity;
-	int id;
+	DontSerialize int id;
 	bool isDirectional;
 
 	virtual void OnAwake(){
@@ -777,36 +768,13 @@ struct LightComponent : Component{
 		}
 	}
 
-	virtual Component* Clone(){
-		LightComponent* newLight = new LightComponent();
-		newLight->intensity = intensity;
-		newLight->isDirectional = isDirectional;
-
-		return newLight;
-	}
-
-	virtual void OnEditorUpdate(){
+	virtual void OnEditorUpdate(bool isSelected){
 		OnUpdate();
 	}
 
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "LightComponent";
-		elem.AddAttribute("intensity", to_string(intensity));
-		elem.AddAttribute("isDirectional", isDirectional ? "T" : "F");
-		return elem;
-	}
-
-	virtual void Deserialize(const XMLElement& elem){
-		for(const XMLAttribute& attr : elem.attributes){
-			if(attr.name == "intensity"){
-				intensity = atof(attr.data.c_str());
-			}
-			else if(attr.name == "isDirectional"){
-				isDirectional = (attr.data == "T");
-			}
-		}
-	}
+	virtual XMLElement Serialize();
+	virtual Component* Clone();
+	virtual void Deserialize(const XMLElement& elem);
 
 	virtual ~LightComponent(){
 		for(auto iter = gameObject->scene->lights.begin(); iter != gameObject->scene->lights.end(); iter++){
@@ -876,14 +844,9 @@ struct FireGun : Component{
 		bulletForce = 10000.0f;
 	}
 
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "FireGun";
-		return elem;
-	}
-
-	virtual void Deserialize(const XMLElement& elem){
-	}
+	virtual XMLElement Serialize();
+	virtual Component* Clone();
+	virtual void Deserialize(const XMLElement& elem);
 
 	virtual void OnAwake(){
 		input = &gameObject->scene->input;
@@ -893,9 +856,7 @@ struct FireGun : Component{
 		bulletPrefab = gameObject->scene->FindPrefab("bullet-rb");
 	}
 
-	virtual Component* Clone(){
-		return new FireGun();
-	}
+	
 
 	virtual void OnUpdate(){
 		if(input->GetMouseUp(GLUT_LEFT_BUTTON)){
@@ -923,15 +884,9 @@ struct MatChangeOnHit : HitComponent{
 		gameObject->material->SetVec4Uniform("_color", Vector4(ratio,1.0,ratio,1.0));
 	}
 
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "MatChangeOnHit";
-		return elem;
-	}
+	virtual XMLElement Serialize();
 
-	virtual Component* Clone(){
-		return new MatChangeOnHit();
-	}
+	virtual Component* Clone();
 
 	virtual ~MatChangeOnHit(){}
 };
@@ -976,38 +931,11 @@ struct EnemyComp : HitComponent{
 		reloadTime = 2 + ((float)(rand() % 500)) / 500;;
 	}
 
-	virtual XMLElement Serialize(){
-		XMLElement elem;
-		elem.name = "EnemyComp";
-		elem.AddAttribute("speed",  to_string(speed));
-		elem.AddAttribute("health", to_string(health));
-		elem.AddAttribute("maxHalth", to_string(maxHealth));
+	virtual XMLElement Serialize();
 
-		return elem;
-	}
+	virtual Component* Clone();
 
-	virtual Component* Clone(){
-		EnemyComp* newComp = new EnemyComp();
-		newComp->speed = speed;
-		newComp->health = maxHealth;
-		newComp->maxHealth = maxHealth;
-
-		return newComp;
-	}
-
-	virtual void Deserialize(const XMLElement& elem){
-		for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
-			if(iter->name == "speed"){
-				speed = atoi(iter->data.c_str());
-			}
-			else if(iter->name == "health"){
-				health = atoi(iter->data.c_str());
-			}
-			else if(iter->name == "maxHealth"){
-				maxHealth = atoi(iter->data.c_str());
-			}
-		}
-	}
+	virtual void Deserialize(const XMLElement& elem);
 
 	void ResetTarget(){
 		float x = ((float)(rand() % 500 - 250)) / 25;
@@ -1142,7 +1070,6 @@ struct OscillateUp : Component{
 		if(frameCount % 60 == -1){
 			GameObject* z2 = new GameObject();
 			z2->scene = gameObject->scene;
-			//z2->transform.SetParent(gameObject->transform.GetParent());
 			z2->transform.position = gameObject->transform.GlobalPosition();
 			z2->transform.scale = Vector3(0.15f, 0.15f, 0.15f);
 			z2->AddMaterial("shader", "Texture.bmp");

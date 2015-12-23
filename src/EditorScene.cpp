@@ -352,6 +352,11 @@ void EditorScene::EditorUpdate(){
 			if(transformMode == TransformMode::Translation){
 				float amount = DotProduct(orthoPart, axis);
 				Vector3 delta = axis * amount;
+				if(selectedObj->transform.GetParent() != nullptr){
+					Mat4x4 glob2loc = selectedObj->transform.GetParent()->GlobalToLocalMatrix();
+					delta = glob2loc*delta - glob2loc*Vector3(0,0,0);
+				}
+				
 				if(globalManipulator){
 					//delta = selectedObj->transform.GlobalToLocal(delta);
 				}
@@ -421,7 +426,7 @@ void EditorScene::EditorUpdate(){
 
 	for(GameObject* obj : objects){
 		for(Component* comp : obj->components){
-			comp->OnEditorUpdate();
+			comp->OnEditorUpdate(selectedObj == obj);
 		}
 	}
 
@@ -547,6 +552,7 @@ void EditorScene::EditorGUI(){
 	glUniform4f(glGetUniformLocation(vertColMat->shaderProgram, "_color"), 1, 0.4f, 0.4f, 1);
 	glEnable(GL_DEPTH_TEST);
 
+#if 0
 	for(PathNode& node : pathfinding.nodes){
 		Vector3 pos = node.position;
 		Vector3 verts[4] = {pos + Vector3(0.2f,  0,  0.2f), pos + Vector3( 0.2f, 0, -0.2f), 
@@ -579,6 +585,8 @@ void EditorScene::EditorGUI(){
 		glEnd();
 		prevPos = pos;
 	}
+
+#endif
 
 	glDisable(GL_DEPTH_TEST);
 

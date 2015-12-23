@@ -9,8 +9,20 @@
 #include "../header/int/RaycastHit.h"
 #include "../header/ext/simple-xml.h"
 #include "../header/int/LoadingUtilities.h"
+#include "../header/int/DebugDraw.h"
 #include <cfloat>
 
+bool BoxCollider::Contains(const Vector3& point) const{
+	Vector3 pt = point;
+	if(gameObject != nullptr){
+		pt = gameObject->transform.GlobalToLocalMatrix() * pt;
+	}
+
+	pt = pt - position;
+	return RangeCheck(-size.x, pt.x, size.x) 
+		&& RangeCheck(-size.y, pt.y, size.y) 
+		&& RangeCheck(-size.z, pt.z, size.z);
+}
 
 Collision BoxCollider::CollisionWith(const Collider* col) const{
 	return col->CollisionWith(this);
@@ -28,6 +40,7 @@ RaycastHit BoxCollider::Raycast(const Vector3& origin, const Vector3& direction)
 
 Collider::Collider(){
 	gameObject = NULL;
+	isTrigger = false;
 }
 
 BoxCollider::BoxCollider(Vector3 _position, Vector3 _size){
@@ -50,32 +63,14 @@ void BoxCollider::OnAwake(){
 	}
 }
 
-Component* BoxCollider::Clone(){
-	BoxCollider* newBox = new BoxCollider();
-	newBox->position = position;
-	newBox->size = size;
-
-	return newBox;
-}
-
-XMLElement BoxCollider::Serialize(){
-	XMLElement elem;
-	elem.name = "BoxCollider";
-	elem.AddAttribute("position", EncodeVector3(position));
-	elem.AddAttribute("size", EncodeVector3(size));
-
-	return elem;
-}
-
-void BoxCollider::Deserialize(const XMLElement& elem){
-	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
-		XMLAttribute attr = *iter;
-		if(attr.name == "position"){
-			position = ParseVector3(attr.data);
-		}
-		else if(attr.name == "size"){
-			size = ParseVector3(attr.data);
-		}
+void BoxCollider::OnEditorUpdate(bool isSelected){
+	if(isSelected){
+		Mat4x4 objectMat = gameObject->transform.LocalToGlobalMatrix();
+		Vector3 pos = objectMat * Vector3(0,0,0);
+		gameObject->scene->debugDraw.Cube(objectMat * position, 
+										  objectMat * (Y_AXIS * size.y) - pos,
+										  objectMat * (X_AXIS * size.x) - pos,
+										  objectMat * (Z_AXIS * size.z) - pos);
 	}
 }
 
@@ -118,35 +113,6 @@ void SphereCollider::AddToSim(PhysicsSim* sim){
 void SphereCollider::OnAwake(){
 	if(gameObject->scene != NULL){
 		AddToSim(gameObject->scene->physicsSim);
-	}
-}
-
-Component* SphereCollider::Clone(){
-	SphereCollider* newSphere = new SphereCollider();
-	newSphere->position = position;
-	newSphere->radius = radius;
-
-	return newSphere;
-}
-
-XMLElement SphereCollider::Serialize(){
-	XMLElement elem;
-	elem.name = "SphereCollider";
-	elem.AddAttribute("position", EncodeVector3(position));
-	elem.AddAttribute("radius", to_string(radius));
-
-	return elem;
-}
-
-void SphereCollider::Deserialize(const XMLElement& elem){
-	for(auto iter = elem.attributes.begin(); iter != elem.attributes.end(); iter++){
-		XMLAttribute attr = *iter;
-		if(attr.name == "position"){
-			position = ParseVector3(attr.data);
-		}
-		else if(attr.name == "radius"){
-			radius = atof(attr.data.c_str());
-		}
 	}
 }
 

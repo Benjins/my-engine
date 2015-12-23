@@ -5,7 +5,7 @@
 	<Model in='data/hand_03.dae' out='data/hand_03.mdf'/>
 	<Model in='data/monkey.obj' out='data/monkey.mdf'/>
 	<Model in='data/floor.obj' out='data/floor.mdf'/>
-	<Model in='data/Sphere.obj' out='data/Sphere.mdf'/>
+	<Model in='data/sphere.obj' out='data/sphere.mdf'/>
 	<Model in='data/Worm.obj' out='data/Worm.mdf'/>
 	
 </Assets>

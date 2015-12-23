@@ -5,6 +5,7 @@
 
 #include "../ext/3dbasics.h"
 #include "Component.h"
+#include "Macros.h"
 
 struct SC_Transform;
 struct Collider;
@@ -47,14 +48,7 @@ struct RigidBody : Component{
 		state.invMass = 1/mass;
 	}
 
-	virtual Component* Clone() override{
-		RigidBody* rb = new RigidBody();
-
-		rb->isKinematic = isKinematic;
-		rb->mass = mass;
-
-		return rb;
-	}
+	virtual Component* Clone();
 
 	virtual void OnAwake();
 	virtual XMLElement Serialize();

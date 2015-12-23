@@ -12,6 +12,9 @@ MetaMemberInfo memberInfo_DoorComponent[] = {
 	{"isLocked", OFFSET_OF(DoorComponent, isLocked), MetaType_bool},
 	{"isOpen", OFFSET_OF(DoorComponent, isOpen), MetaType_bool},
 };
+MetaMemberInfo memberInfo_IKAnimTestComp[] = {
+	{"doIk", OFFSET_OF(IKAnimTestComp, doIk), MetaType_bool},
+};
 MetaMemberInfo memberInfo_AnimationControlTest[] = {
 	{"timeOut", OFFSET_OF(AnimationControlTest, timeOut), MetaType_float},
 	{"isIdle", OFFSET_OF(AnimationControlTest, isIdle), MetaType_bool},
@@ -25,7 +28,7 @@ MetaMemberInfo memberInfo_AudioComponent[] = {
 MetaMemberInfo memberInfo_CameraControl[] = {
 	{"speed", OFFSET_OF(CameraControl, speed), MetaType_float},
 	{"velocity", OFFSET_OF(CameraControl, velocity), MetaType_float},
-	{"isGrounded", OFFSET_OF(CameraControl, isGrounded), MetaType_bool},
+	{"groundedColLastPos", OFFSET_OF(CameraControl, groundedColLastPos), MetaType_Vector3},
 	{"health", OFFSET_OF(CameraControl, health), MetaType_float},
 	{"stepDelay", OFFSET_OF(CameraControl, stepDelay), MetaType_float},
 	{"timeMoving", OFFSET_OF(CameraControl, timeMoving), MetaType_float},
@@ -35,14 +38,12 @@ MetaMemberInfo memberInfo_CameraControl[] = {
 	{"prevY", OFFSET_OF(CameraControl, prevY), MetaType_int},
 	{"xRot", OFFSET_OF(CameraControl, xRot), MetaType_float},
 	{"yRot", OFFSET_OF(CameraControl, yRot), MetaType_float},
+	{"ladderSpeed", OFFSET_OF(CameraControl, ladderSpeed), MetaType_float},
 };
 MetaMemberInfo memberInfo_BulletComponent[] = {
 	{"speed", OFFSET_OF(BulletComponent, speed), MetaType_float},
 	{"time", OFFSET_OF(BulletComponent, time), MetaType_float},
 	{"timeLimit", OFFSET_OF(BulletComponent, timeLimit), MetaType_float},
-};
-MetaMemberInfo memberInfo_PathNodeComponent[] = {
-	{"nodeId", OFFSET_OF(PathNodeComponent, nodeId), MetaType_int},
 };
 MetaMemberInfo memberInfo_AnimationComponent[] = {
 	{"currentTime", OFFSET_OF(AnimationComponent, currentTime), MetaType_float},
@@ -52,7 +53,6 @@ MetaMemberInfo memberInfo_AnimationComponent[] = {
 };
 MetaMemberInfo memberInfo_LightComponent[] = {
 	{"intensity", OFFSET_OF(LightComponent, intensity), MetaType_float},
-	{"id", OFFSET_OF(LightComponent, id), MetaType_int},
 	{"isDirectional", OFFSET_OF(LightComponent, isDirectional), MetaType_bool},
 };
 MetaMemberInfo memberInfo_SimpleAnimation[] = {
@@ -77,11 +77,16 @@ MetaMemberInfo memberInfo_OscillateUp[] = {
 	{"time", OFFSET_OF(OscillateUp, time), MetaType_float},
 	{"frameCount", OFFSET_OF(OscillateUp, frameCount), MetaType_int},
 };
+MetaMemberInfo memberInfo_Collider[] = {
+	{"isTrigger", OFFSET_OF(Collider, isTrigger), MetaType_bool},
+};
 MetaMemberInfo memberInfo_BoxCollider[] = {
+	{"isTrigger", OFFSET_OF(BoxCollider, isTrigger), MetaType_bool},
 	{"position", OFFSET_OF(BoxCollider, position), MetaType_Vector3},
 	{"size", OFFSET_OF(BoxCollider, size), MetaType_Vector3},
 };
 MetaMemberInfo memberInfo_SphereCollider[] = {
+	{"isTrigger", OFFSET_OF(SphereCollider, isTrigger), MetaType_bool},
 	{"position", OFFSET_OF(SphereCollider, position), MetaType_Vector3},
 	{"radius", OFFSET_OF(SphereCollider, radius), MetaType_float},
 };
@@ -93,11 +98,11 @@ MetaMemberInfo memberInfo_RigidBody[] = {
 };
 enum MetaStructTypes {
 metaStruct_DoorComponent,
+metaStruct_IKAnimTestComp,
 metaStruct_AnimationControlTest,
 metaStruct_AudioComponent,
 metaStruct_CameraControl,
 metaStruct_BulletComponent,
-metaStruct_PathNodeComponent,
 metaStruct_AnimationComponent,
 metaStruct_LightComponent,
 metaStruct_SimpleAnimation,
@@ -106,23 +111,25 @@ metaStruct_FireGun,
 metaStruct_RotateConstantly,
 metaStruct_EnemyComp,
 metaStruct_OscillateUp,
+metaStruct_Collider,
 metaStruct_BoxCollider,
 metaStruct_SphereCollider,
 metaStruct_RigidBody,
+metaStruct_LadderComponent,
 metaStruct_ParticleComponent,
 metaStruct_PlayerComponent,
+metaStruct_PathNodeComponent,
 metaStruct_TestComp,
 metaStruct_HitComponent,
 metaStruct_MatChangeOnHit,
-metaStruct_Collider,
 };
 MetaStructInfo genMetaStructInfo[] = {
 {"DoorComponent", memberInfo_DoorComponent, ARRAY_COUNT(memberInfo_DoorComponent)},
+{"IKAnimTestComp", memberInfo_IKAnimTestComp, ARRAY_COUNT(memberInfo_IKAnimTestComp)},
 {"AnimationControlTest", memberInfo_AnimationControlTest, ARRAY_COUNT(memberInfo_AnimationControlTest)},
 {"AudioComponent", memberInfo_AudioComponent, ARRAY_COUNT(memberInfo_AudioComponent)},
 {"CameraControl", memberInfo_CameraControl, ARRAY_COUNT(memberInfo_CameraControl)},
 {"BulletComponent", memberInfo_BulletComponent, ARRAY_COUNT(memberInfo_BulletComponent)},
-{"PathNodeComponent", memberInfo_PathNodeComponent, ARRAY_COUNT(memberInfo_PathNodeComponent)},
 {"AnimationComponent", memberInfo_AnimationComponent, ARRAY_COUNT(memberInfo_AnimationComponent)},
 {"LightComponent", memberInfo_LightComponent, ARRAY_COUNT(memberInfo_LightComponent)},
 {"SimpleAnimation", memberInfo_SimpleAnimation, ARRAY_COUNT(memberInfo_SimpleAnimation)},
@@ -131,15 +138,17 @@ MetaStructInfo genMetaStructInfo[] = {
 {"RotateConstantly", memberInfo_RotateConstantly, ARRAY_COUNT(memberInfo_RotateConstantly)},
 {"EnemyComp", memberInfo_EnemyComp, ARRAY_COUNT(memberInfo_EnemyComp)},
 {"OscillateUp", memberInfo_OscillateUp, ARRAY_COUNT(memberInfo_OscillateUp)},
+{"Collider", memberInfo_Collider, ARRAY_COUNT(memberInfo_Collider)},
 {"BoxCollider", memberInfo_BoxCollider, ARRAY_COUNT(memberInfo_BoxCollider)},
 {"SphereCollider", memberInfo_SphereCollider, ARRAY_COUNT(memberInfo_SphereCollider)},
 {"RigidBody", memberInfo_RigidBody, ARRAY_COUNT(memberInfo_RigidBody)},
+{"LadderComponent", nullptr, 0},
 {"ParticleComponent", nullptr, 0},
 {"PlayerComponent", nullptr, 0},
+{"PathNodeComponent", nullptr, 0},
 {"TestComp", nullptr, 0},
 {"HitComponent", nullptr, 0},
 {"MatChangeOnHit", nullptr, 0},
-{"Collider", nullptr, 0},
 };
 
 #endif
