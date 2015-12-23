@@ -8,6 +8,7 @@ Licensed under MIT License. See License.txt for details
 
 #include <vector>
 #include <string>
+#include <string.h>
 #include <fstream>
 #include <iostream>
 #include <map>
